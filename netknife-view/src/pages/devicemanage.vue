@@ -1,9 +1,13 @@
 <template>
-    
+    <DeviceEdit></DeviceEdit>
 </template>
 
 <script>
+import deviceedit from './deviceedit.vue';
 export default{
-    name:'DeviceManage'
+    name:'DeviceManage',
+    components:{
+        DeviceEdit:deviceedit
+    }
 }
 </script>

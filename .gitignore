@@ -5,6 +5,8 @@ netknife-view/jsconfig.json
 netknife-view/package-lock.json
 netknife-view/package.json
 netknife-view/README.md
+__pycache__
+*.db
 static/
 templates/
 package-lock.json
