@@ -1,0 +1,12 @@
+node_modules/
+netknife-view/node_modules/
+netknife-view/babel.config.js
+netknife-view/jsconfig.json
+netknife-view/package-lock.json
+netknife-view/package.json
+netknife-view/README.md
+static/
+templates/
+package-lock.json
+package.json
+Pipfile
