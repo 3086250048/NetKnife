@@ -1,5 +1,9 @@
 import textfsm 
 
+from processing import AppProcessing
+
+ap=AppProcessing()
+
 class AppInfo():
     def __new__(cls,*args, **kwds):
         if not hasattr(cls,'_instance'):
@@ -25,10 +29,7 @@ class AppInfo():
 
     @check_ip_tuple.setter
     def check_ip_tuple(self,ip_check_dict):
-        
-        str=ip_check_dict['ip']
-        print(str)
-        print(self.__check_ip_tuple)
+        self.__check_ip_tuple=ap.processing_check_ip(ip_check_dict)
     @check_project_str.setter
     def check_project_dict(self,project_dict):
         self.__check_project_str=project_dict['project']

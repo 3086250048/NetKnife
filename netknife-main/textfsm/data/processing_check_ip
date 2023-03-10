@@ -1,0 +1,15 @@
+Value Astart (\d+)
+Value Bstart (\d+)
+Value Cstart (\d+)
+Value Dstart (\d+)
+Value Aend (\d*)
+Value Bend (\d*)
+Value Cend (\d*)
+Value Dend (\d*)
+Value Astep (\d*)
+Value Bstep (\d*)
+Value Cstep (\d*)
+Value Dstep (\d*)
+
+Start
+  ^${Astart}-*${Aend}%*${Astep}.${Bstart}-*${Bend}%*${Bstep}.${Cstart}-*${Cend}%*${Cstep}.${Dstart}-*${Dend}%*${Dstep} -> Record
