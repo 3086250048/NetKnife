@@ -37,7 +37,9 @@ class AppStorage():
                                     '{pub_data.login_dict['port']}',\
                                     '{pub_data.login_dict['username']}',\
                                     '{pub_data.login_dict['password']}',\
-                                    '{pub_data.login_dict['ip']}')")
+                                    '{pub_data.login_dict['ip']}',\
+                                    '{pub_data.login_dict['secret']}',\
+                                    )")
             self.__db.commit()
             return True
         except:

@@ -1,33 +1,39 @@
 <template>
-    <el-form :inline=true ref="device_info" :mode="device_info" label-width="100px" label-position="left">
+    <el-form :inline=true ref="device_info" :mode="device_info" label-width="80px" label-position="rigth">
         <el-form-item label="项目名称">
-            <el-input style="width: 800px;" v-model="device_info.project"><template slot="prepend">Project</template></el-input>
+            <el-input class="project_input" v-model="device_info.project" placeholder="请输入项目名称">
+                <template slot="prepend">项目名称</template>
+            </el-input>
         </el-form-item><br>
         <el-form-item label="设备信息" >
-            <el-select v-model="device_info.class" placeholder="请选择设备类型">
-                <el-option label="Huawei" value="huawei"></el-option>
-                <el-option label="Ruijie" value="ruijie"></el-option>
-                <el-option label="Cisco" value="cisco"></el-option>
-                <el-option label="Linux" value="linux"></el-option>
-            </el-select>
+            <el-input class="input-with-select input" placeholder="自定义设备类型" v-model="device_info.device_class">
+                <el-select class="select" v-model="device_info.device_class" placeholder="类型" slot="prepend">
+                    <el-option label="Huawei" value="huawei"></el-option>
+                    <el-option label="Ruijie" value="ruijie"></el-option>
+                    <el-option label="Cisco" value="cisco"></el-option>
+                    <el-option label="Linux" value="linux"></el-option>
+                </el-select>
+            </el-input>
         </el-form-item>
         <el-form-item>
-            <el-select v-model="device_info.area" placeholder="请选择设备层级">
-                <el-option label="出口区" value="outlet"></el-option>
-                <el-option label="安全区" value="security"></el-option>
-                <el-option label="核心区" value="core"></el-option>
-                <el-option label="汇聚区" value="convergence"></el-option>
-                <el-option label="接入区" value="access"></el-option>
-                <el-option label="服务器区" value="server"></el-option>
-                <el-option label="负载均衡区" value="balance"></el-option>
-                <el-option label="设备管理区" value="manage"></el-option>
-                <el-option label="流量监控区" value="monitor"></el-option>
-                <el-option label="业务增值区" value="value"></el-option>
-            </el-select>
+            <el-input class="input-with-select input" placeholder="自定义设备层级" v-model="device_info.area" >
+                <el-select  class="select" placeholder="层级"  v-model="device_info.area" slot="prepend" >
+                    <el-option label="出口区" value="outlet"></el-option>
+                    <el-option label="安全区" value="security"></el-option>
+                    <el-option label="核心区" value="core"></el-option>
+                    <el-option label="汇聚区" value="convergence"></el-option>
+                    <el-option label="接入区" value="access"></el-option>
+                    <el-option label="服务器区" value="server"></el-option>
+                    <el-option label="负载均衡区" value="balance"></el-option>
+                    <el-option label="设备管理区" value="manage"></el-option>
+                    <el-option label="流量监控区" value="monitor"></el-option>
+                    <el-option label="业务增值区" value="value"></el-option>
+                </el-select>
+            </el-input>
         </el-form-item><br>
         <el-form-item label="连接信息"> 
-            <el-input placeholder="请输入端口号" v-model="device_info.port" class="input-with-select">
-                <el-select  style="width: 150px;" placeholder="请选择协议"  v-model="device_info.protocol" slot="prepend" >
+            <el-input class="input-with-select input" placeholder="请输入端口号" v-model="device_info.port" >
+                <el-select  class="select" placeholder="协议"  v-model="device_info.protocol" slot="prepend" >
                     <el-option label="SSH" value="ssh"></el-option>
                     <el-option label="TELNET" value="telnet"></el-option>
                     <el-option label="FTP" value="ftp"></el-option>
@@ -37,18 +43,27 @@
             </el-input>
         </el-form-item>
         <el-form-item >
-                <el-input v-model="device_info.ip">
-                <template slot="prepend">IP/Domain</template>
-                <el-button slot="append" icon="el-icon-search" @click="check"></el-button>
+                <el-input class="input" v-model="device_info.ip_expression"  placeholder="请输入IP或域名">
+                <template slot="prepend">IP/域名</template>
+                <el-button slot="append" icon="el-icon-search" @click="checkip"></el-button>
                 </el-input>
         </el-form-item><br>
-        <el-form-item  label="连接信息">
-                <el-input style="width: 366px;" v-model="device_info.username"><template slot="prepend">UserName</template></el-input>
+        <el-form-item  label="用户信息">
+                <el-input class="input" v-model="device_info.username" placeholder="请输入用户名">
+                    <template slot="prepend">用户名</template>
+                </el-input>
         </el-form-item>
         <el-form-item >
-                <el-input  style="width: 366px;" v-model="device_info.password"><template slot="prepend">PassWord</template></el-input>
+                <el-input class="input"  :show-password=true v-model="device_info.password" placeholder="请输入密码" >
+                    <template slot="prepend">密码</template>
+                </el-input>
+        </el-form-item>
+        <el-form-item v-show="device_info.secret_able">
+                <el-input class="secret_input" placeholder="请输入特权密码" v-model="device_info.secret">
+                    <template slot="prepend">Secret</template>
+                </el-input>
         </el-form-item><br>
-        <el-button style="margin-left: 100px;" @click="commit">创建</el-button>
+        <el-button class="button"  @click="commit">创建</el-button>
     </el-form>
 </template>
 
@@ -58,52 +73,111 @@ export default{
     name:'DeviceAdd',
     data(){
         return {
-            device_info:{
-                project:'',
-                class:'',
-                area:'',
-                protocol:'',
-                port:'',
-                username:'',
-                password:'',
-                ip:''
-            },
-            
         }
     },
     methods:{
-
         commit(){
             axios({
                 method:'POST',
                 url:'http://127.0.0.1:3000/commit',
                 data:{
-                    project:this.device_info.project,
-                    class:this.device_info.class,
-                    area:this.device_info.area,
-                    protocol:this.device_info.protocol,
-                    port:this.device_info.port,
-                    username:this.device_info.username,
-                    password:this.device_info.password,
-                    ip:this.device_info.ip
+                    project:this.project,
+                    class:this.device_class,
+                    area:this.area,
+                    protocol:this.protocol,
+                    port:this.port,
+                    username:this.username,
+                    password:this.password,
+                    secret:this.secret,
+                    ip:this.ip_expression
                 }
             }).then(response=>console.log(response))
             .catch(reason=>{console.log(reason)})
         },
-        check(){
+        checkip(){
             axios({
                 method:'POST',
-                url:'http://127.0.0.1:3000/check',
+                url:'http://127.0.0.1:3000/checkip',
                 data:{
-                    ip:this.device_info.ip
+                    ip:this.ip_expression
                 }
             }).then(response=>console.log(response))
             .catch(reason=>{console.log(reason)})
         }
+    },
+    computed:{
+        device_info(){
+            return this.$store.state.deviceaddAbout.device_info
+        },
+        project(){
+            return this.device_info.project
+        },
+        device_class(){
+            return this.device_info.device_class
+        },
+        area(){
+            return this.device_info.area
+        },
+        protocol(){
+            return this.device_info.protocol
+        },
+        port(){
+            return this.device_info.port
+        },
+        username(){
+            return this.device_info.username
+        },
+        password(){
+            return this.device_info.password
+        },
+        secret(){
+            return this.device_info.secret
+        },
+        ip_expression(){
+            return this.device_info.ip_expression
+        },
+        secret_able(){
+            return this.$store.state.deviceaddAbout.secret_able
+        }
+    },
+    watch:{
+        device_class(newvalue){
+            if(newvalue == 'cisco' | newvalue == 'ruijie'){
+                this.device_info.secret_able=true
+            }else{
+                this.device_info.secret_able=false
+            }
+        },
+        project(newvalue){
+            axios({
+                method:'POST',
+                url:'http://127.0.0.1:3000/checkproject',
+                data:{
+                    project:newvalue
+                }
+            })
+        }
+       
+    },
+    mounted(){        
     }
-    
 }
 </script>
-<style>
-
+<style scoped>
+    .select{
+        width: 100px;
+    }
+    .input{
+        width: 400px;
+    }
+    .project_input{
+        width: 810px;
+    }
+    .secret_input{
+        width: 300px;
+    }
+    .button{
+        width: 100px;
+        margin-left: 80px;
+    }
 </style>

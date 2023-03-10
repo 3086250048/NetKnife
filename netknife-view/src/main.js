@@ -6,10 +6,13 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 //应用ElementUI
 Vue.use(ElementUI)
-
+//关闭语法提示
 Vue.config.productionTip = false
+// //引入Vuex插件
+import store from './store/index'
 
 new Vue({
   el:'#app',
+  store:store,
   render: CreateElement => CreateElement(App),
 })
