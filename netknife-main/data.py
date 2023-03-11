@@ -29,7 +29,7 @@ class AppInfo():
 
     @check_ip_tuple.setter
     def check_ip_tuple(self,ip_check_dict):
-        self.__check_ip_tuple=ap.processing_check_ip(ip_check_dict)
+        self.__check_ip_tuple=ap.processing_check_ip(ip_check_dict['ip'])
     @check_project_str.setter
     def check_project_dict(self,project_dict):
         self.__check_project_str=project_dict['project']

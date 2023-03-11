@@ -44,8 +44,12 @@
         </el-form-item>
         <el-form-item >
                 <el-input class="input" v-model="device_info.ip_expression"  placeholder="请输入IP或域名">
-                <template slot="prepend">IP/域名</template>
-                <el-button slot="append" icon="el-icon-search" @click="checkip"></el-button>
+                <template slot="prepend">IP&ensp;&ensp;</template>
+                <el-select  class="checkselect" v-model="device_info.check_protocol" placeholder="检查协议"  slot="prepend" >
+                    <el-option label="TCP" value="tcp"></el-option>
+                    <el-option label="ICMP" value="icmp"></el-option>
+                </el-select>
+                <el-button class="checkbutton" slot="append" icon="el-icon-search" @click="checkip"></el-button>
                 </el-input>
         </el-form-item><br>
         <el-form-item  label="用户信息">
@@ -58,7 +62,7 @@
                     <template slot="prepend">密码</template>
                 </el-input>
         </el-form-item>
-        <el-form-item v-show="device_info.secret_able">
+        <el-form-item v-show="device_info.device_class == 'cisco' | device_info.device_class == 'ruijie'">
                 <el-input class="secret_input" placeholder="请输入特权密码" v-model="device_info.secret">
                     <template slot="prepend">Secret</template>
                 </el-input>
@@ -95,14 +99,27 @@ export default{
             .catch(reason=>{console.log(reason)})
         },
         checkip(){
-            axios({
+            console.log(this.check_protocol)
+            if(this.check_protocol=='icmp'){
+                axios({
                 method:'POST',
-                url:'http://127.0.0.1:3000/checkip',
+                url:'http://127.0.0.1:3000/checkip_icmp',
                 data:{
                     ip:this.ip_expression
                 }
             }).then(response=>console.log(response))
             .catch(reason=>{console.log(reason)})
+            }else{
+                axios({
+                method:'POST',
+                url:'http://127.0.0.1:3000/checkip_tcp',
+                data:{
+                    ip:this.ip_expression
+                }
+                }).then(response=>console.log(response))
+                .catch(reason=>{console.log(reason)})
+            }
+            
         }
     },
     computed:{
@@ -136,18 +153,11 @@ export default{
         ip_expression(){
             return this.device_info.ip_expression
         },
-        secret_able(){
-            return this.$store.state.deviceaddAbout.secret_able
+        check_protocol(){
+            return this.device_info.check_protocol
         }
     },
     watch:{
-        device_class(newvalue){
-            if(newvalue == 'cisco' | newvalue == 'ruijie'){
-                this.device_info.secret_able=true
-            }else{
-                this.device_info.secret_able=false
-            }
-        },
         project(newvalue){
             axios({
                 method:'POST',
@@ -180,4 +190,10 @@ export default{
         width: 100px;
         margin-left: 80px;
     }
+    .checkbutton{
+        width: 60px;
+    }
+    .checkselect{
+        width: 105px
+    }   
 </style>

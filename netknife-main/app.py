@@ -4,10 +4,11 @@ import json
 
 from data import AppInfo
 from storage import AppStorage
-from net import AppNet,net_checkip
+from net import AppNet
 
-pub_data=AppInfo()
+data=AppInfo()
 storage=AppStorage()
+net=AppNet()
 
 
 
@@ -21,20 +22,20 @@ def index():
 
 @netknife.route('/commit',methods=['POST'])
 def adddevice():
-    pub_data.login_dict=json.loads(request.get_data(as_text=True))
+    data.login_dict=json.loads(request.get_data(as_text=True))
     if storage.add_login_info():
         return 'AddOK!!!'
     else:
         return 'AddFAULT...'
-@netknife.route('/checkip',methods=['POST'])
-def checkip():
-    pub_data.check_ip_tuple=json.loads(request.get_data(as_text=True))
-    print(pub_data.check_ip_tuple)
-    return 'CheckOK!!!'
-    # if net_checkip():
-    #     return 'checkOk!!!'  
-    # else:
-    #     return 'checkFault...'
+@netknife.route('/checkip_icmp',methods=['POST'])
+def checkip_icmp():
+    data.check_ip_tuple=json.loads(request.get_data(as_text=True))
+    return net.check_ip_icmp(data.check_ip_tuple)
+
+@netknife.route('/checkip_tcp',methods=['POST'])
+def checkip_tcp():
+    data.check_ip_tuple=json.loads(request.get_data(as_text=True))
+    return net.check_ip_tcp(data.check_ip_tuple)
 
 @netknife.route('/checkproject',methods=['POST'])
 def checkproject():

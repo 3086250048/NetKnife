@@ -16,9 +16,9 @@ const deviceaddAbout={
             username:'',
             password:'',
             ip_expression:'',
-            secret:''
+            secret:'',
+            check_protocol:'icmp'
         },
-        secret_able:false,
     }
 
 }
