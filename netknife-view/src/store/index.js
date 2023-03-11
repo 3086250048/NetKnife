@@ -1,5 +1,22 @@
 import axios from 'axios'
 
+let cancel=null
+function send_post(url,data,success_fun,fault_fun){
+    const axios_post=axios.create({
+        baseURL:'http://127.0.0.1:3000'
+    })
+    if( cancel !== null ) cancel()
+    axios_post.post(url,data,{cancelToken: new axios.CancelToken(c=>{cancel=c})}).then(
+        response=>{
+            success_fun | success_fun(response)
+            cancel=null
+        }
+    ).catch(
+        reason=>{
+            fault_fun | fault_fun(reason)
+        }
+    )
+}
 
 
 const deviceaddAbout={
@@ -21,7 +38,6 @@ const deviceaddAbout={
             }else{
                context.commit('CHECKIP_TCP')
             }
-            
         }
     },
     mutations:{
@@ -44,13 +60,7 @@ const deviceaddAbout={
             .catch(reason=>{console.log(reason)})
         },
         CHECKIP_ICMP(state){
-            axios({
-                method:'POST',
-                url:'http://127.0.0.1:3000/checkip_icmp',
-                data:{
-                    ip:state.device_info.ip_expression
-                }
-            }).then(response=>{
+            send_post('/checkip_icmp',{'ip':state.device_info.ip_expression},response=>{
                 if(response.data.length>0){
                     console.log(response.data)
                     state.pop_info.able=true
@@ -80,52 +90,61 @@ const deviceaddAbout={
                     state.pop_info.type='success'
                     state.pop_info.title='ICMP检测成功!!!'
                 }
-               
-
-            })
-            .catch(reason=>{console.log(reason)})
-        },
-        CHECKIP_TCP(state){
-           
-            axios({
-                method:'POST',
-                url:'http://127.0.0.1:3000/checkip_tcp',
-                data:{
-                    ip:state.device_info.ip_expression
-                }
-                }).then(response=>{
-                    if(response.data.length>0){
-                        console.log(response.data)
-                        state.pop_info.able=true
-                        if(this.time_id == null){
-                            this.time_id=setTimeout(()=>{
-                                state.pop_info.able=false
-                                this.time_id=null
-                            },3000)
-                        }
-                        state.pop_info.type='warning'
-                        let result=''
-                        response.data.forEach(element => {
-                            result+=element['ip']+element['port']+' ； '
-                        });
-                        if(result.length>=100){
-                            result=result.slice(0,97)+'...'
-                        }
-                        state.pop_info.title='TCP检测失败:'+result
-                    }else{
-                        state.pop_info.able=true
-                        if(this.time_id == null){
-                            this.time_id=setTimeout(()=>{
-                                state.pop_info.able=false
-                                this.time_id=null
-                            },3000)
-                        }
-                        state.pop_info.type='success'
-                        state.pop_info.title='TCP检测成功！！！'
-
+            },reason=>{
+                    state.pop_info.able=true
+                    state.pop_info.title='请不要重复发送ICMP检测'
+                    state.pop_info.type='warning'
+                    if(this.time_id == null){
+                        this.time_id=setTimeout(()=>{
+                            state.pop_info.able=false
+                            this.time_id=null
+                        },3000)
                     }
                 })
-                .catch(reason=>{console.log(reason)})
+        },
+        CHECKIP_TCP(state){
+            send_post('/checkip_tcp',{'ip':state.device_info.ip_expression},response=>{
+                if(response.data.length>0){
+                    console.log(response.data)
+                    state.pop_info.able=true
+                    if(this.time_id == null){
+                        this.time_id=setTimeout(()=>{
+                            state.pop_info.able=false
+                            this.time_id=null
+                        },3000)
+                    }
+                    state.pop_info.type='warning'
+                    let result=''
+                    response.data.forEach(element => {
+                        result+=element['ip']+':'+element['port']+' ； '
+                    });
+                    if(result.length>=100){
+                        result=result.slice(0,97)+'...'
+                    }
+                    state.pop_info.title='TCP检测失败:'+result
+                }else{
+                    state.pop_info.able=true
+                    if(this.time_id == null){
+                        this.time_id=setTimeout(()=>{
+                            state.pop_info.able=false
+                            this.time_id=null
+                        },3000)
+                    }
+                    state.pop_info.type='success'
+                    state.pop_info.title='TCP检测成功！！！'
+
+                }
+            },reason=>{
+                state.pop_info.able=true
+                state.pop_info.title='请不要重复发送TCP检测'
+                state.pop_info.type='warning'
+                if(this.time_id == null){
+                    this.time_id=setTimeout(()=>{
+                        state.pop_info.able=false
+                        this.time_id=null
+                    },3000)
+                }
+            })
         },
         POP_INFO(state){
             state.pop_info.able=true
@@ -158,7 +177,8 @@ const deviceaddAbout={
             able:false,
             title:'',
             type:''
-        }
+        },
+        
     }
 
 }
