@@ -1,5 +1,8 @@
 <template>
     <el-form :inline=true ref="device_info" :mode="device_info" label-width="80px" label-position="rigth">
+        <div class="popinfo">
+            <DeviceAddPopInfo></DeviceAddPopInfo>
+        </div>
         <el-form-item label="项目名称">
             <el-input class="project_input" v-model="device_info.project" placeholder="请输入项目名称">
                 <template slot="prepend">项目名称</template>
@@ -73,54 +76,20 @@
 
 <script>
 import axios from 'axios'
+import {mapActions} from 'vuex'
+import DeviceAddPopInfo from './infopop/deviceadd_infopop.vue'
 export default{
     name:'DeviceAdd',
+    components:{
+        DeviceAddPopInfo:DeviceAddPopInfo
+    },
     data(){
         return {
         }
     },
     methods:{
-        commit(){
-            axios({
-                method:'POST',
-                url:'http://127.0.0.1:3000/commit',
-                data:{
-                    project:this.project,
-                    class:this.device_class,
-                    area:this.area,
-                    protocol:this.protocol,
-                    port:this.port,
-                    username:this.username,
-                    password:this.password,
-                    secret:this.secret,
-                    ip:this.ip_expression
-                }
-            }).then(response=>console.log(response))
-            .catch(reason=>{console.log(reason)})
-        },
-        checkip(){
-            console.log(this.check_protocol)
-            if(this.check_protocol=='icmp'){
-                axios({
-                method:'POST',
-                url:'http://127.0.0.1:3000/checkip_icmp',
-                data:{
-                    ip:this.ip_expression
-                }
-            }).then(response=>console.log(response))
-            .catch(reason=>{console.log(reason)})
-            }else{
-                axios({
-                method:'POST',
-                url:'http://127.0.0.1:3000/checkip_tcp',
-                data:{
-                    ip:this.ip_expression
-                }
-                }).then(response=>console.log(response))
-                .catch(reason=>{console.log(reason)})
-            }
-            
-        }
+        ...mapActions('deviceaddAbout',{commit:'commit',checkip:'checkip'}),
+        
     },
     computed:{
         device_info(){
@@ -157,18 +126,6 @@ export default{
             return this.device_info.check_protocol
         }
     },
-    watch:{
-        project(newvalue){
-            axios({
-                method:'POST',
-                url:'http://127.0.0.1:3000/checkproject',
-                data:{
-                    project:newvalue
-                }
-            })
-        }
-       
-    },
     mounted(){        
     }
 }
@@ -196,4 +153,7 @@ export default{
     .checkselect{
         width: 105px
     }   
+    .popinfo{
+        height: 40px;
+    }
 </style>

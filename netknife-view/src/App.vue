@@ -4,6 +4,7 @@
       <h1>Netknife</h1>
     </el-header>
     <el-main  id="main">
+      <div></div>
       <div id='mainbox'>
           <Meun></Meun>
       </div>
