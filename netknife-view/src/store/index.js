@@ -83,7 +83,9 @@ const deviceaddAbout={
     },
     mutations:{
         COMMIT(state){
-            if(state.check_flag){
+            console.log(state.ip_expression_check_flag,1)
+            console.log(state.port_range_check_flag)
+            if(state.ip_expression_check_flag && state.port_range_check_flag){
                 send_post('/commit',{
                     'project':state.device_info.project,
                     'class':state.device_info.device_class,
@@ -100,6 +102,8 @@ const deviceaddAbout={
                     },(reason)=>{
                         pop_info(state,'请不要重复提交设备信息','warning')
                     })
+            }else{
+                pop_info(state,'请检查填写表项是否存在错误','error')
             }
            
         },
@@ -156,6 +160,16 @@ const deviceaddAbout={
         PORT_POP_INFO(state){
             pop_info(state,'设备登录端口不能为空','error')
         },
+        CHECK_PORT_RANGE_POP_INFO(state){
+            let result=/^\d+$/.test(state.device_info.port)
+            if(result && parseInt(state.device_info.port) >= 0 && parseInt(state.device_info.port) <=65535 ){
+                state.port_range_check_flag=true
+                pop_info(state,'端口范围正确！！！','success')
+            }else{
+                state.port_range_check_flag=false
+                pop_info(state,'端口范围应在:0~65535之内','error')
+            }
+        },
         IP_EXPRESSION_POP_INFO(state){
             pop_info(state,'设备IP表达式不能为空','error')
         },
@@ -163,10 +177,10 @@ const deviceaddAbout={
             let result=/^(2[0-4][0-9]|2[0-5][0-5]|1[0-9][0-9]|[1-9]?\d)(-(2[0-4][0-9]|[1-2][0-5][0-5]|[1-9]?\d))?(%(2[0-4][0-9]|[1-2][0-5][0-5]|[1-9]?\d))?\.(2[0-4][0-9]|2[0-5][0-5]|1[0-9][0-9]|[1-9]?\d)(-(2[0-4][0-9]|[1-2][0-5][0-5]|[1-9]?\d))?(%(2[0-4][0-9]|[1-2][0-5][0-5]|[1-9]?\d))?\.(2[0-4][0-9]|2[0-5][0-5]|1[0-9][0-9]|[1-9]?\d)(-(2[0-4][0-9]|[1-2][0-5][0-5]|[1-9]?\d))?(%(2[0-4][0-9]|[1-2][0-5][0-5]|[1-9]?\d))?\.(2[0-4][0-9]|2[0-5][0-5]|1[0-9][0-9]|[1-9]?\d)(-(2[0-4][0-9]|[1-2][0-5][0-5]|[1-9]?\d))?(%(2[0-4][0-9]|[1-2][0-5][0-5]|[1-9]?\d))?$/.test(state.device_info.ip_expression)
             if(result){
                 pop_info(state,'IP表达式正确','success')    
-                state.check_flag=true        
+                state.ip_expression_check_flag=true        
             }else{
                 pop_info(state,'IP表达式错误','error')
-                state.check_flag=false
+                state.ip_expression_check_flag=false
             }
         },
         USERNAME_POP_INFO(state){
@@ -196,8 +210,8 @@ const deviceaddAbout={
             title:'',
             type:''
         },
-        check_flag:false
-
+        ip_expression_check_flag:false,
+        port_range_check_flag:true
     }
 
 }

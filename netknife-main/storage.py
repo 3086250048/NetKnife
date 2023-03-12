@@ -28,7 +28,6 @@ class AppStorage():
                 );'''
                 )
                 con.commit()
-                print('数据库创建成功')
             except sqlite3.Error as e:
                 print(e)
                 con.rollback()
