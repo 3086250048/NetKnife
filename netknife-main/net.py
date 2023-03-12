@@ -14,29 +14,15 @@ class AppNet():
         return cls._instance     
     def __init__(self) :
         pass
-        # self.__login_list=[{'device_type':item[1],
-        #                     'host':item[7],
-        #                     'username':item[5],
-        #                     'password':item[6],
-        #                     'port':item[4],
-        #                     'secret':item[8]
-        #                     }
-        #                     for item in  storage.select_login_info()]
     def check_ip_icmp(self,check_ip_tuple):
         mp=MultiPing(check_ip_tuple)
         mp.send()
         no_responses=mp.receive(2)[1]
-        # fault_ip=[]
-        # for ip in  check_ip_tuple:
-        #     if subprocess.run(['ping','-c', '1','-w','1','-i','0.002',ip],stdout=subprocess.PIPE).returncode:
-        #         fault_ip+=[ip]
-        
-        # print(fault_ip)
         return no_responses
-    def check_ip_tcp(self,check_ip_tuple):
+    def check_ip_tcp(self,check_ip_tuple,check_ip_port_str):
         fault_tcp_ping=[]
         for ip in check_ip_tuple:
-            ping=Ping(ip,22,1)
+            ping=Ping(ip,int(check_ip_port_str),1)
             fault_tcp_ping+=ping.ping(1)
         return fault_tcp_ping
 

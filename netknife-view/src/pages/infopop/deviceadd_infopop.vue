@@ -24,7 +24,8 @@ export default{
        pop_type(){
             return this.$store.state.deviceaddAbout.pop_info.type
        }
-    },mounted(){
+    },
+    mounted(){
     //   test
     }
 }

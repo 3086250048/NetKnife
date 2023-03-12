@@ -1,5 +1,3 @@
-import textfsm 
-
 from processing import AppProcessing
 
 ap=AppProcessing()
@@ -12,6 +10,7 @@ class AppInfo():
     def __init__(self) -> None:
         self.__login_dict=None
         self.__check_ip_tuple=None
+        self.__check_ip_port_str=None
         self.__check_project_str=None
     @property
     def login_dict(self):
@@ -22,14 +21,20 @@ class AppInfo():
     @property
     def check_project_str(self):
         return self.__check_project_str
+    @property
+    def check_ip_port_str(self):
+        return self.__check_ip_port_str
 
     @login_dict.setter
     def login_dict(self,login_dict):
         self.__login_dict=login_dict
-
     @check_ip_tuple.setter
     def check_ip_tuple(self,ip_check_dict):
-        self.__check_ip_tuple=ap.processing_check_ip(ip_check_dict['ip'])
+        print(ip_check_dict)
+        self.__check_ip_tuple=ap.processing_check_ip(ip_check_dict['ip_expression'])
+    @check_ip_port_str.setter
+    def check_ip_port_str(self,ip_check_dict):
+        self.__check_ip_port_str=ip_check_dict['port']
     @check_project_str.setter
     def check_project_dict(self,project_dict):
         self.__check_project_str=project_dict['project']

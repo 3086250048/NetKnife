@@ -65,8 +65,8 @@
                     <template slot="prepend">密码</template>
                 </el-input>
         </el-form-item>
-        <el-form-item v-show="device_info.device_class == 'cisco' | device_info.device_class == 'ruijie'">
-                <el-input class="secret_input" placeholder="请输入特权密码" v-model="device_info.secret">
+        <el-form-item  v-show="device_info.device_class == 'cisco' | device_info.device_class == 'ruijie'">
+                <el-input :show-password=true class="secret_input" placeholder="请输入特权密码" v-model="device_info.secret">
                     <template slot="prepend">Secret</template>
                 </el-input>
         </el-form-item><br>
@@ -75,8 +75,7 @@
 </template>
 
 <script>
-import axios from 'axios'
-import {mapActions} from 'vuex'
+import {mapActions, mapMutations} from 'vuex'
 import DeviceAddPopInfo from './infopop/deviceadd_infopop.vue'
 export default{
     name:'DeviceAdd',
@@ -89,7 +88,7 @@ export default{
     },
     methods:{
         ...mapActions('deviceaddAbout',{commit:'commit',checkip:'checkip'}),
-        
+        ...mapMutations('deviceaddAbout',{CHECK_IP_EXPRESSION_POP_INFO:'CHECK_IP_EXPRESSION_POP_INFO'})
     },
     computed:{
         device_info(){
@@ -124,6 +123,11 @@ export default{
         },
         check_protocol(){
             return this.device_info.check_protocol
+        }
+    },
+    watch:{
+        ip_expression(){
+           this.CHECK_IP_EXPRESSION_POP_INFO()
         }
     },
     mounted(){        

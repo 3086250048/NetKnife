@@ -8,29 +8,68 @@ function send_post(url,data,success_fun,fault_fun){
     if( cancel !== null ) cancel()
     axios_post.post(url,data,{cancelToken: new axios.CancelToken(c=>{cancel=c})}).then(
         response=>{
-            success_fun | success_fun(response)
+            success_fun(response)
             cancel=null
         }
     ).catch(
         reason=>{
-            fault_fun | fault_fun(reason)
+             fault_fun(reason)
         }
     )
 }
 
+function pop_info(state,title,type){
+    state.pop_info.able=true
+    state.pop_info.title=title
+    state.pop_info.type=type
+
+    if(state.time_id == null){
+        state.time_id=setTimeout(()=>{
+            state.pop_info.able=false
+            state.time_id=null
+        },3000)
+    }
+}
 
 const deviceaddAbout={
     namespaced:true,
     actions:{
             /*弹窗类型:success\info\warning\error*/
         commit(context){
-            if(context.state.device_info.project !== ''){
-                
-                context.commit('COMMIT')
-
-            }else{
-               context.commit('POP_INFO')
+            if(context.state.device_info.project == ''){
+                context.commit('PROJECT_POP_INFO')
+                return
+            } 
+            if(context.state.device_info.device_class ==''){
+                context.commit('DEVICE_CLASS_POP_INFO')
+                return
             }
+            
+            if(context.state.device_info.area==''){
+                context.commit('AREA_POP_INFO')
+                return
+            }
+            if(context.state.device_info.protocol ==''){
+                context.commit('PROTOCOL_POP_INFO')
+                return
+            } 
+            if(context.state.device_info.port ==''){
+                context.commit('PORT_POP_INFO')
+                return
+            }
+            if(context.state.device_info.ip_expression == ''){
+                context.commit('IP_EXPRESSION_POP_INFO')
+                return
+            }
+            if(context.state.device_info.username ==''){
+                context.commit('USERNAME_POP_INFO')
+                return
+            } 
+            if(context.state.device_info.password ==''){ 
+                context.commit('PASSWORD_POP_INFO')
+                return
+            } 
+            context.commit('COMMIT')
         },
         checkip(context){
             if(context.state.device_info.check_protocol=='icmp'){
@@ -38,39 +77,35 @@ const deviceaddAbout={
             }else{
                context.commit('CHECKIP_TCP')
             }
-        }
+        },
+        
+
     },
     mutations:{
         COMMIT(state){
-            axios({
-                method:'POST',
-                url:'http://127.0.0.1:3000/commit',
-                data:{
-                    project:state.project,
-                    class:state.device_class,
-                    area:state.area,
-                    protocol:state.protocol,
-                    port:state.port,
-                    username:state.username,
-                    password:state.password,
-                    secret:state.secret,
-                    ip:state.ip_expression
-                }
-            }).then(response=>console.log(response.data))
-            .catch(reason=>{console.log(reason)})
+            if(state.check_flag){
+                send_post('/commit',{
+                    'project':state.device_info.project,
+                    'class':state.device_info.device_class,
+                    'area':state.device_info.area,
+                    'protocol':state.device_info.protocol,
+                    'port':state.device_info.port,
+                    'username':state.device_info.username,
+                    'password':state.device_info.password,
+                    'secret':state.device_info.secret,
+                    'ip_expression':state.device_info.ip_expression}
+                    ,(response)=>{
+                        console.log(response)
+                        pop_info(state,'设备信息提交成功','success')
+                    },(reason)=>{
+                        pop_info(state,'请不要重复提交设备信息','warning')
+                    })
+            }
+           
         },
         CHECKIP_ICMP(state){
-            send_post('/checkip_icmp',{'ip':state.device_info.ip_expression},response=>{
-                if(response.data.length>0){
-                    console.log(response.data)
-                    state.pop_info.able=true
-                    if(this.time_id == null){
-                        this.time_id=setTimeout(()=>{
-                            state.pop_info.able=false
-                            this.time_id=null
-                        },3000)
-                    }
-                    state.pop_info.type='warning'
+            send_post('/checkip_icmp',{'ip_expression':state.device_info.ip_expression},response=>{
+                if(response.data.length>0){ 
                     let result=''
                     response.data.forEach(element => {
                         result+=element+' ； '
@@ -78,42 +113,18 @@ const deviceaddAbout={
                     if(result.length>=100){
                         result=result.slice(0,97)+'...'
                     }
-                    state.pop_info.title='ICMP检测失败:'+result
+                    result='ICMP检测失败:'+result
+                    pop_info(state,result,'warning')
                 }else{
-                    state.pop_info.able=true
-                    if(this.time_id == null){
-                        this.time_id=setTimeout(()=>{
-                            state.pop_info.able=false
-                            this.time_id=null
-                        },3000)
-                    }
-                    state.pop_info.type='success'
-                    state.pop_info.title='ICMP检测成功!!!'
+                    pop_info(state,'ICMP检测成功！！！','success')
                 }
             },reason=>{
-                    state.pop_info.able=true
-                    state.pop_info.title='请不要重复发送ICMP检测'
-                    state.pop_info.type='warning'
-                    if(this.time_id == null){
-                        this.time_id=setTimeout(()=>{
-                            state.pop_info.able=false
-                            this.time_id=null
-                        },3000)
-                    }
+                pop_info(state,'请不要重复发送ICMP检测','warning')
                 })
         },
         CHECKIP_TCP(state){
-            send_post('/checkip_tcp',{'ip':state.device_info.ip_expression},response=>{
+            send_post('/checkip_tcp',{'ip_expression':state.device_info.ip_expression,'port':state.device_info.port},response=>{
                 if(response.data.length>0){
-                    console.log(response.data)
-                    state.pop_info.able=true
-                    if(this.time_id == null){
-                        this.time_id=setTimeout(()=>{
-                            state.pop_info.able=false
-                            this.time_id=null
-                        },3000)
-                    }
-                    state.pop_info.type='warning'
                     let result=''
                     response.data.forEach(element => {
                         result+=element['ip']+':'+element['port']+' ； '
@@ -121,52 +132,59 @@ const deviceaddAbout={
                     if(result.length>=100){
                         result=result.slice(0,97)+'...'
                     }
-                    state.pop_info.title='TCP检测失败:'+result
+                    result='TCP检测失败:'+result
+                    pop_info(state,result,'warning')
                 }else{
-                    state.pop_info.able=true
-                    if(this.time_id == null){
-                        this.time_id=setTimeout(()=>{
-                            state.pop_info.able=false
-                            this.time_id=null
-                        },3000)
-                    }
-                    state.pop_info.type='success'
-                    state.pop_info.title='TCP检测成功！！！'
-
+                    pop_info(state,'TCP检测成功!!!','success')
                 }
             },reason=>{
-                state.pop_info.able=true
-                state.pop_info.title='请不要重复发送TCP检测'
-                state.pop_info.type='warning'
-                if(this.time_id == null){
-                    this.time_id=setTimeout(()=>{
-                        state.pop_info.able=false
-                        this.time_id=null
-                    },3000)
-                }
+                pop_info(state,'请不要重复发送TCP检测','warning')
             })
         },
-        POP_INFO(state){
-            state.pop_info.able=true
-            state.pop_info.title='项目名称不能为空'
-            state.pop_info.type='error'
-            
-            if(this.time_id == null){
-                this.time_id=setTimeout(()=>{
-                    state.pop_info.able=false
-                    this.time_id=null
-                },3000)
+        PROJECT_POP_INFO(state){
+            pop_info(state,'项目名称不能为空','error')
+        },
+        DEVICE_CLASS_POP_INFO(state){
+            pop_info(state,'设备类型不能为空','error')
+        },
+        AREA_POP_INFO(state){
+            pop_info(state,'设备区域不能为空','error')
+        },
+        PROTOCOL_POP_INFO(state){
+            pop_info(state,'设备登录协议不能为空','error')
+        },
+        PORT_POP_INFO(state){
+            pop_info(state,'设备登录端口不能为空','error')
+        },
+        IP_EXPRESSION_POP_INFO(state){
+            pop_info(state,'设备IP表达式不能为空','error')
+        },
+        CHECK_IP_EXPRESSION_POP_INFO(state){
+            let result=/^(2[0-5][0-5]|1[0-9][0-9]|[1-9]?\d)(-([1-2][0-5][0-5]|[1-9]?\d))?(%([1-2][0-5][0-5]|[1-9]?\d))?\.(2[0-5][0-5]|1[0-9][0-9]|[1-9]?\d)(-([1-2][0-5][0-5]|[1-9]?\d))?(%([1-2][0-5][0-5]|[1-9]?\d))?\.(2[0-5][0-5]|1[0-9][0-9]|[1-9]?\d)(-([1-2][0-5][0-5]|[1-9]?\d))?(%([1-2][0-5][0-5]|[1-9]?\d))?\.(2[0-5][0-5]|1[0-9][0-9]|[1-9]?\d)(-([1-2][0-5][0-5]|[1-9]?\d))?(%([1-2][0-5][0-5]|[1-9]?\d))?$/.test(state.device_info.ip_expression)
+            if(result){
+                pop_info(state,'IP表达式正确','success')    
+                state.check_flag=true        
+            }else{
+                pop_info(state,'IP表达式错误','error')
+                state.check_flag=false
             }
-        }
+        },
+        USERNAME_POP_INFO(state){
+            pop_info(state,'设备用户名不能为空','error')
+        },
+        PASSWORD_POP_INFO(state){
+            pop_info(state,'设备密码不能为空','error')
+        },
+       
 
     },
     state:{
         device_info:{
-            project:'',
-            device_class:'',
-            area:'',
-            protocol:'',
-            port:'',
+            project:'默认项目',
+            device_class:'huawei',
+            area:'默认区域',
+            protocol:'telnet',
+            port:'23',
             username:'',
             password:'',
             ip_expression:'',
@@ -178,7 +196,8 @@ const deviceaddAbout={
             title:'',
             type:''
         },
-        
+        check_flag:false
+
     }
 
 }

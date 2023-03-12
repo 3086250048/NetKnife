@@ -1,8 +1,4 @@
 import sqlite3,os
-from  data import AppInfo
-
-pub_data=AppInfo()
-
 
 class AppStorage():
     def __new__(cls,*args, **kwds):
@@ -10,12 +6,16 @@ class AppStorage():
             cls._instance=super().__new__(cls,*args,**kwds)
         return cls._instance       
     def __init__(self) -> None:
-        self.__path=os.path.dirname(os.path.abspath(__file__) )
-        self.__db=sqlite3.connect(f'{self.__path}/appdata.db',check_same_thread=False)
-        self.__cur=self.__db.cursor()
-        self.__operate=self.__cur.execute
-        if not os.path.exists(f'{self.__path}/appdata.db'):
-            self.__operate('''CREATE TABLE  LOGININFO(
+        self.__path=os.path.dirname(os.path.abspath(__file__))+'/appdata.db'
+        self.__add_login_info_sql=fr'''INSERT INTO LOGININFO (PROJECT,CLASS,AREA,PROTOCOL,PORT,USERNAME,PASSWORD,SECRET,IP_EXPRESSION)
+                            VALUES (?,?,?,?,?,?,?,?,?)'''
+
+        if not os.path.exists(self.__path):
+            try:
+                con=sqlite3.connect(self.__path)
+                cur=con.cursor()
+                cur.execute(
+                    '''CREATE TABLE  LOGININFO(
                 PROJECT        TEXT    PRIMARY KEY   NOT NULL,
                 CLASS          TEXT    NOT NULL,
                 AREA           TEXT    NOT NULL,
@@ -23,31 +23,40 @@ class AppStorage():
                 PORT           TEXT    NOT NULL,
                 USERNAME       TEXT    NOT NULL,
                 PASSWORD     TEXT      NOT NULL,
-                IP             TEXT    NOT NULL
-                );''')
-            self.__db.commit()
-
-    def add_login_info(self):
+                SECRET        TEXT     NOT NULL,
+                IP_EXPRESSION   TEXT    NOT NULL
+                );'''
+                )
+                con.commit()
+                print('数据库创建成功')
+            except sqlite3.Error as e:
+                print(e)
+                con.rollback()
+            finally:
+                if cur:
+                    cur.close()
+                if con:
+                    con.close()
+    def add_login_info(self,login_dict):
         try:
-            self.__operate(f"INSERT INTO LOGININFO (PROJECT,CLASS,AREA,PROTOCOL,PORT,USERNAME,PASSWORD,IP)\
-                            VALUES ('{pub_data.login_dict['project']}',\
-                                    '{pub_data.login_dict['class']}',\
-                                    '{pub_data.login_dict['area']}',\
-                                    '{pub_data.login_dict['protocol']}',\
-                                    '{pub_data.login_dict['port']}',\
-                                    '{pub_data.login_dict['username']}',\
-                                    '{pub_data.login_dict['password']}',\
-                                    '{pub_data.login_dict['ip']}',\
-                                    '{pub_data.login_dict['secret']}',\
-                                    )")
-            self.__db.commit()
+            value_tuple=tuple(login_dict.values())
+            con=sqlite3.connect(self.__path,check_same_thread=False)
+            cur=con.cursor()
+            cur.execute(self.__add_login_info_sql,value_tuple)
+            con.commit()
             return True
-        except:
+        except sqlite3.Error as e:
+            print(e)
+            con.rollback()
             return False
+        finally:
+            if cur:
+                cur.close()
+            if con:
+                con.close()
 
     def select_login_info(self):
-        cursor= self.__operate("SELECT * FROM LOGININFO")
-        return cursor
+        return 1
 
 
 if __name__ == '__main__':
