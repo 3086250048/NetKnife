@@ -107,6 +107,20 @@ const deviceaddAbout={
             }
            
         },
+        CHECK_PROJECT_POP_INFO(state){
+            send_post('/check_project',{'project':state.device_info.project},response=>{
+                console.log(response.data)
+                 if(1 ){
+                     pop_info(state,'项目名未被使用','info')
+                 }else{
+                     pop_info(state,'项目名称被使用','info')
+                 }
+            },
+            reason=>{
+                 pop_info(state,'项目名检测失败','error')
+            }
+            )
+        },
         CHECKIP_ICMP(state){
             send_post('/checkip_icmp',{'ip_expression':state.device_info.ip_expression},response=>{
                 if(response.data.length>0){ 
@@ -217,6 +231,7 @@ const deviceaddAbout={
 }
 import Vuex from 'vuex'
 import Vue from 'vue'
+
 Vue.use(Vuex)
 export default new Vuex.Store({
     modules:{

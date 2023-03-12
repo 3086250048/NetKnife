@@ -88,7 +88,7 @@ export default{
     },
     methods:{
         ...mapActions('deviceaddAbout',{commit:'commit',checkip:'checkip'}),
-        ...mapMutations('deviceaddAbout',{CHECK_IP_EXPRESSION_POP_INFO:'CHECK_IP_EXPRESSION_POP_INFO',CHECK_PORT_RANGE_POP_INFO:'CHECK_PORT_RANGE_POP_INFO'})
+        ...mapMutations('deviceaddAbout',{CHECK_IP_EXPRESSION_POP_INFO:'CHECK_IP_EXPRESSION_POP_INFO',CHECK_PORT_RANGE_POP_INFO:'CHECK_PORT_RANGE_POP_INFO',CHECK_PROJECT_POP_INFO:'CHECK_PROJECT_POP_INFO'})
     },
     computed:{
         device_info(){
@@ -131,7 +131,11 @@ export default{
         },
         port(){
             this.CHECK_PORT_RANGE_POP_INFO()
+        },
+        project(){
+            this.CHECK_PROJECT_POP_INFO()
         }
+
     },
     mounted(){        
     }

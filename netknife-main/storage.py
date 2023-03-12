@@ -9,7 +9,7 @@ class AppStorage():
         self.__path=os.path.dirname(os.path.abspath(__file__))+'/appdata.db'
         self.__add_login_info_sql=fr'''INSERT INTO LOGININFO (PROJECT,CLASS,AREA,PROTOCOL,PORT,USERNAME,PASSWORD,SECRET,IP_EXPRESSION)
                             VALUES (?,?,?,?,?,?,?,?,?)'''
-
+        self.__check_project_sql=fr'''SELECT PROJECT FROM LOGININFO WHERE PROJECT=?'''
         if not os.path.exists(self.__path):
             try:
                 con=sqlite3.connect(self.__path)
@@ -53,7 +53,26 @@ class AppStorage():
                 cur.close()
             if con:
                 con.close()
-
+    def check_project(self,check_project_str):       
+        try:
+            project_tuple=tuple([check_project_str])
+            print(project_tuple)
+            con=sqlite3.connect(self.__path,check_same_thread=False)
+            cur=con.cursor()
+            cur.execute(self.__check_project_sql,project_tuple)
+            result=cur.fetchall()
+            if len(result)<=0:
+                return True  
+            else:
+                return False
+        except sqlite3.Error as e:
+            con.rollback()
+            return False
+        finally:
+            if cur:
+                cur.close()
+            if con:
+                con.close()
     def select_login_info(self):
         return 1
 

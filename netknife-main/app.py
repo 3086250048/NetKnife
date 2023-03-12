@@ -38,9 +38,14 @@ def checkip_tcp():
     data.check_ip_port_str=json.loads(request.get_data(as_text=True))
     return net.check_ip_tcp(data.check_ip_tuple,data.check_ip_port_str)
 
-@netknife.route('/checkproject',methods=['POST'])
+@netknife.route('/check_project',methods=['POST'])
 def checkproject():
-    pass
+    data.check_project_str=json.loads(request.get_data(as_text=True))
+    result=storage.check_project(data.check_project_str)
+    print(result)
+    return True
+    
+
 
 if __name__ == '__main__':
     netknife.run('0.0.0.0',port=3000,debug=True)
