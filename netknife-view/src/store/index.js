@@ -190,7 +190,7 @@ const deviceaddAbout={
             pop_info(state,'设备IP表达式不能为空','error')
         },
         CHECK_IP_EXPRESSION_POP_INFO(state){
-            let result=/^(2[0-4][0-9]|2[0-5][0-5]|1[0-9][0-9]|[1-9]?\d)(-(2[0-4][0-9]|[1-2][0-5][0-5]|[1-9]?\d))?(%(2[0-4][0-9]|[1-2][0-5][0-5]|[1-9]?\d))?\.(2[0-4][0-9]|2[0-5][0-5]|1[0-9][0-9]|[1-9]?\d)(-(2[0-4][0-9]|[1-2][0-5][0-5]|[1-9]?\d))?(%(2[0-4][0-9]|[1-2][0-5][0-5]|[1-9]?\d))?\.(2[0-4][0-9]|2[0-5][0-5]|1[0-9][0-9]|[1-9]?\d)(-(2[0-4][0-9]|[1-2][0-5][0-5]|[1-9]?\d))?(%(2[0-4][0-9]|[1-2][0-5][0-5]|[1-9]?\d))?\.(2[0-4][0-9]|2[0-5][0-5]|1[0-9][0-9]|[1-9]?\d)(-(2[0-4][0-9]|[1-2][0-5][0-5]|[1-9]?\d))?(%(2[0-4][0-9]|[1-2][0-5][0-5]|[1-9]?\d))?$/.test(state.device_info.ip_expression)
+            let result=/^((2[0-4][0-9]|2[0-5][0-5]|1[0-9][0-9]|[1-9]?\d)\.(2[0-4][0-9]|2[0-5][0-5]|1[0-9][0-9]|[1-9]?\d)\.(2[0-4][0-9]|2[0-5][0-5]|1[0-9][0-9]|[1-9]?\d)\.(2[0-4][0-9]|2[0-5][0-5]|1[0-9][0-9]|[1-9]?\d),)*(2[0-4][0-9]|2[0-5][0-5]|1[0-9][0-9]|[1-9]?\d)(-(2[0-4][0-9]|[1-2][0-5][0-5]|[1-9]?\d))?(%(2[0-4][0-9]|[1-2][0-5][0-5]|[1-9]?\d))?\.(2[0-4][0-9]|2[0-5][0-5]|1[0-9][0-9]|[1-9]?\d)(-(2[0-4][0-9]|[1-2][0-5][0-5]|[1-9]?\d))?(%(2[0-4][0-9]|[1-2][0-5][0-5]|[1-9]?\d))?\.(2[0-4][0-9]|2[0-5][0-5]|1[0-9][0-9]|[1-9]?\d)(-(2[0-4][0-9]|[1-2][0-5][0-5]|[1-9]?\d))?(%(2[0-4][0-9]|[1-2][0-5][0-5]|[1-9]?\d))?\.(2[0-4][0-9]|2[0-5][0-5]|1[0-9][0-9]|[1-9]?\d)(-(2[0-4][0-9]|[1-2][0-5][0-5]|[1-9]?\d))?(%(2[0-4][0-9]|[1-2][0-5][0-5]|[1-9]?\d))?(,(2[0-4][0-9]|2[0-5][0-5]|1[0-9][0-9]|[1-9]?\d)\.(2[0-4][0-9]|2[0-5][0-5]|1[0-9][0-9]|[1-9]?\d)\.(2[0-4][0-9]|2[0-5][0-5]|1[0-9][0-9]|[1-9]?\d)\.(2[0-4][0-9]|2[0-5][0-5]|1[0-9][0-9]|[1-9]?\d))*$/.test(state.device_info.ip_expression)
             if(result){
                 pop_info(state,'IP表达式正确','success')    
                 state.ip_expression_check_flag=true        
@@ -233,26 +233,72 @@ const deviceaddAbout={
 
 }
 
-const deviceupdataAbout={
+const deviceupdateAbout={
+    namespaced:true,
     actions:{
     },
     mutations:{
 
     },
     state:{
-
+        where_info:{
+            project:'',
+            device_class:'',
+            area:'',
+            protocol:'',
+            port:'',
+            username:'',
+            password:'',
+            ip_expression:'',
+            secret:'',
+            check_protocol:''
+        },
+        update_info:{
+            project:'',
+            device_class:'',
+            area:'',
+            protocol:'',
+            port:'',
+            username:'',
+            password:'',
+            ip_expression:'',
+            secret:'',
+            check_protocol:''
+        },
+        pop_info:{
+            able:false,
+            title:'',
+            type:''
+        },
+        
     }
 
 }
 
-const deviceremoveAbout={
+const devicedeleteAbout={
     actions:{
     },
     mutations:{
 
     },
     state:{
-        
+        delete_info:{
+            project:'',
+            device_class:'',
+            area:'',
+            protocol:'',
+            port:'',
+            username:'',
+            password:'',
+            ip_expression:'',
+            secret:'',
+            check_protocol:''
+        },
+        pop_info:{
+            able:false,
+            title:'',
+            type:''
+        },
     }
 }
 
@@ -263,6 +309,8 @@ import Vue from 'vue'
 Vue.use(Vuex)
 export default new Vuex.Store({
     modules:{
-        deviceaddAbout:deviceaddAbout
+        deviceaddAbout:deviceaddAbout,
+        deviceupdateAbout:deviceupdateAbout,
+        devicedeleteAbout:devicedeleteAbout
     }
 })

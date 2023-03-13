@@ -1,29 +1,28 @@
 <template>
     <div>
-        <DeviceCrudPopInfo></DeviceCrudPopInfo>
-        <el-tabs type="border-card" style="height: 520px;">
+        <el-tabs type="border-card" style="height: 800px;">
         <el-tab-pane label="新建项目"><DeviceCreate></DeviceCreate></el-tab-pane>
-        <el-tab-pane label="更新项目">消息中心</el-tab-pane>
-        <el-tab-pane label="删除项目">角色管理</el-tab-pane>
+        <el-tab-pane label="更新项目"><DeviceUpdate></DeviceUpdate></el-tab-pane>
+        <el-tab-pane label="删除项目"> <DeviceDelete></DeviceDelete> </el-tab-pane>
         </el-tabs>
     </div>
 </template>
 
 <script>
-import DeviceCrudPopInfo from './infopop/devicecrud_infopop.vue'
 import DeviceCreate from './crud/devicecreate.vue'
+import DeviceUpdate from './crud/deviceupdate.vue';
+import DeviceDelete from './crud/devicedelete.vue';
 export default{
     name:'DeviceCrud',
     components:{
-        DeviceCrudPopInfo:DeviceCrudPopInfo,
-        DeviceCreate:DeviceCreate
+        DeviceCreate:DeviceCreate,
+        DeviceUpdate:DeviceUpdate,
+        DeviceDelete:DeviceDelete
     },
 }
 </script>
 <style>
-    .popinfo{
-        height: 40px;
-    }
+   
 </style>
 
 
