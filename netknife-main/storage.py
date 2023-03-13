@@ -1,4 +1,4 @@
-import sqlite3,os
+import sqlite3,os,uuid
 
 class AppStorage():
     def __new__(cls,*args, **kwds):
@@ -7,8 +7,8 @@ class AppStorage():
         return cls._instance       
     def __init__(self) -> None:
         self.__path=os.path.dirname(os.path.abspath(__file__))+'/appdata.db'
-        self.__add_login_info_sql=fr'''INSERT INTO LOGININFO (PROJECT,CLASS,AREA,PROTOCOL,PORT,USERNAME,PASSWORD,SECRET,IP_EXPRESSION)
-                            VALUES (?,?,?,?,?,?,?,?,?)'''
+        self.__add_login_info_sql=fr'''INSERT INTO LOGININFO (ID,PROJECT,CLASS,AREA,PROTOCOL,PORT,USERNAME,PASSWORD,SECRET,IP_EXPRESSION)
+                            VALUES (?,?,?,?,?,?,?,?,?,?)'''
         self.__check_project_sql=fr'''SELECT PROJECT FROM LOGININFO WHERE PROJECT=?'''
         if not os.path.exists(self.__path):
             try:
@@ -16,7 +16,8 @@ class AppStorage():
                 cur=con.cursor()
                 cur.execute(
                     '''CREATE TABLE  LOGININFO(
-                PROJECT        TEXT    PRIMARY KEY   NOT NULL,
+                ID             TEXT    PRIMARY KEY NOT NULL,
+                PROJECT        TEXT    NOT NULL,
                 CLASS          TEXT    NOT NULL,
                 AREA           TEXT    NOT NULL,
                 PROTOCOL       TEXT    NOT NULL,
@@ -27,7 +28,11 @@ class AppStorage():
                 IP_EXPRESSION   TEXT    NOT NULL
                 );'''
                 )
+                uid =str(uuid.uuid4())
+                suid=''.join(uid.split('-'))
+                cur.execute(self.__add_login_info_sql,[suid]*10)
                 con.commit()
+                print('-----------------创建成功-------------------')
             except sqlite3.Error as e:
                 print(e)
                 con.rollback()
@@ -38,10 +43,13 @@ class AppStorage():
                     con.close()
     def add_login_info(self,login_dict):
         try:
-            value_tuple=tuple(login_dict.values())
+            uid =str(uuid.uuid4())
+            suid=''.join(uid.split('-'))
+            value_list=list(login_dict.values())
+            value_list.insert(0,suid)
             con=sqlite3.connect(self.__path,check_same_thread=False)
             cur=con.cursor()
-            cur.execute(self.__add_login_info_sql,value_tuple)
+            cur.execute(self.__add_login_info_sql,value_list)
             con.commit()
             return True
         except sqlite3.Error as e:
@@ -56,7 +64,6 @@ class AppStorage():
     def check_project(self,check_project_str):       
         try:
             project_tuple=tuple([check_project_str])
-            print(project_tuple)
             con=sqlite3.connect(self.__path,check_same_thread=False)
             cur=con.cursor()
             cur.execute(self.__check_project_sql,project_tuple)

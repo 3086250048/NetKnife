@@ -5,11 +5,6 @@
         :title="pop_title"
         :type="pop_type">
         </el-alert>
-        <!-- <el-alert
-            v-show="true"
-            title="错误提示的文案"
-            type="error">
-        </el-alert> -->
     </div>
 </template>
 <script>

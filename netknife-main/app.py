@@ -42,8 +42,11 @@ def checkip_tcp():
 def checkproject():
     data.check_project_str=json.loads(request.get_data(as_text=True))
     result=storage.check_project(data.check_project_str)
-    print(result)
-    return True
+    if result:
+        return 'NOT_USED'
+    else:
+        return 'USED'
+    
     
 
 

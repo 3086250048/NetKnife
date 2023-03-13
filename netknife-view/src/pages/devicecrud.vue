@@ -1,7 +1,7 @@
 <template>
     <el-form :inline=true ref="device_info" :mode="device_info" label-width="80px" label-position="rigth">
         <div class="popinfo">
-            <DeviceAddPopInfo></DeviceAddPopInfo>
+            <DeviceCrudPopInfo></DeviceCrudPopInfo>
         </div>
         <el-form-item label="项目名称">
             <el-input class="project_input" v-model="device_info.project" placeholder="请输入项目名称">
@@ -76,11 +76,11 @@
 
 <script>
 import {mapActions, mapMutations} from 'vuex'
-import DeviceAddPopInfo from './infopop/deviceadd_infopop.vue'
+import DeviceCrudPopInfo from './infopop/devicecrud_infopop.vue'
 export default{
     name:'DeviceAdd',
     components:{
-        DeviceAddPopInfo:DeviceAddPopInfo
+        DeviceCrudPopInfo:DeviceCrudPopInfo
     },
     data(){
         return {

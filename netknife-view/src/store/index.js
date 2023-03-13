@@ -85,7 +85,7 @@ const deviceaddAbout={
         COMMIT(state){
             console.log(state.ip_expression_check_flag,1)
             console.log(state.port_range_check_flag)
-            if(state.ip_expression_check_flag && state.port_range_check_flag){
+            if(state.ip_expression_check_flag && state.port_range_check_flag && state.project_check_flag){
                 send_post('/commit',{
                     'project':state.device_info.project,
                     'class':state.device_info.device_class,
@@ -110,10 +110,12 @@ const deviceaddAbout={
         CHECK_PROJECT_POP_INFO(state){
             send_post('/check_project',{'project':state.device_info.project},response=>{
                 console.log(response.data)
-                 if(1 ){
-                     pop_info(state,'项目名未被使用','info')
+                 if(response.data === 'NOT_USED'){
+                    state.project_check_flag=true
+                    pop_info(state,'项目名未被使用','success')
                  }else{
-                     pop_info(state,'项目名称被使用','info')
+                    state.project_check_flag=false
+                    pop_info(state,'项目名称被使用','info')
                  }
             },
             reason=>{
@@ -225,7 +227,8 @@ const deviceaddAbout={
             type:''
         },
         ip_expression_check_flag:false,
-        port_range_check_flag:true
+        port_range_check_flag:true,
+        project_check_flag:false
     }
 
 }

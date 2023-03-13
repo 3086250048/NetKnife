@@ -1,4 +1,4 @@
-完成对project的较验，防止添加重复的项目--
+; 完成对project的较验，防止添加重复的项目--
 实现对已有项目的修改、删除
 实现点击project input框时弹出数据库中已经存在的项目名称
 实现点击device_class input框时弹出netmiko支持的设备类型列表
