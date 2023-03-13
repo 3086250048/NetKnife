@@ -9,6 +9,7 @@
 </template>
 <script>
 export default{
+    name:'DeviceCrudPopInfo',
     computed:{
         pop_able(){
             return this.$store.state.deviceaddAbout.pop_info.able
@@ -25,4 +26,3 @@ export default{
     }
 }
 </script>
-

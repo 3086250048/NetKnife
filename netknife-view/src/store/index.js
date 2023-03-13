@@ -232,6 +232,31 @@ const deviceaddAbout={
     }
 
 }
+
+const deviceupdataAbout={
+    actions:{
+    },
+    mutations:{
+
+    },
+    state:{
+
+    }
+
+}
+
+const deviceremoveAbout={
+    actions:{
+    },
+    mutations:{
+
+    },
+    state:{
+        
+    }
+}
+
+
 import Vuex from 'vuex'
 import Vue from 'vue'
 

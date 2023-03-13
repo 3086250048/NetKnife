@@ -1,5 +1,5 @@
 <template>
-        <ul v-infinite-scroll="load">
+        <ul v-infinite-scroll="load" >
             <li v-for="i in count"> 
                 <el-descriptions title="设备连接块">
                     <el-descriptions-item label="IP">{{  }}</el-descriptions-item>
@@ -28,3 +28,5 @@ export default{
 }
 
 </script>
+<style>
+</style>

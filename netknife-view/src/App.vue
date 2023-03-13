@@ -1,15 +1,12 @@
 <template>
-  <el-container>
+  <el-container id="app">
     <el-header id="header">
       <h1>Netknife</h1>
     </el-header>
     <el-main  id="main">
-      <div></div>
-      <div id='mainbox'>
           <Meun></Meun>
-      </div>
     </el-main>
-    <el-footer id="footer">
+    <el-footer id="footer" >
       <h1>Footer</h1>
     </el-footer>
   </el-container>
@@ -23,14 +20,18 @@ export default{
     }
 }
 </script>
-<style>
+<style scoped>
 #header{
-  background-color: green;
+  background-color: #409EFF;
+  color:#303133 ;
+  height:50px;
 }
 #footer{
-  background-color: green;
+  background-color: #409EFF;
+  color: #303133;
 }
-#mainbox{
-  height: 640px;
+#main{
+  height: 620px;
+  
 }
 </style>
