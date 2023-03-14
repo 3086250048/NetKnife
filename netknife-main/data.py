@@ -12,6 +12,8 @@ class AppInfo():
         self.__check_ip_tuple=None
         self.__check_ip_port_str=None
         self.__check_project_str=None
+        self.__where_dict=None
+        self.__update_data_dict=None
     @property
     def login_dict(self):
         return self.__login_dict
@@ -24,6 +26,12 @@ class AppInfo():
     @property
     def check_project_str(self):
         return self.__check_project_str
+    @property
+    def where_dict(self):
+        return self.__where_dict
+    @property
+    def update_data_dict(self):
+        return self.__update_data_dict
 
     @login_dict.setter
     def login_dict(self,login_dict):
@@ -37,7 +45,13 @@ class AppInfo():
     @check_project_str.setter
     def check_project_str(self,project_dict):
         self.__check_project_str=project_dict['project']
-    
+    @where_dict.setter
+    def where_dict(self,where_dict):
+        self.__where_dict=where_dict
+    @update_data_dict.setter
+    def update_data_dict(self,update_data_dict):
+        self.__update_data_dict=update_data_dict
+
 if __name__ =='__main__':
     a1=AppInfo()
     a2=AppInfo()

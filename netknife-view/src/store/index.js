@@ -228,7 +228,7 @@ const deviceaddAbout={
         },
         ip_expression_check_flag:false,
         port_range_check_flag:true,
-        project_check_flag:false
+        project_check_flag:true
     }
 
 }
@@ -236,9 +236,52 @@ const deviceaddAbout={
 const deviceupdateAbout={
     namespaced:true,
     actions:{
+        update(context){
+            send_post('/check_where',{ 
+            'project':context.state.where_info.project,
+            'class':context.state.where_info.device_class,
+            'area':context.state.where_info.area,
+            'protocol':context.state.where_info.protocol,
+            'port':context.state.where_info.port,
+            'username':context.state.where_info.username,
+            'password':context.state.where_info.password,
+            'secret':context.state.where_info.secret,
+            'ip_expression':context.state.where_info.ip_expression},response=>{
+                console.log(response)
+                if(response.data==='EXIST'){
+                    context.commit('UPDATE')
+                }else{
+                    pop_info(context.state,'数据不存在','warning')
+                }
+              
+               
+            },reason=>{
+                pop_info(context.state,'请不要重复发送更新请求','warning')
+            })
+        }
     },
     mutations:{
-
+        UPDATE(state){
+            send_post('/update_data',{ 
+                'project': state.update_info.project,
+                'class': state.update_info.device_class,
+                'area': state.update_info.area,
+                'protocol': state.update_info.protocol,
+                'port': state.update_info.port,
+                'username': state.update_info.username,
+                'password': state.update_info.password,
+                'secret': state.update_info.secret,
+                'ip_expression': state.update_info.ip_expression},response=>{
+                    console.log(response)
+                    if(response.data==='UPDATE_SUCCESS'){
+                        pop_info(state,'数据更新成功','success')
+                    }else{
+                        pop_info(state,'数据更新失败','error')
+                    }},reason=>{
+                        pop_info(state,'请不要重复发送更新请求','warning')
+                })
+            }
+        
     },
     state:{
         where_info:{
@@ -251,7 +294,7 @@ const deviceupdateAbout={
             password:'',
             ip_expression:'',
             secret:'',
-            check_protocol:''
+
         },
         update_info:{
             project:'',
@@ -263,7 +306,7 @@ const deviceupdateAbout={
             password:'',
             ip_expression:'',
             secret:'',
-            check_protocol:''
+     
         },
         pop_info:{
             able:false,
@@ -276,10 +319,55 @@ const deviceupdateAbout={
 }
 
 const devicedeleteAbout={
+    namespaced:true,
     actions:{
+        remove(context){
+            send_post('/check_where',{
+                'project':context.state.delete_info.project,
+                'class':context.state.delete_info.device_class,
+                'area':context.state.delete_info.area,
+                'protocol':context.state.delete_info.protocol ,
+                'port': context.state.delete_info.port,
+                'username':context.state.delete_info.username,
+                'password':context.state.delete_info.password,
+                'ip_expression':context.state.delete_info.ip_expression,
+                'secret':context.state.delete_info.secret,
+                'check_protocol':context.state.delete_info.check_protocol
+            },response=>{
+                if(response.data=='EXIST'){
+                    context.commit('DELETE')
+                }
+                else{
+                    pop_info(context.state,'数据不存在','warning')
+                }
+            },reason=>{
+                pop_info(context.state,'请勿重复发送请求','warning')
+            })
+        }
     },
     mutations:{
-
+        DELETE(state){
+            send_post('/delete_data',{
+                'project':state.delete_info.project,
+                'device_class':state.delete_info.device_class,
+                'area':state.delete_info.area,
+                'protocol':state.delete_info.protocol ,
+                'port': state.delete_info.port,
+                'username':state.delete_info.username,
+                'password':state.delete_info.password,
+                'ip_expression':state.delete_info.ip_expression,
+                'secret':state.delete_info.secret,
+                'check_protocol':state.delete_info.check_protocol
+            },response=>{
+                if(response.data=='DELETE_SUCCESS'){
+                    pop_info(state,'数据删除成功','success')
+                }else{
+                    pop_info(state,'数据删除失败','warning')
+                }
+            },reason=>{
+                pop_info(state,'请勿重复发送删除请求','warning')           
+            })
+        }
     },
     state:{
         delete_info:{
@@ -292,7 +380,6 @@ const devicedeleteAbout={
             password:'',
             ip_expression:'',
             secret:'',
-            check_protocol:''
         },
         pop_info:{
             able:false,
@@ -305,6 +392,8 @@ const devicedeleteAbout={
 
 import Vuex from 'vuex'
 import Vue from 'vue'
+
+
 
 Vue.use(Vuex)
 export default new Vuex.Store({

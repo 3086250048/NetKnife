@@ -66,6 +66,9 @@
             </el-form-item><br>
         </el-form>
         <el-divider content-position="left">更新数据</el-divider>
+        <div class="popinfo">
+            <DeviceUpdatePopInfo></DeviceUpdatePopInfo>
+        </div>
         <el-form :inline=true ref="update_info" :mode="update_info" label-width="80px" label-position="rigth">
             <el-form-item label="项目名称">
                 <el-input class="project_input" v-model="update_info.project" placeholder="请输入项目名称">
@@ -130,7 +133,7 @@
                     </el-input>
             </el-form-item><br>
         </el-form><br>
-        <el-button class="button" >更新</el-button>
+        <el-button class="button" @click="update">更新</el-button>
     </div>
 </template>
 <script>
@@ -142,7 +145,7 @@ export default{
         DeviceUpdatePopInfo:deviceupdate_pop_info
     },
     methods:{
-        ...mapActions('deviceupdateAbout',{}),
+        ...mapActions('deviceupdateAbout',{update:'update'}),
         ...mapMutations('deviceupdateAbout',{}),
     },
     computed:{

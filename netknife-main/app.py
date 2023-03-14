@@ -24,9 +24,9 @@ def index():
 def commit():
     data.login_dict=json.loads(request.get_data(as_text=True))
     if storage.add_login_info(data.login_dict):
-        return 'AddOK!!!'
+        return 'ADD_SUCCESS'
     else:
-        return 'AddFAULT...'
+        return 'ADD_FAULT'
 @netknife.route('/checkip_icmp',methods=['POST'])
 def checkip_icmp():
     data.check_ip_tuple=json.loads(request.get_data(as_text=True))
@@ -39,15 +39,33 @@ def checkip_tcp():
     return net.check_ip_tcp(data.check_ip_tuple,data.check_ip_port_str)
 
 @netknife.route('/check_project',methods=['POST'])
-def checkproject():
+def checkp_roject():
     data.check_project_str=json.loads(request.get_data(as_text=True))
     result=storage.check_project(data.check_project_str)
     if result:
         return 'NOT_USED'
-    else:
-        return 'USED'
+    return 'USED'
     
-    
+@netknife.route('/check_where',methods=['POST'])
+def check_where():
+    data.where_dict=json.loads(request.get_data(as_text=True))
+    result=storage.check_where(data.where_dict)
+    if result:
+        return 'NOT_EXIST'
+    return 'EXIST'
+@netknife.route('/update_data',methods=['POST'])
+def update_data():
+    data.update_data_dict=json.loads(request.get_data(as_text=True))
+    result=storage.update_data(data.where_dict,data.update_data_dict)
+    if result:
+        return 'UPDATE_SUCCESS'
+    return 'UPDATE_FAULT'
+@netknife.route('/delete_data',methods=['POST'])
+def delete_data():
+    result=storage.delete_data(data.where_dict)
+    if result:
+        return 'DELETE_SUCCESS'
+    return 'DELETE_FAULT'
 
 
 if __name__ == '__main__':

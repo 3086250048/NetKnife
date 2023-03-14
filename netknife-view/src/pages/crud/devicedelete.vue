@@ -1,6 +1,9 @@
 <template>
     <div>
         <el-divider content-position="left">刪除数据</el-divider>
+        <div class="popinfo">
+            <DeviceDeletePopInfo></DeviceDeletePopInfo>
+        </div>
         <el-form :inline=true ref="delete_info" :mode="delete_info" label-width="80px" label-position="rigth">
             <el-form-item label="项目名称">
                 <el-input class="project_input" v-model="delete_info.project" placeholder="请输入项目名称">
@@ -65,7 +68,7 @@
                     </el-input>
             </el-form-item><br>
         </el-form><br>
-        <el-button class="button">删除</el-button>
+        <el-button class="button" @click="remove">删除</el-button>
     </div>
 </template>
 
@@ -78,7 +81,7 @@ export default{
         DeviceDeletePopInfo:devicedelete_pop_info
     },
     methods:{
-        ...mapActions('deviceupdeleteAbout',{}),
+        ...mapActions('devicedeleteAbout',{remove:'remove'}),
         ...mapMutations('devicedeleteAbout',{}),
     },
     computed:{

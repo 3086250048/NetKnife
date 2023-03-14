@@ -39,21 +39,26 @@ class AppProcessing():
             for b in range(int(address_dict['Bstart']),int(address_dict['Bend'])+1):
                 for c in range(int(address_dict['Cstart']),int(address_dict['Cend'])+1):
                     for d in range(int(address_dict['Dstart']),int(address_dict['Dend'])+1):
-                        if a % int(address_dict['Astep'])==0:
-                            if b % int(address_dict['Bstep'])==0:
-                                if c % int(address_dict['Cstep'])==0:
-                                    if d % int(address_dict['Dstep'])==0:
-                                        address_list+=[f'{a}.{b}.{c}.{d}']
-                                    else:
-                                        continue
-                            else:
-                                continue       
-                        else:
-                            continue
+                        if not a % int(address_dict['Astep'])==0:continue
+                        if not b % int(address_dict['Bstep'])==0:continue
+                        if not c % int(address_dict['Cstep'])==0:continue
+                        if not d % int(address_dict['Dstep'])==0:continue
+                        address_list+=[f'{a}.{b}.{c}.{d}']
         return tuple(address_list)
+    
+    # def processing_check_update_where(self,check_update_where_dict):
+    #     {'project': '', 'class': '', 'area': '', 'protocol': '', 'port': '', 'username': '', 'password': '', 'secret': '', 'ip_expression': ''}
+    #     check_update_where_list=[v for v in check_update_where_dict.values() ]
+    #     def callback(v):
+    #         if v=='':
+    #             return True
+    #         return v
+    #     check_update_where_tuple=tuple(map(callback,check_update_where_list ))
+    #     return check_update_where_tuple
+        
 
 if __name__ == '__main__':
     ap=AppProcessing()
-    print(ap.processing_check_ip('192.168.123.1-10'))
+    ap.processing_check_update_where({'a':1,'b':'2','c':''})
    
 
