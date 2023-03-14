@@ -25,7 +25,8 @@ class AppStorage():
                 USERNAME       TEXT    NOT NULL,
                 PASSWORD     TEXT      NOT NULL,
                 SECRET        TEXT     NOT NULL,
-                IP_EXPRESSION   TEXT    NOT NULL
+                IP_EXPRESSION   TEXT    NOT NULL,
+                UNIQUE(PROJECT,AREA,PORT,PROTOCOL,IP_EXPRESSION)
                 );'''
                 )
                 uid =str(uuid.uuid4())
@@ -57,7 +58,7 @@ class AppStorage():
 
 
 
-    def oprate_sql(self,sql,data,call_back):
+    def oprate_sql(self,sql,data,call_back,*args):
         try:
             con=sqlite3.connect(self.__path,check_same_thread=False)
             cur=con.cursor()
@@ -83,15 +84,15 @@ class AppStorage():
             return True
         return self.oprate_sql(self.__add_login_info_sql,value_list,callback)
 
-    def check_project(self,check_project_str):
-        project_tuple=tuple([check_project_str])
+    def check_quads(self,check_quads_dict):
+        sql=AppStorage.dynamic_sql('SELECT * FROM LOGININFO','WHERE','AND',check_quads_dict)
         def callback(cur,con):
             result=cur.fetchall()
             if len(result)<=0:
                 return True
             else:
                 return False
-        return self.oprate_sql(self.__check_project_sql,project_tuple,callback)    
+        return self.oprate_sql(sql,check_quads_dict,callback)    
     def check_where(self,where_dict):
         def callback(cur,con):
             result=cur.fetchall()
@@ -101,17 +102,16 @@ class AppStorage():
             return False
         return self.oprate_sql(AppStorage.dynamic_sql('SELECT * FROM LOGININFO','WHERE','AND',where_dict),where_dict,callback)
     def update_data(self,where_dict,update_data_dict):
-        def callback(cur,con):
-            result=cur.fetchall()
-            print(result)
+        def callback_after(cur,con):
             con.commit()
             return True
         where_sql=AppStorage.dynamic_sql('','where','and',where_dict)
         update_sql=AppStorage.dynamic_sql('update logininfo','set',',',update_data_dict)
-        print(where_sql)
-        print(update_sql)
         sql=update_sql+where_sql
-        return self.oprate_sql(sql,update_data_dict,callback)
+        return self.oprate_sql(sql,{},callback_after)
+
+     
+        
     def delete_data(self,where_dict):
         def callback(cur,con):
             con.commit()

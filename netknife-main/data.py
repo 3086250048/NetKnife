@@ -11,7 +11,7 @@ class AppInfo():
         self.__login_dict=None
         self.__check_ip_tuple=None
         self.__check_ip_port_str=None
-        self.__check_project_str=None
+        self.__check_quads_dict=None
         self.__where_dict=None
         self.__update_data_dict=None
     @property
@@ -24,8 +24,8 @@ class AppInfo():
     def check_ip_port_str(self):
         return self.__check_ip_port_str
     @property
-    def check_project_str(self):
-        return self.__check_project_str
+    def check_quads_dict(self):
+        return self.__check_quads_dict
     @property
     def where_dict(self):
         return self.__where_dict
@@ -42,9 +42,9 @@ class AppInfo():
     @check_ip_port_str.setter
     def check_ip_port_str(self,ip_check_dict):
         self.__check_ip_port_str=ip_check_dict['port']
-    @check_project_str.setter
-    def check_project_str(self,project_dict):
-        self.__check_project_str=project_dict['project']
+    @check_quads_dict.setter
+    def check_quads_dict(self,check_quads_dict):
+        self.__check_quads_dict=check_quads_dict
     @where_dict.setter
     def where_dict(self,where_dict):
         self.__where_dict=where_dict

@@ -146,7 +146,10 @@ export default{
     },
     methods:{
         ...mapActions('deviceupdateAbout',{update:'update'}),
-        ...mapMutations('deviceupdateAbout',{}),
+        ...mapMutations('deviceupdateAbout',{
+            IP_EXPRESSION_POP_INFO:'IP_EXPRESSION_POP_INFO',
+            PORT_POP_INFO:'PORT_POP_INFO'
+        }),
     },
     computed:{
         where_info(){
@@ -155,9 +158,20 @@ export default{
         update_info(){
             return this.$store.state.deviceupdateAbout.update_info
         },
-       
+        ip_expression(){
+            return this.update_info.ip_expression
+        },
+        port(){
+            return this.update_info.port
+        }
     },
     watch:{
+        ip_expression(){
+            this.IP_EXPRESSION_POP_INFO()
+        },  
+        port(){
+            this.PORT_POP_INFO()
+        }
     },
     mounted(){        
     }

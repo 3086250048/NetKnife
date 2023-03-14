@@ -10,7 +10,10 @@ Value Astep (\d*)
 Value Bstep (\d*)
 Value Cstep (\d*)
 Value Dstep (\d*)
+Value BeforeAddress ((\d+\.\d+\.\d+\.\d+,)*)
+Value AfterAddress ((,\d+\.\d+\.\d+\.\d+)*)
 
 
 Start
-  ^${Astart}-*${Aend}%*${Astep}.${Bstart}-*${Bend}%*${Bstep}.${Cstart}-*${Cend}%*${Cstep}.${Dstart}-*${Dend}%*${Dstep} -> Record
+  ^${BeforeAddress}${Astart}-*${Aend}%*${Astep}.${Bstart}-*${Bend}%*${Bstep}.${Cstart}-*${Cend}%*${Cstep}.${Dstart}-*${Dend}%*${Dstep}${AfterAddress} -> Record
+  

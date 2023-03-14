@@ -5,11 +5,12 @@ import json
 from data import AppInfo
 from storage import AppStorage
 from net import AppNet
+from processing import AppProcessing
 
 data=AppInfo()
 storage=AppStorage()
 net=AppNet()
-
+ap=AppProcessing()
 
 
 netknife=Flask(__name__)
@@ -38,10 +39,11 @@ def checkip_tcp():
     data.check_ip_port_str=json.loads(request.get_data(as_text=True))
     return net.check_ip_tcp(data.check_ip_tuple,data.check_ip_port_str)
 
-@netknife.route('/check_project',methods=['POST'])
-def checkp_roject():
-    data.check_project_str=json.loads(request.get_data(as_text=True))
-    result=storage.check_project(data.check_project_str)
+@netknife.route('/check_quads',methods=['POST'])
+def checkp_quads():
+    data.check_quads_dict=json.loads(request.get_data(as_text=True))
+    result=storage.check_quads(data.check_quads_dict)
+    print(result)
     if result:
         return 'NOT_USED'
     return 'USED'
