@@ -1,32 +1,43 @@
 <template>
-        <ul v-infinite-scroll="load" >
-            <li v-for="i in count"> 
-                <el-descriptions title="设备连接块">
-                    <el-descriptions-item label="IP">{{  }}</el-descriptions-item>
-                    <el-descriptions-item label="协议和端口">{{  }}</el-descriptions-item>
-                    <el-descriptions-item label="设备层级">{{  }}</el-descriptions-item>
-                    <el-descriptions-item label="设备类型">{{  }}</el-descriptions-item>
-                    <el-descriptions-item label="项目名称">{{  }}</el-descriptions-item>
-                </el-descriptions>
-            </li>
-        </ul>
+    <ul >
+        <li v-for="(project,i) in project_unit_list " > 
+            <el-card class="box-card">    
+            <el-descriptions :title="project[0]">
+                <el-descriptions-item label="区域" >{{ project[1] }}</el-descriptions-item>
+                <el-descriptions-item label="协议" >{{ project[2] }}</el-descriptions-item>
+                <el-descriptions-item label="端口" >{{ project[3] }}</el-descriptions-item>
+                <el-descriptions-item label="IP地址表达式">{{ project[4] }}</el-descriptions-item>
+            </el-descriptions>
+            </el-card>
+        </li>
+    </ul>
 </template>
 
 <script>
+import {mapActions, mapMutations} from 'vuex'
 export default{
     name:'DeviceState',
-    data(){
-        return {
-            count:0
+    methods:{
+        ...mapMutations('devicestateAbout',{GET_PROJECT_UNIT_LIST:'GET_PROJECT_UNIT_LIST'})
+    },
+    computed:{
+        project_unit_list(){
+            return this.$store.state.devicestateAbout.project_unit_list
         }
     },
-    methods:{
-        load(){
-            this.count+=2
-        }
-    }
+    mounted(){
+      this.GET_PROJECT_UNIT_LIST()
+    },
 }
 
 </script>
-<style>
+<style scoped>
+li{
+    list-style-type: none;
+}
+li:not(:first-child){
+    margin-top: 8px;
+}
+
+
 </style>

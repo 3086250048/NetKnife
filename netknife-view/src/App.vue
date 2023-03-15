@@ -30,8 +30,10 @@ export default{
   background-color: #409EFF;
   color: #303133;
 }
-#main{
-  height: 620px;
-  
+h1{
+  margin-top: 6px;
+  font-size: 50px;
+  font-weight:bold;
 }
+
 </style>

@@ -1,6 +1,7 @@
 from textfsm import TextFSM
 from itertools import chain
 import os
+from ordered_set import OrderedSet
 
 class AppProcessing():
     def __new__(cls,*args, **kwds):
@@ -58,12 +59,29 @@ class AppProcessing():
             if v==',':
                 address_list+=[result]
                 result=''
-        return tuple(address_list)
+        return tuple([ v for v in address_list if v!=''])
 
-        
+    def processing_project_unit_data(self,project_unit_data):
+        result=[]
+        return_result=[]
+        for i in project_unit_data:
+            for j in i:
+                for k in j:
+                    result+=[k]
+            return_result+=[[v for v in OrderedSet(result) if v!='']]
+            result=[]  
+        return return_result
+                
+
+
 
 if __name__ == '__main__':
     ap=AppProcessing()
-    print(ap.processing_check_ip('1.1.1.1,2.2.2.2,192.168.1.4-10,3.3.3.3,4.4.4.4'))
+    lis=[[('Myproject', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '100.100.100.100')], [('默认项目', '默认区域', 'telnet', '23', 'admin', '11', '', '192.168.123.1'), ('默认项目', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '2.1.1.1')], [('默认项目1', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2'), ('默认项目1', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.3')], [('默认项目11', '默认区域', 'telnet', '23', '1', '1', '', '2.2.2.2')], [('默认项目2', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2')], [('默认项目3', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2')], [('默认项目4', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2'), ('默认项目4', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.3')]]
+    r= ap.processing_project_unit_data(lis)
+    print(r)
+
+
+
    
 

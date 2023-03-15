@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <el-tabs type="border-card" style="height: 800px;">
+    <div  class="crud_div">
+        <el-tabs type="border-card">
         <el-tab-pane label="新建项目"><DeviceCreate></DeviceCreate></el-tab-pane>
         <el-tab-pane label="更新项目"><DeviceUpdate></DeviceUpdate></el-tab-pane>
         <el-tab-pane label="删除项目"> <DeviceDelete></DeviceDelete> </el-tab-pane>
@@ -21,8 +21,10 @@ export default{
     },
 }
 </script>
-<style>
-   
+<style scoped>
+   .curd_div{
+    background-color: #DCDFE6;
+   }
 </style>
 
 

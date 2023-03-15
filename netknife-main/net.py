@@ -15,6 +15,7 @@ class AppNet():
     def __init__(self) :
         pass
     def check_ip_icmp(self,check_ip_tuple):
+        print(check_ip_tuple)
         mp=MultiPing(check_ip_tuple)
         mp.send()
         no_responses=mp.receive(2)[1]
