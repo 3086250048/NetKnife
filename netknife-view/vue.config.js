@@ -6,7 +6,14 @@ module.exports = defineConfig({
   assetsDir:process.env.NODE_ENV === 'production'? '../static' : 'static',
   publicPath: process.env.NODE_ENV === 'production'? './' : '/',
   outputDir: path.resolve(__dirname,'../templates'),
-  // devServer:{
-  //   proxy:'http://127.0.0.1:3000'
-  // }
+  devServer:{
+    host:'0.0.0.0',
+    client:{
+      webSocketURL:'ws://0.0.0.0:6101/ws',
+    },
+    headers:{
+      'Access-Control-Allow-Origin':'*'
+    },
+    proxy:'http://127.0.0.1:3000'
+  }
 })

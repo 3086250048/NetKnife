@@ -4,6 +4,9 @@
 
 <script>
 export default{
-    name:'DeviceEdit'
+    name:'DeviceOprate',
+    components:{
+      
+    }
 }
 </script>

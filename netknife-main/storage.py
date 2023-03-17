@@ -141,32 +141,41 @@ class AppStorage():
             n=0
             for j in i:    
                 if n!=0:
-                    if j[0] != dic['project']:
-                        dic['project']+=';'+j[0]
-                    if j[1] != dic['area']:
-                        dic['area']+=';'+j[1]
-                    if j[2] != dic['protocol']:
-                        dic['protocol']+=';'+j[2]
-                    if j[3] != dic['port']:
-                        dic['port']+=';'+j[3]
-                    if j[4] != dic['ip_expression']:
-                        dic['ip_expression']+=';'+j[4]
+                    if j[0] not in dic['project']:
+                        dic['project']+=j[0] 
+                    if j[1] not in dic['area']:
+                        dic['area']+=' 、'+j[1]
+                    if j[2] not in  dic['protocol']:
+                        dic['protocol']+='  ； '+j[2]
+                    if j[3] not in  dic['port']:
+                        dic['port']+='  ； '+j[3]
+                    if j[4] not in dic['ip_expression']:
+                        dic['ip_expression']+='  ； '+j[4]
                 else:
-                    if j[0] != dic['project']:
+                    if j[0] not in dic['project']:
                         dic['project']+=j[0]
-                    if j[1] != dic['area']:
+                    if j[1] not in dic['area']:
                         dic['area']+=j[1]
-                    if j[2] != dic['protocol']:
+                    if j[2] not in dic['protocol']:
                         dic['protocol']+=j[2]
-                    if j[3] != dic['port']:
+                    if j[3] not in dic['port']:
                         dic['port']+=j[3]
-                    if j[4] != dic['ip_expression']:
+                    if j[4] not in dic['ip_expression']:
                         dic['ip_expression']+=j[4]
                 n+=1
             result+=[list(dic.values())]
             dic={'project':'','area':'','protocol':'','port':'',"ip_expression":''}
         return result
+    def get_all_project_list(self):
+        def callback(cur,con):
+            return cur.fetchall()
+        _lis= self.oprate_sql('SELECT DISTINCT project FROM LOGININFO;',{},callback)[1:]
+        result= [ {'value':v[0]} for v in _lis]
+        return result
+     
 
+        
+        
 if __name__ == '__main__':
     ap=AppStorage()
     # s1.add_login_info()

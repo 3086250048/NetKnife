@@ -74,6 +74,10 @@ def get_project_unit_data():
     return storage.get_project_unit_list()
     
 
+@netknife.route('/get_all_project_data',methods=['POST'])
+def get_all_project_data():
+    return storage.get_all_project_list()
+
 if __name__ == '__main__':
     netknife.run('0.0.0.0',port=3000,debug=True)
  
