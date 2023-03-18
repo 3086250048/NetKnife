@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <div>
+    <el-container>
+        <el-header>
             <el-button type="primary" icon="el-icon-search" ></el-button>
             <el-autocomplete
             style="width: 500px;margin-bottom: 10px;"
@@ -9,37 +9,55 @@
             placeholder="请输入项目名称"
             @select="handleSelect"
             ></el-autocomplete>
-            
-        </div>
-        <ul>
-        <li v-for="(project,i) in select_project_unit_list " > 
-                <el-card class="box-card normal"  style="height: 40px;">
-                    <div style="margin-top: -10px;">{{ project[0] }}</div>
-                </el-card>   
-                <el-card class="box-card" style="">
-                    区域:{{ project[1].length>=50?project[1].slice(0,150)+'...':project[1] }}<br>
-                    协议:{{ project[2].length>=50?project[2].slice(0,150)+'...':project[2] }}<br>
-                    端口:{{ project[3].length>=50?project[3].slice(0,140)+'...':project[3] }}<br>
-                    IP表达式:{{ project[4].length>=50?project[4].slice(0,150)+'...':project[4] }}
-                </el-card>
-        </li>
-    </ul>
-    </div>
-    
+        </el-header>
+        <el-main>
+            <ul>
+                <li v-if="able" v-for="(project,i) in select_project_unit_list " > 
+                    <el-card class="box-card  head_card " >
+                        <div style="margin-top: -10px;">
+                            {{ project[0] }}
+                                <el-button type="primary" class="head_button" @click="show_mix_unit_page">显示最小操作单元</el-button>
+                                <el-button type="primary" class="head_button" @click="show_oprate_page">操作</el-button>
+                        </div>
+                    </el-card>   
+                    <el-card class="box-card" style="">
+                                区域:{{ project[1].length>=150?project[1].slice(0,150)+'...':project[1] }}<br>
+                                协议:{{ project[2].length>=150?project[2].slice(0,150)+'...':project[2] }}<br>
+                                端口:{{ project[3].length>=140?project[3].slice(0,140)+'...':project[3] }}<br>
+                                IP表达式:{{ project[4].length>=150?project[4].slice(0,150)+'...':project[4] }}
+                    </el-card>
+                </li>
+            </ul>
+            <router-view></router-view>
+        </el-main>
+    </el-container>    
 </template>
 
 <script>
 
-import {mapActions, mapMutations} from 'vuex'
+import { mapMutations} from 'vuex'
 
 export default{
     name:'DeviceState',
     data() {
         return{
+            able:true,
             input:'',
             };
     },
     methods:{
+        show_mix_unit_page(){
+            this.able=false
+            this.$router.push({
+                name:'mixunit'
+            })
+        },
+        show_oprate_page(){
+            this.able=false
+            this.$router.push({
+                name:'projectoprate'
+            })
+        },
        
         ...mapMutations('devicestateAbout',{GET_PROJECT_UNIT_LIST:'GET_PROJECT_UNIT_LIST',
                                             CHOOSE_CHANGE:'CHOOSE_CHANGE',
@@ -108,4 +126,13 @@ li:not(:first-child){
     background-color: #F56C6C;
 }
 
+.head_card{
+    height: 40px;
+}
+.head_button{
+    height: 40px;
+    float: right;
+    margin-left: 10px;
+    margin-top: -6px;
+}
 </style>

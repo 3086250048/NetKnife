@@ -11,8 +11,13 @@ Vue.config.productionTip = false
 // //引入Vuex插件
 import store from './store/index'
 
+import router from './router/index'
 new Vue({
   el:'#app',
   store:store,
+  router:router,
   render: CreateElement => CreateElement(App),
+  beforeCreate(){
+    Vue.prototype.$bus=this
+  }
 })
