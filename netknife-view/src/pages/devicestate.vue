@@ -1,7 +1,7 @@
 <template>
     <el-container>
-        <el-header>
-            <el-button type="primary" icon="el-icon-search" ></el-button>
+        <el-header v-if="project_view_able">
+            <el-button  type="primary" icon="el-icon-search" ></el-button>
             <el-autocomplete
             style="width: 500px;margin-bottom: 10px;"
             v-model="input"
@@ -10,9 +10,9 @@
             @select="handleSelect"
             ></el-autocomplete>
         </el-header>
-        <el-main>
-            <ul>
-                <li v-if="able" v-for="(project,i) in select_project_unit_list " > 
+        <el-main v-if="project_view_able">
+            <ul >
+                <li  v-for="(project,i) in select_project_unit_list " > 
                     <el-card class="box-card  head_card " >
                         <div style="margin-top: -10px;">
                             {{ project[0] }}
@@ -28,8 +28,8 @@
                     </el-card>
                 </li>
             </ul>
-            <router-view></router-view>
         </el-main>
+        <router-view></router-view>
     </el-container>    
 </template>
 
@@ -41,28 +41,32 @@ export default{
     name:'DeviceState',
     data() {
         return{
-            able:true,
             input:'',
             };
     },
     methods:{
+        ...mapMutations('devicestateAbout',{GET_PROJECT_UNIT_LIST:'GET_PROJECT_UNIT_LIST',
+                                            CHOOSE_CHANGE:'CHOOSE_CHANGE',
+                                            ROLLBACK_SELECT_PROJECT_UNIT_LIST:'ROLLBACK_SELECT_PROJECT_UNIT_LIST',
+                                            SET_PROJECT_VIEW_ABLE:'SET_PROJECT_VIEW_ABLE'}),
+        
         show_mix_unit_page(){
-            this.able=false
+            this.SET_PROJECT_VIEW_ABLE(false)
             this.$router.push({
                 name:'mixunit'
             })
+           
+           
         },
         show_oprate_page(){
-            this.able=false
+            this.SET_PROJECT_VIEW_ABLE(false)
             this.$router.push({
                 name:'projectoprate'
             })
+          
         },
        
-        ...mapMutations('devicestateAbout',{GET_PROJECT_UNIT_LIST:'GET_PROJECT_UNIT_LIST',
-                                            CHOOSE_CHANGE:'CHOOSE_CHANGE',
-                                            ROLLBACK_SELECT_PROJECT_UNIT_LIST:'ROLLBACK_SELECT_PROJECT_UNIT_LIST'}),
-
+        
 
         querySearchAsync(queryString, cb) {
         
@@ -88,6 +92,9 @@ export default{
         },
         all_project_list(){
             return this.$store.state.devicestateAbout.all_project_list
+        },
+        project_view_able(){
+            return this.$store.state.devicestateAbout.project_view_able
         }
        
     },

@@ -10,14 +10,9 @@
     </div>
 </template>
 <script>
-// import deviceinfo from '../pages/deviceinfo.vue'
-// import deviceoprate from '../pages/deviceoprate.vue'
+
 export default{
     name:'Meun',
-    // components:{
-    //     DeviceInfo:deviceinfo,
-    //     DeviceOprate:deviceoprate
-    // },
     data(){
         return{
                 activeName:'first' 
@@ -25,7 +20,6 @@ export default{
     },
     methods:{
         handleClick(tab,event){
-            console.log(tab,event)
             if(this.activeName==='first'){
                 this.$router.push({
                     name:'info',

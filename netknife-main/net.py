@@ -26,7 +26,10 @@ class AppNet():
             ping=Ping(ip,int(check_ip_port_str),1)
             fault_tcp_ping+=ping.ping(1)
         return fault_tcp_ping
-
+    
+    def send_command(self,login_dict,command_data):
+        result=command_data['command']
+        return result
 
 if __name__ == '__main__':
     net =AppNet()

@@ -72,7 +72,8 @@ class AppProcessing():
             result=[]  
         return return_result
                 
-
+    def processing_command(self,command_data):
+        return command_data
 
 
 if __name__ == '__main__':

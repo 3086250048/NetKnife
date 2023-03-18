@@ -78,6 +78,13 @@ def get_project_unit_data():
 def get_all_project_data():
     return storage.get_all_project_list()
 
+@netknife.route('/commit_command',methods=['POST'])
+def commit_command():
+    data.command_dict=json.loads(request.get_data(as_text=True))
+    result=net.send_command({},data.command_dict)
+    return result
+
+
 if __name__ == '__main__':
     netknife.run('0.0.0.0',port=3000,debug=True)
  

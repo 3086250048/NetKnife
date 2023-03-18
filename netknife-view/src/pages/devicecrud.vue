@@ -24,7 +24,9 @@ export default{
             if(this.activename==='first'){
                 this.$router.push({
                     name:'create'
-                })
+                }).then(
+
+                )
             }
             if(this.activename==='second'){
                 this.$router.push({
