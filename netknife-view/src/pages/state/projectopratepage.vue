@@ -3,7 +3,7 @@
         <div style="margin-bottom: 20px;">
             <el-button @click="goBack">返回</el-button>
             <div style="margin-left: 80px;margin-top: -30px;">
-                <span>影响设备百分比</span><el-progress style="width: 300px;margin-left: 130px;margin-top: -20px;" :percentage="effect_connect_percent"></el-progress>
+                <span>影响连接百分比</span><el-progress style="width: 300px;margin-left: 130px;margin-top: -20px;" :percentage="effect_connect_percent"></el-progress>
             </div>
             <div style="margin-left: 500px;margin-top: -20px;">
                 <span>设备执行进度</span><el-progress style="width: 300px;margin-left: 110px;margin-top: -20px;" :percentage="96"></el-progress>

@@ -9,6 +9,7 @@ export const  projectoprateAbout={
             //goback的时候清空textarea中内容
             if(command===''){
                 state.textarea=''
+                state.effect_connect_percent=0
                 return
             }
             //
@@ -31,12 +32,12 @@ export const  projectoprateAbout={
         
                 },reason=>{  
                 })
-            }, 500);
+            }, 300);
         }
     },
     state:{
         textarea:'test',
         choose_project:[],
-        effect_connect_percent:''
+        effect_connect_percent:0
     }
 }

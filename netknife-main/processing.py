@@ -84,8 +84,11 @@ class AppProcessing():
             os.chdir(self.__path+'/textfsm/data')
         result={}
         ex_effect_range=AppProcessing.oprate_dict(self.__file['effect'],command_data['command'])
-        ex_effect_range[0]['project']=command_data['base_effect_range']
-        full_effect_dict=ex_effect_range[0]
+        if len(ex_effect_range)==0:
+            full_effect_dict={'project':command_data['base_effect_range']}
+        else:
+            ex_effect_range[0]['project']=command_data['base_effect_range']
+            full_effect_dict=ex_effect_range[0]
 
         ap=AppProcessing()
         _full_connect_lis=[]
