@@ -83,6 +83,10 @@ def commit_command():
     data.command_dict=json.loads(request.get_data(as_text=True))
     result=net.send_command({},data.command_dict)
     return result
+@netknife.route('/get_effect_data',methods=['POST'])
+def get_effect_data():
+    result=ap.processing_effect_command(json.loads(request.get_data(as_text=True)))
+    return result
 
 
 if __name__ == '__main__':

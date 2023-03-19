@@ -16,11 +16,11 @@
                     <el-card class="box-card  head_card " >
                         <div style="margin-top: -10px;">
                             {{ project[0] }}
-                                <el-button type="primary" class="head_button" @click="show_mix_unit_page">显示最小操作单元</el-button>
-                                <el-button type="primary" class="head_button" @click="show_oprate_page">操作</el-button>
+                                <el-button type="primary" class="head_button" @click="show_mix_unit_page(),set_choose_project(project)">显示最小操作单元</el-button>
+                                <el-button type="primary" class="head_button" @click="show_oprate_page(),set_choose_project(project)">操作</el-button>
                         </div>
                     </el-card>   
-                    <el-card class="box-card" style="">
+                    <el-card class="box-card" >
                                 区域:{{ project[1].length>=150?project[1].slice(0,150)+'...':project[1] }}<br>
                                 协议:{{ project[2].length>=150?project[2].slice(0,150)+'...':project[2] }}<br>
                                 端口:{{ project[3].length>=140?project[3].slice(0,140)+'...':project[3] }}<br>
@@ -49,15 +49,15 @@ export default{
                                             CHOOSE_CHANGE:'CHOOSE_CHANGE',
                                             ROLLBACK_SELECT_PROJECT_UNIT_LIST:'ROLLBACK_SELECT_PROJECT_UNIT_LIST',
                                             SET_PROJECT_VIEW_ABLE:'SET_PROJECT_VIEW_ABLE'}),
-        
+        ...mapMutations('projectoprateAbout',{SET_CHOOSE_PROJECT:'SET_CHOOSE_PROJECT'}),
+
         show_mix_unit_page(){
             this.SET_PROJECT_VIEW_ABLE(false)
             this.$router.push({
                 name:'mixunit'
             })
-           
-           
         },
+
         show_oprate_page(){
             this.SET_PROJECT_VIEW_ABLE(false)
             this.$router.push({
@@ -66,7 +66,9 @@ export default{
           
         },
        
-        
+        set_choose_project(project){
+            this.SET_CHOOSE_PROJECT(project)
+        },
 
         querySearchAsync(queryString, cb) {
         
@@ -132,7 +134,7 @@ li:not(:first-child){
 .error{
     background-color: #F56C6C;
 }
-
+ 
 .head_card{
     height: 40px;
 }

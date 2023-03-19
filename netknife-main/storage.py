@@ -173,6 +173,27 @@ class AppStorage():
         result= [ {'value':v[0]} for v in _lis]
         return result
      
+    def get_effect_ip_expression_list(self,effect_range_dict):
+        # if len(effect_range_list)==1:
+        #     effect_number_data={'project':effect_range_list[0]}
+        # if len(effect_range_list)==2:
+        #     effect_number_data={'project':effect_range_list[0],'area':effect_range_list[1]}
+        # if len(effect_range_list)==3:
+        #     effect_number_data={'project':effect_range_list[0],'area':effect_range_list[1],'protocol':effect_range_list[2]}
+        # if len(effect_range_list)==4:
+        #     effect_number_data={'project':effect_range_list[0],'area':effect_range_list[1],'protocol':effect_range_list[2],'port':effect_range_list[3]}
+        # if len(effect_range_list)==5:
+        #                 effect_number_data={'project':effect_range_list[0],'area':effect_range_list[1],'protocol':effect_range_list[2],'port':effect_range_list[3],'ip_expression':effect_range_list[4]}
+        effect_number_sql=AppStorage.dynamic_sql_return('SELECT IP_EXPRESSION FROM LOGININFO','WHERE','AND',effect_range_dict)
+        def callback(cur,con):
+            return cur.fetchall()
+        
+        result_lis=[ v[0] for v in self.oprate_sql(effect_number_sql,{},callback)]
+        return result_lis
+       
+
+
+
 
         
         

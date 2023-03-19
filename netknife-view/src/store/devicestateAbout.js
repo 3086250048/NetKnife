@@ -25,14 +25,15 @@ export const  devicestateAbout={
             state.select_project_unit_list=state.project_unit_list
         },
         SET_PROJECT_VIEW_ABLE(state,boolen){
-            state.project_view_able=boolen
+            state.project_view_able=boolen     
         }
     },
     state:{
         project_unit_list:[],
         all_project_list:[],
         select_project_unit_list:[],
-        project_view_able:true
+        project_view_able:true,
+
     }
 
 
