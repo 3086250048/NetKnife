@@ -55,23 +55,8 @@ class AppNet():
         out=''
         for device_info in device_list:
             with ConnectHandler(**device_info) as connect:
-                out+=connect.send_command(command_data)
+                out+=connect.send_command(command_data,)
         return out
-        # async def netmiko_send_command(device,command_data):
-        #     try:
-        #         with ConnectHandler(**device) as connect:
-        #             out=await connect.send_command(command_data)
-        #             return out
-        #     except:
-        #             return device['ip']
-        # async def main():
-        #     task_list=[]
-        #     for device_info in device_list:
-        #         task_list+=[ asyncio.create_task(netmiko_send_command(device_info,command_data))]
-        #     done,pending=await asyncio.wait(task_list,timeout=None)
-        #     return done
-        # return asyncio.run(main())
-
 
 if __name__ == '__main__':
     net =AppNet()

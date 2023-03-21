@@ -25,11 +25,10 @@ export default{
                 })
             }else{
                 this.$router.push({
-                    name:'crud'
+                    name:'create'
                 })
             }
-
-        }
+        },
     },
     mounted(){
         this.handleClick()

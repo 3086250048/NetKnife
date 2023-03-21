@@ -1,4 +1,4 @@
-import { send_post,pop_info } from './tools'
+import { send_post,send_get,pop_info } from './tools'
 import { devicestateAbout } from './devicestateAbout'
  
 export const deviceaddAbout={
@@ -65,22 +65,32 @@ export const deviceaddAbout={
                     'password':state.device_info.password,
                     'secret':state.device_info.secret,
                     'ip_expression':state.device_info.ip_expression}
-                    ,(response)=>{
+                    ,response=>{
                         if(response.data==='ADD_SUCCESS'){
                             pop_info(state,'设备信息提交成功','success')
                             devicestateAbout.mutations.GET_PROJECT_UNIT_LIST(devicestateAbout.state)
+                            send_get('/select_count',response=>{
+                                if (response.data[0][0]<=1){
+                                    devicestateAbout.state.empty_able=true
+                                }else{
+                                    devicestateAbout.empty_able=false
+                                }
+                             },reason=>{
+                              
+                            })
                         }
                         else{
                             pop_info(state,'设备信息提交失败','warning')
-                        }
-                        
-                    },(reason)=>{
+                        }  
+                    },reason=>{
+                        console.log(11111111111111)
+                        console.log(reason)
                         pop_info(state,'请不要重复提交设备信息','warning')
                     })
-            },reason=>{
-                pop_info(state,'最小单元检测失败','error')
-            })
-        },
+                    },reason=>{
+                    pop_info(state,'最小单元检测失败','error')
+                 })
+                },
         CHECKIP_ICMP(state){
             send_post('/checkip_icmp',{'ip_expression':state.device_info.ip_expression},response=>{
                 if(response.data.length>0){ 

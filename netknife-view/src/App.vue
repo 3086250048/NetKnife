@@ -4,11 +4,8 @@
       <h1>Netknife</h1>
     </el-header>
     <el-main  id="main">
-          <Meun></Meun>
+        <Meun></Meun>
     </el-main>
-    <el-footer id="footer" >
-      <h1>Footer</h1>
-    </el-footer>
   </el-container>
 </template>
 <script>

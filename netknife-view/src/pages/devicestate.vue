@@ -1,17 +1,16 @@
 <template>
     <el-container>
         <el-header v-if="project_view_able">
-            <el-button  type="primary" icon="el-icon-search" ></el-button>
             <el-autocomplete
-            style="width: 500px;margin-bottom: 10px;"
+            style="width: 500px;margin-left: 200px;"
             v-model="input"
             :fetch-suggestions="querySearchAsync"
-            placeholder="请输入项目名称"
+            placeholder="输入项目名称进行搜索"
             @select="handleSelect"
             ></el-autocomplete>
         </el-header>
         <el-main v-if="project_view_able">
-            <ul >
+            <ul style="margin-top: -15px;">
                 <li  v-for="(project,i) in select_project_unit_list " > 
                     <el-card class="box-card  head_card " >
                         <div style="margin-top: -10px;">
@@ -29,12 +28,16 @@
                 </li>
             </ul>
         </el-main>
+        <el-empty v-if="empty_able" description="没有代管理的项目">
+            <el-button type="primary" @click="forward_to_create">新建项目</el-button>
+        </el-empty>
         <router-view></router-view>
     </el-container>    
 </template>
 
 <script>
 
+import { send_get } from '../store/tools';
 import { mapMutations} from 'vuex'
 
 export default{
@@ -71,19 +74,27 @@ export default{
         },
 
         querySearchAsync(queryString, cb) {
-        
         let results=this.all_project_list
         results = queryString ? results.filter(this.createStateFilter(queryString)) : results;
         cb(results);
-      },
-      createStateFilter(queryString) {
+        },
+
+        createStateFilter(queryString) {
         return (item) => {
           return item.value.toLowerCase().match(queryString.toLowerCase());
         };
-      },
-      handleSelect(item) {
-        this.CHOOSE_CHANGE(item.value)
-      },
+
+        },
+        handleSelect(item) {
+            this.CHOOSE_CHANGE(item.value)
+        },
+
+        forward_to_create(){
+           
+            this.$router.push({
+                name:'crud'
+            })
+        }
     },
     computed:{
         select_project_unit_list(){
@@ -97,6 +108,9 @@ export default{
         },
         project_view_able(){
             return this.$store.state.devicestateAbout.project_view_able
+        },
+        empty_able(){
+            return this.$store.state.devicestateAbout.empty_able
         }
        
     },

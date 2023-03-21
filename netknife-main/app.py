@@ -21,6 +21,10 @@ CORS(netknife,resource=r'/*')
 def index():
     return render_template('index.html')
 
+@netknife.route('/select_count')
+def select_count():
+    return storage.select_count()
+
 #向数据库中添加一条记录
 #需要传入一个字典{'project':,'class':,'area':,'protocol':,
 # 'port':,'username':,'password':,'secret':,'ip_expression':

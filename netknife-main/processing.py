@@ -118,14 +118,14 @@ class AppProcessing():
             os.chdir(self.__path+'/textfsm/data')
         input_data = command_data['command']
         pattern = r'^(?:(?!\bwhere\b).)+'
-        match=re.match(pattern,input_data)
-        return match.group()
+        pattern = re.compile(r"(?<=select\s)(.*?)(?=\s(?:where|config)\b|$)")
+        match = pattern.search(input_data)
         
 if __name__ == '__main__':
     ap=AppProcessing()
     # lis=[[('Myproject', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '100.100.100.100')], [('默认项目', '默认区域', 'telnet', '23', 'admin', '11', '', '192.168.123.1'), ('默认项目', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '2.1.1.1')], [('默认项目1', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2'), ('默认项目1', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.3')], [('默认项目11', '默认区域', 'telnet', '23', '1', '1', '', '2.2.2.2')], [('默认项目2', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2')], [('默认项目3', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2')], [('默认项目4', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2'), ('默认项目4', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.3')]]
     # ap.processing_effect_command({'base_effect_range':'Myproject','command':'where area=默认区域,protocol=ssh,port=1000,ip=172.168.1.1'})
-    print(ap.processing_command_data({'command':'display ip roting where iajksjda'}))
+    print(ap.processing_command_data({'command':'config sadhkashd ashkad select display ip routing  '}))
 
    
 

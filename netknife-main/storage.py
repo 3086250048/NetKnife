@@ -234,7 +234,11 @@ class AppStorage():
         result=self.oprate_sql(effect_number_sql,{},callback)
         return result
 
-
+    def select_count(self):
+        def callback(cur,con):
+            return cur.fetchall()
+        result=self.oprate_sql('select count(*) from logininfo',{},callback)
+        return result
         
         
 if __name__ == '__main__':

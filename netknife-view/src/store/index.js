@@ -5,6 +5,7 @@ import { devicedeleteAbout } from './devicedeleteAbout'
 import { devicestateAbout } from './devicestateAbout'
 import { projectoprateAbout } from './projectoprateAbout'
 
+
 import Vuex from 'vuex'
 import Vue from 'vue'
 
@@ -16,6 +17,7 @@ export default new Vuex.Store({
         deviceupdateAbout:deviceupdateAbout,
         devicedeleteAbout:devicedeleteAbout,
         devicestateAbout:devicestateAbout,
-        projectoprateAbout:projectoprateAbout
+        projectoprateAbout:projectoprateAbout,
+   
     }
 })

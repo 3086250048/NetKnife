@@ -1,4 +1,4 @@
-import { send_post,pop_info } from './tools'
+import { send_post,send_get,pop_info } from './tools'
 import { devicestateAbout } from './devicestateAbout'
 
 export const devicedeleteAbout={
@@ -45,6 +45,14 @@ export const devicedeleteAbout={
                 if(response.data=='DELETE_SUCCESS'){
                     pop_info(state,'数据删除成功','success')
                     devicestateAbout.mutations.GET_PROJECT_UNIT_LIST(devicestateAbout.state)
+                    send_get('/select_count',response=>{
+                        if (response.data[0][0]<=1){
+                            devicestateAbout.state.empty_able=true
+                        }else{
+                            devicestateAbout.empty_able=false
+                        }
+                     },reason=>{
+                    })
                 }else{
                     pop_info(state,'数据删除失败','warning')
                 }
