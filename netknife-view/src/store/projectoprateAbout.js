@@ -14,11 +14,14 @@ export const  projectoprateAbout={
             }
             //
             send_post('/commit_command',{
+                'base_effect_range':state.choose_project[0],
                 'command':command
             },response=>{
                 state.textarea=''
-                state.textarea=response.data
-            },reason=>{})
+                state.textarea=response.data[0][0]
+            },reason=>{
+            
+            })
         },
         SET_CHOOSE_PROJECT(state,project){
             state.choose_project=project

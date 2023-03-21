@@ -10,6 +10,8 @@ class AppStorage():
         self.__add_login_info_sql='''INSERT INTO LOGININFO (ID,PROJECT,CLASS,AREA,PROTOCOL,PORT,USERNAME,PASSWORD,SECRET,IP_EXPRESSION)
                             VALUES (?,?,?,?,?,?,?,?,?,?);'''
         self.__get_project_list_sql='''SELECT PROJECT FROM LOGININFO GROUP BY PROJECT ;'''
+        
+        #初始化创建数据库和表
         if not os.path.exists(self.__path):
             try:
                 con=sqlite3.connect(self.__path)
@@ -42,6 +44,12 @@ class AppStorage():
                     cur.close()
                 if con:
                     con.close()
+
+    #返回一个sql语句,要求附带数据
+    #例子:
+    #init_sql=select * from logininfo | first_sql=where | loop_sql=and
+    #data_dict={'project':'a',area:'',protocol:'b'}
+    #得到 select * from logininfo where project=a and protocol=b
     @classmethod
     def dynamic_sql_return (cls,init_sql,first_sql,loop_sql,data_dict):
         sql=''
@@ -55,7 +63,15 @@ class AppStorage():
             else:
                 sql+=f'{loop_sql} {k}=\'{v}\''
         return sql
-        
+    
+    #迭代出一个sql语句
+    #例子:
+    #init_sql=select * from logininfo | first_sql=where | field_sql=project
+    #data_list=['a','b','c']
+    #迭代三次得到
+    #1.select * from logininfo where project=a
+    #2.select * from logininfo where project=b
+    #3.select * from logininfo where project=c
     @classmethod
     def dynamic_sql_yield (cls,init_sql,first_sql,field_sql,data_list):
         sql=''
@@ -64,6 +80,9 @@ class AppStorage():
             yield sql
             sql=''
 
+    #执行sql语句,data可以传入空字典{},call_back为执行sql语句之后的回调函数
+    #返回:回调函数决定,发生异常返回False
+    #传入:sql语句,sql数据{}(可为空),回调函数(决定返回数值)
     def oprate_sql(self,sql,data,call_back,*args):
         try:
             con=sqlite3.connect(self.__path,check_same_thread=False)
@@ -80,7 +99,10 @@ class AppStorage():
             if con:
                 con.close()
 
-    def add_login_info(self,login_dict):
+    #向数据库中插入数据
+    #返回:布尔值
+    #传入:{'projet':'',area:'',protocol:'',port:'',ip_expression:'',username:'',password:'',secret:''} 
+    def add_login_info(self,login_dict)->bool:
         uid =str(uuid.uuid4())
         suid=''.join(uid.split('-'))
         value_list=list(login_dict.values())
@@ -90,7 +112,10 @@ class AppStorage():
             return True
         return self.oprate_sql(self.__add_login_info_sql,value_list,callback)
 
-    def check_quads(self,check_quads_dict):
+    #检查数据库中是否存在某个最小单元
+    #返回:布尔值
+    #传入:{'projet':'',area:'',protocol:'',port:'',ip_expression:''} 
+    def check_quads(self,check_quads_dict)->bool:
         sql=AppStorage.dynamic_sql_return('SELECT * FROM LOGININFO','WHERE','AND',check_quads_dict)
         def callback(cur,con):
             result=cur.fetchall()
@@ -99,15 +124,24 @@ class AppStorage():
             else:
                 return False
         return self.oprate_sql(sql,check_quads_dict,callback)    
-    def check_where(self,where_dict):
+    
+    #检查数据库中是否存在某条记录
+    #返回:布尔值
+    #传入:{'projet':'',area:'',protocol:'',port:''....} 
+    def check_where(self,where_dict)->bool:
         def callback(cur,con):
             result=cur.fetchall()
-            print(result)
             if len(result)<=0:
                 return True
             return False
         return self.oprate_sql(AppStorage.dynamic_sql_return('SELECT * FROM LOGININFO','WHERE','AND',where_dict),where_dict,callback)
-    def update_data(self,where_dict,update_data_dict):
+    
+    #更新数据库中某条记录
+    #返回:布尔值
+    #传入:
+    #条件数据:{'projet':'',area:'',protocol:'',port:''....} 
+    #更新数据:{'projet':'',area:'',protocol:'',port:''....}
+    def update_data(self,where_dict,update_data_dict)->bool:
         def callback_after(cur,con):
             con.commit()
             return True
@@ -116,18 +150,22 @@ class AppStorage():
         sql=update_sql+where_sql
         return self.oprate_sql(sql,{},callback_after)
 
-    def delete_data(self,where_dict):
+    #删除数据库中某条记录
+    #返回:布尔值
+    #传入:{'projet':'',area:'',protocol:'',port:''....}
+    def delete_data(self,where_dict) -> bool:
         def callback(cur,con):
             con.commit()
             return True
         delete_sql=AppStorage.dynamic_sql_return('DELETE FROM LOGININFO','WHERE','AND',where_dict)
         return self.oprate_sql(delete_sql,where_dict,callback)
     
-    def get_project_unit_list(self):
+    #得到数据库中以project为查询条件的最小单元列表
+    #返回:[['projetc1','area1 、area2','protocol1 ; protocol2','port1 ; port2','ip_expression'],[...]]
+    def get_project_unit_list(self) -> list:
         def callback(cur,con):
             return cur.fetchall()
         project_list=[ v[0] for v in self.oprate_sql(self.__get_project_list_sql,{},callback)[1:]]
-
         project_sql_gen=AppStorage.dynamic_sql_yield('select project,area,protocol,port,ip_expression from logininfo','where','project',project_list)
         lis=[]
         for _ in range(len(project_list)):
@@ -166,33 +204,35 @@ class AppStorage():
             result+=[list(dic.values())]
             dic={'project':'','area':'','protocol':'','port':'',"ip_expression":''}
         return result
-    def get_all_project_list(self):
+    
+    #获取数据库中所有的项目名称
+    #返回:[{'value':'project1'},{'value':'project2'},{'project3':'project3'}]
+    def get_all_project_list(self)-> list:
         def callback(cur,con):
             return cur.fetchall()
         _lis= self.oprate_sql('SELECT DISTINCT project FROM LOGININFO;',{},callback)[1:]
         result= [ {'value':v[0]} for v in _lis]
         return result
-     
-    def get_effect_ip_expression_list(self,effect_range_dict):
-        # if len(effect_range_list)==1:
-        #     effect_number_data={'project':effect_range_list[0]}
-        # if len(effect_range_list)==2:
-        #     effect_number_data={'project':effect_range_list[0],'area':effect_range_list[1]}
-        # if len(effect_range_list)==3:
-        #     effect_number_data={'project':effect_range_list[0],'area':effect_range_list[1],'protocol':effect_range_list[2]}
-        # if len(effect_range_list)==4:
-        #     effect_number_data={'project':effect_range_list[0],'area':effect_range_list[1],'protocol':effect_range_list[2],'port':effect_range_list[3]}
-        # if len(effect_range_list)==5:
-        #                 effect_number_data={'project':effect_range_list[0],'area':effect_range_list[1],'protocol':effect_range_list[2],'port':effect_range_list[3],'ip_expression':effect_range_list[4]}
+
+    #获取数据库中满足某个查询条件时的ip_expression表达式。
+    #返回:[1.1.1.1,192.168.1.1-100%2,....]
+    #传入:{'project':'','area':'','protocol':'','port':'','ip_expression':'',....}
+    def get_effect_ip_expression_list(self,effect_range_dict) -> list:
         effect_number_sql=AppStorage.dynamic_sql_return('SELECT IP_EXPRESSION FROM LOGININFO','WHERE','AND',effect_range_dict)
         def callback(cur,con):
             return cur.fetchall()
-        
         result_lis=[ v[0] for v in self.oprate_sql(effect_number_sql,{},callback)]
         return result_lis
        
-
-
+    #获取登录设备时需要的信息。
+    #返回:{'class':'','protocol':'','port':'','ip_expression':'','username':‘’,'password':'','secret':''}
+    #传入:{'project':'','area':'','protocol':'','port':'','ip_expression':'',.....}
+    def get_full_login_list(self,effect_range_dict):
+        effect_number_sql=AppStorage.dynamic_sql_return('SELECT CLASS,PROTOCOL,PORT,IP_EXPRESSION,USERNAME,PASSWORD,SECRET FROM LOGININFO','WHERE','AND',effect_range_dict)
+        def callback(cur,con):
+            return cur.fetchall()
+        result=self.oprate_sql(effect_number_sql,{},callback)
+        return result
 
 
         

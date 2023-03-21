@@ -1,7 +1,7 @@
 Value area ([^ ,]+)
 Value protocol ([^ ,]+)
 Value port ([^ ,]+)
-Value ip_expression ([^ a-zA-Z]+)
+Value ip_expression ([^ a-zA-Z,]+)
 
 Start
-  ^.*where\s*(area=${area})?\s*,?\s*(protocol=${protocol})?\s*,?\s*(port=${port})?\s*,?\s*(ip=${ip_expression})?
+  ^.*where\s*(area=${area})?\s*,?\s*(protocol=${protocol})?\s*,?\s*(port=${port})?\s*,?\s*(ip=${ip_expression})? 

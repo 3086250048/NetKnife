@@ -76,14 +76,26 @@ class AppProcessing():
             result=[]  
         return return_result
                 
-    def processing_command(self,command_data):
-        return command_data
+    def processing_effect_login_data(self,effect_login_dict):
+        if not self.__path == self.__path+'/textfsm/data':
+            os.chdir(self.__path+'/textfsm/data')
+        ex_effect_range=AppProcessing.oprate_dict(self.__file['effect'],effect_login_dict['command'])
+        if len(ex_effect_range)==0:
+            full_effect_dict={'project':effect_login_dict['base_effect_range']}
+        else:
+            ex_effect_range[0]['project']=effect_login_dict['base_effect_range']
+            full_effect_dict=ex_effect_range[0]
+        return storage.get_full_login_list(full_effect_dict)
+
+        
+
 
     def processing_effect_command(self,command_data):
         if not self.__path == self.__path+'/textfsm/data':
             os.chdir(self.__path+'/textfsm/data')
         result={}
         ex_effect_range=AppProcessing.oprate_dict(self.__file['effect'],command_data['command'])
+        
         if len(ex_effect_range)==0:
             full_effect_dict={'project':command_data['base_effect_range']}
         else:
@@ -97,38 +109,16 @@ class AppProcessing():
             _full_connect_lis+=list(ap.processing_check_ip(i))
         for i in storage.get_effect_ip_expression_list(full_effect_dict):
             _effect_connect_lis+=list(ap.processing_check_ip(i))
-        
+  
         result['effect_connect_percent']=int(len(_effect_connect_lis)/len(_full_connect_lis)*100)
         return result
         
 
-        #[{'area': '默认区域', 'protocol': 'ssh', 'port': '1000', 'ip_expression': '172.168.1.1,172.168.1.1,192.168.1.1-10%20,192.168.1.1'}]
-        # effect_range_list=[]
-        # _str=''
-
-        # if len(ex_effect_range)==0:
-        #     result['range']=command_data['base_effect_range']
-        #     result['number']=storage.get_effect_number([command_data['base_effect_range']])
-        #     return result
-        # for i,v in enumerate(ex_effect_range[0]['effect'],1):
-        #     if v != ',':
-        #         _str+=v
-        #     else:
-        #         effect_range_list+=[_str]
-        #         _str=''
-        #     if i==len(ex_effect_range[0]['effect']):
-        #         effect_range_list+=[_str]
-        # effect_range_list.insert(0,command_data['base_effect_range'])
-
-        # result['range']=effect_range_list
-        # result['number']=storage.get_effect_number(effect_range_list)
-        # print(result)
-        # return result
-
+       
 if __name__ == '__main__':
     ap=AppProcessing()
     lis=[[('Myproject', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '100.100.100.100')], [('默认项目', '默认区域', 'telnet', '23', 'admin', '11', '', '192.168.123.1'), ('默认项目', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '2.1.1.1')], [('默认项目1', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2'), ('默认项目1', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.3')], [('默认项目11', '默认区域', 'telnet', '23', '1', '1', '', '2.2.2.2')], [('默认项目2', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2')], [('默认项目3', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2')], [('默认项目4', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2'), ('默认项目4', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.3')]]
-    ap.processing_effect_command({'base_effect_range':'Myproject','command':'select display ip routing where area=默认区域,protocol=ssh,port=1000,ip=172.168.1.1,172.168.1.1,192.168.1.1-10%20,192.168.1.1 actions  '})
+    ap.processing_effect_command({'base_effect_range':'Myproject','command':'where area=默认区域,protocol=ssh,port=1000,ip=172.168.1.1'})
 
 
    

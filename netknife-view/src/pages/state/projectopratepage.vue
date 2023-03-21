@@ -2,11 +2,12 @@
     <div>
         <div style="margin-bottom: 20px;">
             <el-button @click="goBack">返回</el-button>
-            <div style="margin-left: 80px;margin-top: -30px;">
-                <span>影响连接百分比</span><el-progress style="width: 300px;margin-left: 130px;margin-top: -20px;" :percentage="effect_connect_percent"></el-progress>
+            <div style="margin-left:80px;margin-top: -40px;" >当前所在项目:{{ choose_project[0].slice(0,80) }} </div>
+            <div style="margin-left: 80px;margin-top: -5px;">
+                <span>影响连接百分比</span><el-progress style="width: 200px;margin-left: 130px;margin-top: -20px;" :percentage="effect_connect_percent"></el-progress>
             </div>
-            <div style="margin-left: 500px;margin-top: -20px;">
-                <span>设备执行进度</span><el-progress style="width: 300px;margin-left: 110px;margin-top: -20px;" :percentage="96"></el-progress>
+            <div style="margin-left: 420px;margin-top: -20px;">
+                <span>设备执行进度</span><el-progress style="width: 200px;margin-left: 110px;margin-top: -20px;" :percentage="96"></el-progress>
             </div>
         </div>
         <el-input  v-model="command" clearable placeholder="请输入内容" @change="commit_command" @input="set_effect">
@@ -63,6 +64,9 @@ export default {
         },
         effect_connect_percent(){
             return this.$store.state.projectoprateAbout.effect_connect_percent
+        },
+        choose_project(){
+            return this.$store.state.projectoprateAbout.choose_project
         }
     },
     mounted(){

@@ -14,7 +14,7 @@ class AppInfo():
         self.__check_quads_dict=None
         self.__where_dict=None
         self.__update_data_dict=None
-        self.__command_dict=None
+        self.__effect_login_dict=None
     @property
     def login_dict(self):
         return self.__login_dict
@@ -34,8 +34,8 @@ class AppInfo():
     def update_data_dict(self):
         return self.__update_data_dict
     @property
-    def command_dict(self):
-        return self.__command_dict
+    def effect_login_dict(self):
+        return self.__effect_login_dict
 
     @login_dict.setter
     def login_dict(self,login_dict):
@@ -55,9 +55,9 @@ class AppInfo():
     @update_data_dict.setter
     def update_data_dict(self,update_data_dict):
         self.__update_data_dict=update_data_dict
-    @command_dict.setter
-    def command_dict(self,command_data):
-        self.__command_dict=ap.processing_command(command_data)
+    @effect_login_dict.setter
+    def effect_login_dict(self,effect_login_data):
+        self.__effect_login_dict=ap.processing_effect_login_data(effect_login_data)
         
 if __name__ =='__main__':
     a1=AppInfo()
