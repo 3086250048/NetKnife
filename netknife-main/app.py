@@ -111,7 +111,8 @@ def get_effect_data():
 @netknife.route('/commit_command',methods=['POST'])
 def commit_command():
     data.effect_login_dict=json.loads(request.get_data(as_text=True))
-    result=net.send_command(data.effect_login_dict,'1')
+    data.command_str=json.loads(request.get_data(as_text=True))
+    result=net.send_command(data.effect_login_dict,data.command_str)
     return result
 
 

@@ -17,8 +17,9 @@ export const  projectoprateAbout={
                 'base_effect_range':state.choose_project[0],
                 'command':command
             },response=>{
+                console.log(response.data)
                 state.textarea=''
-                state.textarea=response.data[0][0]
+                state.textarea=response.data.toString()
             },reason=>{
             
             })

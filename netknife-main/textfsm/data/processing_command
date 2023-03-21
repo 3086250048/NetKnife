@@ -1,0 +1,4 @@
+Value command ([^(where)]+)
+
+Start
+  ^${command}\s?where?

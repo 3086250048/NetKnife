@@ -1,6 +1,6 @@
 from textfsm import TextFSM
 from itertools import chain
-import os
+import os,re
 from ordered_set import OrderedSet
 from storage import AppStorage
 
@@ -15,7 +15,9 @@ class AppProcessing():
     def __init__(self):
         self.__path=os.path.dirname(os.path.abspath(__file__))
         os.chdir(self.__path)
-        self.__file={'check_ip':'processing_check_ip','effect':'processing_effect_command'}
+        self.__file={'check_ip':'processing_check_ip',
+                     'effect':'processing_effect_command',
+                     'command':'processing_command'}
 
     @classmethod
     def oprate_dict(cls,file,value):
@@ -76,20 +78,6 @@ class AppProcessing():
             result=[]  
         return return_result
                 
-    def processing_effect_login_data(self,effect_login_dict):
-        if not self.__path == self.__path+'/textfsm/data':
-            os.chdir(self.__path+'/textfsm/data')
-        ex_effect_range=AppProcessing.oprate_dict(self.__file['effect'],effect_login_dict['command'])
-        if len(ex_effect_range)==0:
-            full_effect_dict={'project':effect_login_dict['base_effect_range']}
-        else:
-            ex_effect_range[0]['project']=effect_login_dict['base_effect_range']
-            full_effect_dict=ex_effect_range[0]
-        return storage.get_full_login_list(full_effect_dict)
-
-        
-
-
     def processing_effect_command(self,command_data):
         if not self.__path == self.__path+'/textfsm/data':
             os.chdir(self.__path+'/textfsm/data')
@@ -112,14 +100,32 @@ class AppProcessing():
   
         result['effect_connect_percent']=int(len(_effect_connect_lis)/len(_full_connect_lis)*100)
         return result
-        
 
-       
+    def processing_effect_login_data(self,effect_login_dict):
+        if not self.__path == self.__path+'/textfsm/data':
+            os.chdir(self.__path+'/textfsm/data')
+        ex_effect_range=AppProcessing.oprate_dict(self.__file['effect'],effect_login_dict['command'])
+        if len(ex_effect_range)==0:
+            full_effect_dict={'project':effect_login_dict['base_effect_range']}
+        else:
+            ex_effect_range[0]['project']=effect_login_dict['base_effect_range']
+            full_effect_dict=ex_effect_range[0]
+        return storage.get_full_login_list(full_effect_dict)
+
+ 
+    def processing_command_data(self,command_data):
+        if not self.__path == self.__path+'/textfsm/data':
+            os.chdir(self.__path+'/textfsm/data')
+        input_data = command_data['command']
+        pattern = r'^(?:(?!\bwhere\b).)+'
+        match=re.match(pattern,input_data)
+        return match.group()
+        
 if __name__ == '__main__':
     ap=AppProcessing()
-    lis=[[('Myproject', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '100.100.100.100')], [('默认项目', '默认区域', 'telnet', '23', 'admin', '11', '', '192.168.123.1'), ('默认项目', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '2.1.1.1')], [('默认项目1', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2'), ('默认项目1', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.3')], [('默认项目11', '默认区域', 'telnet', '23', '1', '1', '', '2.2.2.2')], [('默认项目2', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2')], [('默认项目3', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2')], [('默认项目4', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2'), ('默认项目4', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.3')]]
-    ap.processing_effect_command({'base_effect_range':'Myproject','command':'where area=默认区域,protocol=ssh,port=1000,ip=172.168.1.1'})
-
+    # lis=[[('Myproject', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '100.100.100.100')], [('默认项目', '默认区域', 'telnet', '23', 'admin', '11', '', '192.168.123.1'), ('默认项目', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '2.1.1.1')], [('默认项目1', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2'), ('默认项目1', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.3')], [('默认项目11', '默认区域', 'telnet', '23', '1', '1', '', '2.2.2.2')], [('默认项目2', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2')], [('默认项目3', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2')], [('默认项目4', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2'), ('默认项目4', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.3')]]
+    # ap.processing_effect_command({'base_effect_range':'Myproject','command':'where area=默认区域,protocol=ssh,port=1000,ip=172.168.1.1'})
+    print(ap.processing_command_data({'command':'display ip roting where iajksjda'}))
 
    
 
