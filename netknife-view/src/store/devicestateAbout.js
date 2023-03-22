@@ -27,8 +27,6 @@ export const  devicestateAbout={
         SET_PROJECT_VIEW_ABLE(state,boolen){
             state.project_view_able=boolen     
         },
-   
-
 
     },
     state:{

@@ -1,4 +1,4 @@
-import asyncio
+from concurrent.futures import ThreadPoolExecutor
 
 from multiping import MultiPing
 from tcping import Ping
@@ -51,15 +51,27 @@ class AppNet():
                               'password':mix_unit[5],'secret':mix_unit[6]}]
             device_dict={}
 
-        select_out=''
-        config_out=''
-        for device_info in device_list:
+        def send_commands(device_info, command_data):
             with ConnectHandler(**device_info) as connect:
+                select_out = ''
+                config_out = ''
                 if command_data['select']:
-                    select_out+=connect.send_command(command_data['select'])
+                    select_out += connect.send_command(command_data['select'])
                 if command_data['config']:
-                    config_out+=connect.send_config_set(command_data['config'])
-        return config_out+select_out
+                    config_out += connect.send_config_set(command_data['config'])
+                    connect.save_config()
+                return config_out + select_out
+
+        def process_device(device_info, command_data):
+            result = send_commands(device_info, command_data)
+            return result
+        results = []
+        with ThreadPoolExecutor(max_workers=len(device_list)) as executor:
+            futures = [executor.submit(process_device, device_info, command_data) for device_info in device_list]
+            for future in futures:
+                result = future.result()
+                results.append(result)
+        return ''.join(results)
 
 if __name__ == '__main__':
     net =AppNet()

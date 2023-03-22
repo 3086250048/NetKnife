@@ -100,7 +100,7 @@ export default{
         empty_able(){
             return this.$store.state.devicestateAbout.empty_able
         }
-       
+
     },
     watch:{
         input(new_value,old_value){
