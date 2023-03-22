@@ -50,13 +50,16 @@ class AppNet():
                               'port':mix_unit[2],'ip':ip,'username':mix_unit[4],
                               'password':mix_unit[5],'secret':mix_unit[6]}]
             device_dict={}
-        print(device_list)
-        print(command_data)
-        out=''
+
+        select_out=''
+        config_out=''
         for device_info in device_list:
             with ConnectHandler(**device_info) as connect:
-                out+=connect.send_command(command_data,)
-        return out
+                if command_data['select']:
+                    select_out+=connect.send_command(command_data['select'])
+                if command_data['config']:
+                    config_out+=connect.send_config_set(command_data['config'])
+        return config_out+select_out
 
 if __name__ == '__main__':
     net =AppNet()

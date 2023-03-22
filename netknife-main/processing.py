@@ -33,7 +33,7 @@ class AppProcessing():
         if not self.__path == self.__path+'/textfsm/data':
             os.chdir(self.__path+'/textfsm/data')
         address_dict=AppProcessing.oprate_dict(self.__file['check_ip'],check_ip)[0]
-        print(address_dict)
+        # print(address_dict)
         if address_dict['Aend'] == '':address_dict['Aend']=address_dict['Astart']
         if address_dict['Bend'] == '':address_dict['Bend']=address_dict['Bstart']
         if address_dict['Cend'] == '':address_dict['Cend']=address_dict['Cstart']
@@ -79,53 +79,108 @@ class AppProcessing():
         return return_result
                 
     def processing_effect_command(self,command_data):
-        if not self.__path == self.__path+'/textfsm/data':
-            os.chdir(self.__path+'/textfsm/data')
-        result={}
-        ex_effect_range=AppProcessing.oprate_dict(self.__file['effect'],command_data['command'])
+        # if not self.__path == self.__path+'/textfsm/data':
+        #     os.chdir(self.__path+'/textfsm/data')
+        # result={}
+        # ex_effect_range=AppProcessing.oprate_dict(self.__file['effect'],command_data['command'])
         
-        if len(ex_effect_range)==0:
-            full_effect_dict={'project':command_data['base_effect_range']}
+        # if len(ex_effect_range)==0:
+        #     full_effect_dict={'project':command_data['base_effect_range']}
+        # else:
+        #     ex_effect_range[0]['project']=command_data['base_effect_range']
+        #     full_effect_dict=ex_effect_range[0]
+        input_data = command_data['command']
+        where_dict={}
+        where_pattern = r"(?<=where\s)(.*?)(?=\sconfig|\sselect|\saction|$)"
+        where_match = re.search(where_pattern,input_data)
+        if where_match:
+            where_key_value_list=where_match.group(1).split(',')
+            for item in where_key_value_list:
+                if item !='':
+                    _kv=item.split('=')
+                    if _kv[0]=='project':continue
+                    if len(_kv)<=1:continue
+                    if _kv[0]=='ip':
+                        where_dict['ip_expression']=_kv[1]
+                    else:
+                        where_dict[_kv[0]]=_kv[1]
+           
+            where_dict['project']=command_data['base_effect_range']
         else:
-            ex_effect_range[0]['project']=command_data['base_effect_range']
-            full_effect_dict=ex_effect_range[0]
-
+            where_dict['project']=command_data['base_effect_range']
+                    
+        result={}
         ap=AppProcessing()
         _full_connect_lis=[]
         _effect_connect_lis=[]
         for i in storage.get_effect_ip_expression_list({'project':command_data['base_effect_range']}):
             _full_connect_lis+=list(ap.processing_check_ip(i))
-        for i in storage.get_effect_ip_expression_list(full_effect_dict):
+        for i in storage.get_effect_ip_expression_list(where_dict):
             _effect_connect_lis+=list(ap.processing_check_ip(i))
   
         result['effect_connect_percent']=int(len(_effect_connect_lis)/len(_full_connect_lis)*100)
         return result
 
-    def processing_effect_login_data(self,effect_login_dict):
-        if not self.__path == self.__path+'/textfsm/data':
-            os.chdir(self.__path+'/textfsm/data')
-        ex_effect_range=AppProcessing.oprate_dict(self.__file['effect'],effect_login_dict['command'])
-        if len(ex_effect_range)==0:
-            full_effect_dict={'project':effect_login_dict['base_effect_range']}
+    def processing_effect_login_data(self,command_data):
+        # if not self.__path == self.__path+'/textfsm/data':
+        #     os.chdir(self.__path+'/textfsm/data')
+        # ex_effect_range=AppProcessing.oprate_dict(self.__file['effect'],effect_login_dict['command'])
+        # if len(ex_effect_range)==0:
+        #     full_effect_dict={'project':effect_login_dict['base_effect_range']}
+        # else:
+        #     ex_effect_range[0]['project']=effect_login_dict['base_effect_range']
+        #     full_effect_dict=ex_effect_range[0]
+        input_data = command_data['command']
+        where_dict={}
+        where_pattern = r"(?<=where\s)(.*?)(?=\sconfig|\sselect|\saction|$)"
+        where_match = re.search(where_pattern,input_data)
+        if where_match:
+            where_key_value_list=where_match.group(1).split(',')
+            for item in where_key_value_list:
+                if item !='':
+                    _kv=item.split('=')
+                    if _kv[0]=='project':continue
+                    if len(_kv)<=1:continue
+                    if _kv[0]=='ip':
+                        where_dict['ip_expression']=_kv[1]
+                    else:
+                        where_dict[_kv[0]]=_kv[1]
+           
+            where_dict['project']=command_data['base_effect_range']
+            # print(where_dict)
+            return storage.get_full_login_list(where_dict)
         else:
-            ex_effect_range[0]['project']=effect_login_dict['base_effect_range']
-            full_effect_dict=ex_effect_range[0]
-        return storage.get_full_login_list(full_effect_dict)
-
+            where_dict['project']=command_data['base_effect_range']
+            # print(where_dict)
+            return storage.get_full_login_list(where_dict)
+                    
  
     def processing_command_data(self,command_data):
-        if not self.__path == self.__path+'/textfsm/data':
-            os.chdir(self.__path+'/textfsm/data')
+        # if not self.__path == self.__path+'/textfsm/data':
+        #     os.chdir(self.__path+'/textfsm/data')
         input_data = command_data['command']
-        pattern = r'^(?:(?!\bwhere\b).)+'
-        pattern = re.compile(r"(?<=select\s)(.*?)(?=\s(?:where|config)\b|$)")
-        match = pattern.search(input_data)
-        
+        select_pattern = r"(?<=select\s)(.*?)(?=\swhere|\sconfig|\saction|$)"
+        config_pattern = r"(?<=config\s)(.*?)(?=\swhere|\sselect|\saction|$)"
+       
+        select_match = re.search(select_pattern, input_data)
+        config_match = re.search(config_pattern, input_data)
+
+        command_dict={}
+        if select_match:
+            command_dict['select']=select_match.group(1)
+        else:
+            command_dict['select']=None
+        if config_match:
+            _lis=config_match.group(1).split(',')
+            command_dict['config']=_lis
+        else:
+            command_dict['config']=None
+        return command_dict
 if __name__ == '__main__':
     ap=AppProcessing()
     # lis=[[('Myproject', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '100.100.100.100')], [('默认项目', '默认区域', 'telnet', '23', 'admin', '11', '', '192.168.123.1'), ('默认项目', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '2.1.1.1')], [('默认项目1', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2'), ('默认项目1', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.3')], [('默认项目11', '默认区域', 'telnet', '23', '1', '1', '', '2.2.2.2')], [('默认项目2', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2')], [('默认项目3', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2')], [('默认项目4', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2'), ('默认项目4', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.3')]]
     # ap.processing_effect_command({'base_effect_range':'Myproject','command':'where area=默认区域,protocol=ssh,port=1000,ip=172.168.1.1'})
-    print(ap.processing_command_data({'command':'config sadhkashd ashkad select display ip routing  '}))
+    print(ap.processing_command_data({'base_effect_range':'默认项目','command':''}))
 
    
 
