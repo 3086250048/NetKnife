@@ -69,22 +69,11 @@ export const deviceaddAbout={
                         if(response.data==='ADD_SUCCESS'){
                             pop_info(state,'设备信息提交成功','success')
                             devicestateAbout.mutations.GET_PROJECT_UNIT_LIST(devicestateAbout.state)
-                            send_get('/select_count',response=>{
-                                if (response.data[0][0]<=1){
-                                    devicestateAbout.state.empty_able=true
-                                }else{
-                                    devicestateAbout.empty_able=false
-                                }
-                             },reason=>{
-                              
-                            })
                         }
                         else{
                             pop_info(state,'设备信息提交失败','warning')
                         }  
                     },reason=>{
-                        console.log(11111111111111)
-                        console.log(reason)
                         pop_info(state,'请不要重复提交设备信息','warning')
                     })
                     },reason=>{

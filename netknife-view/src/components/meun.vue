@@ -1,11 +1,15 @@
 <template>
-    <div>
-        <el-tabs v-model="activeName" @tab-click="handleClick">
-            <el-tab-pane label="设备信息" name="first"></el-tab-pane>
-            <el-tab-pane label="命令行管理CLI" name="second"></el-tab-pane>
-        </el-tabs>
-        <router-view></router-view>
-    </div>
+    <el-container>
+        <el-header height="35px">
+            <el-tabs v-model="activeName" @tab-click="handleClick">
+                <el-tab-pane label="设备信息" name="first"></el-tab-pane>
+                <el-tab-pane label="命令行管理CLI" name="second"></el-tab-pane>
+            </el-tabs>
+        </el-header>
+        <el-main>
+            <router-view></router-view>
+        </el-main>
+    </el-container>
 </template>
 <script>
 

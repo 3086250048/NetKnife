@@ -13,7 +13,7 @@ import devicedelete from '../pages/crud/devicedelete.vue'
 import deviceupdate from '../pages/crud/deviceupdate.vue'
 import mixunitpage from '../pages/state/mixunitpage.vue'
 import projectopratepage from '../pages/state/projectopratepage.vue'
-
+import empty from '../pages/empty.vue'
 
 export const originalPush = VueRouter.prototype.push
 VueRouter.prototype.push = function push(location) {
@@ -28,6 +28,11 @@ export default new VueRouter({
             path:'/info',
             component:deviceinfo,
             children:[
+                {
+                    name:'empty',
+                    path:'empty',
+                    component:empty
+                },
                 {
                     name:'state',
                     path:'state',

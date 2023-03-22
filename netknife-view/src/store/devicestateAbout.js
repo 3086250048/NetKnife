@@ -10,15 +10,6 @@ export const  devicestateAbout={
                 state.select_project_unit_list=state.project_unit_list
                 send_post('/get_all_project_data',{},response=>{
                     state.all_project_list=response.data
-                    send_get('/select_count',response=>{
-                        if (response.data[0][0]<=1){
-                            state.empty_able=true
-                        }else{
-                            state.empty_able=false
-                        }
-                     },reason=>{
-        
-                    })
                 },reason=>{})
             },reason=>{})
         },
@@ -45,7 +36,7 @@ export const  devicestateAbout={
         all_project_list:[],
         select_project_unit_list:[],
         project_view_able:true,
-        empty_able:false,
+  
        
 
     }

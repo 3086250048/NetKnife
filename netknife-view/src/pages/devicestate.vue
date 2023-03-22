@@ -1,6 +1,6 @@
 <template>
     <el-container>
-        <el-header v-if="project_view_able">
+        <el-header v-if="project_view_able" style="margin-top: -20px;" height="30px">
             <el-autocomplete
             style="width: 500px;margin-left: 200px;"
             v-model="input"
@@ -10,7 +10,7 @@
             ></el-autocomplete>
         </el-header>
         <el-main v-if="project_view_able">
-            <ul style="margin-top: -15px;">
+            <ul>
                 <li  v-for="(project,i) in select_project_unit_list " > 
                     <el-card class="box-card  head_card " >
                         <div style="margin-top: -10px;">
@@ -28,16 +28,12 @@
                 </li>
             </ul>
         </el-main>
-        <el-empty v-if="empty_able" description="没有代管理的项目">
-            <el-button type="primary" @click="forward_to_create">新建项目</el-button>
-        </el-empty>
         <router-view></router-view>
     </el-container>    
 </template>
 
 <script>
 
-import { send_get } from '../store/tools';
 import { mapMutations} from 'vuex'
 
 export default{
@@ -78,7 +74,6 @@ export default{
         results = queryString ? results.filter(this.createStateFilter(queryString)) : results;
         cb(results);
         },
-
         createStateFilter(queryString) {
         return (item) => {
           return item.value.toLowerCase().match(queryString.toLowerCase());
@@ -88,13 +83,6 @@ export default{
         handleSelect(item) {
             this.CHOOSE_CHANGE(item.value)
         },
-
-        forward_to_create(){
-           
-            this.$router.push({
-                name:'crud'
-            })
-        }
     },
     computed:{
         select_project_unit_list(){

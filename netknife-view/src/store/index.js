@@ -18,6 +18,6 @@ export default new Vuex.Store({
         devicedeleteAbout:devicedeleteAbout,
         devicestateAbout:devicestateAbout,
         projectoprateAbout:projectoprateAbout,
-   
+  
     }
 })

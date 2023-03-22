@@ -106,7 +106,8 @@ export default{
         width: 810px;
     }
     .secret_input{
-        width: 300px;
+        width: 400px;
+        margin-left: 80px;
     }
     .button{
         width: 100px;

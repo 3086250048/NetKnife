@@ -1,6 +1,6 @@
 <template>
     <el-container class="crud_div">
-        <el-main>
+        <el-main style="margin-left: -30px;margin-top: -40px;">
             <el-tabs type="border-card" v-model="activename" @tab-click="handleClick">
             <el-tab-pane label="新建项目" name="first"></el-tab-pane>
             <el-tab-pane label="更新项目" name="second"></el-tab-pane>

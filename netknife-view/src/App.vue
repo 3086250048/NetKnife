@@ -1,12 +1,5 @@
 <template>
-  <el-container id="app">
-    <el-header id="header">
-      <h1>Netknife</h1>
-    </el-header>
-    <el-main  id="main">
         <Meun></Meun>
-    </el-main>
-  </el-container>
 </template>
 <script>
 import meun from './components/meun.vue';
@@ -21,7 +14,7 @@ export default{
 #header{
   background-color: #409EFF;
   color:#303133 ;
-  height:50px;
+  height:20px;
 }
 #footer{
   background-color: #409EFF;
