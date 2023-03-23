@@ -14,7 +14,7 @@
                 <li  v-for="(project,i) in select_project_unit_list " > 
                     <el-card class="box-card  head_card " >
                         <div style="margin-top: -10px;">
-                            {{ project[0] }}
+                            {{ project[0].slice(0,39) }}
                                 <el-button type="primary" class="head_button" @click="show_mix_unit_page(),set_choose_project(project)">显示最小操作单元</el-button>
                                 <el-button type="primary" class="head_button" @click="show_oprate_page(),set_choose_project(project)">操作</el-button>
                         </div>

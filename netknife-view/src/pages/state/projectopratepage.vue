@@ -5,12 +5,12 @@
                 <el-button class="el_header-div-el_button" @click="goBack">返回</el-button>
                 <div class="el_header-div-div" >
                     <h1  class="el_header-div-div-h1">
-                        当前所在项目:{{ choose_project[0].slice(0,25) }}
+                        当前所在项目:{{ choose_project[0].slice(0,22) }}
                     </h1>
                 </div>
             </div>
         </el-header>
-        <el-main>
+        <el-main >
             <el-input class="el_main-el_input" v-model="command" clearable placeholder="请输入内容"
              @keyup.enter.native="commit_command" @input="set_effect">
             <template slot="prepend">CLI</template>
@@ -114,7 +114,7 @@ export default {
 </script>
 
 <style scoped>
-  
+    
     .el_container{
         margin-left: -30px;
     }
@@ -132,6 +132,7 @@ export default {
         font-size:30px;
        
     }
+
     .el_main-el_input{
         margin-top: -10px;
         margin-bottom: 10px;

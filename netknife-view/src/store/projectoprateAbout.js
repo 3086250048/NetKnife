@@ -1,4 +1,3 @@
-import { Loading } from "element-ui";
 import { send_post,get_time } from "./tools";
 
 
