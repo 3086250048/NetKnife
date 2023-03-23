@@ -12,7 +12,7 @@
         </el-header>
         <el-main>
             <el-input class="el_main-el_input" v-model="command" clearable placeholder="请输入内容"
-             @change="commit_command" @input="set_effect">
+             @keyup.enter.native="commit_command" @input="set_effect">
             <template slot="prepend">CLI</template>
             </el-input><br>
             <div class="el_main-div">
@@ -31,9 +31,10 @@
             class="el_main--el_input"
             >
             </el-input>
-            <ul class="el_main-ul" >
-                <el-checkbox-group v-model="check_list">
-                    <li v-for="item,index in response_data_list" :key="index" class="el_main-ul-li">
+            <div class="el_main-loading_div" element-loading-text="等待响应中...." v-loading="loading_able"></div>
+            <ul class="el_main-ul">
+                <el-checkbox-group v-model="check_list" >
+                    <li  v-for="item,index in response_data_list" :key="index" class="el_main-ul-li">
                         <el-checkbox :label="item.type+item.ip+':'+item.port" class="el_main-ul-li-el_checkbox" :border="true">
                         {{ item.type }} {{item.ip}} {{ item.port }}
                         </el-checkbox>
@@ -51,20 +52,23 @@ export default {
     data(){
         return {
             command:'',
-            check_list:[]
+            check_list:[],
+           
         }
     },
     methods:{
         ...mapMutations('devicestateAbout',{SET_PROJECT_VIEW_ABLE:'SET_PROJECT_VIEW_ABLE'}),
         ...mapMutations('projectoprateAbout',{COMMIT_COMMAND:'COMMIT_COMMAND',
-        SET_EFFECT:'SET_EFFECT',SET_TEXT_AREA:'SET_TEXT_AREA'}),
+        SET_EFFECT:'SET_EFFECT',SET_TEXT_AREA:'SET_TEXT_AREA',SET_GO_BACK_STATE:'SET_GO_BACK_STATE'}),
         goBack(){
-            this.COMMIT_COMMAND('')
+            this.commit_command=false
+            this.SET_GO_BACK_STATE()
             this.$router.push({
                 name:'state',
             })
         },
         commit_command(){
+            this.check_list=[]
             this.COMMIT_COMMAND(this.command)
         },
         set_effect(){
@@ -89,6 +93,9 @@ export default {
         },
         response_data_list(){
             return this.$store.state.projectoprateAbout.response_data_list
+        },
+        loading_able(){
+            return this.$store.state.projectoprateAbout.loading_able
         }
     },
     beforeDestroy(){
@@ -170,5 +177,10 @@ export default {
     }
     .el_main-ul-li-el_checkbox{
         width: 300px;
+    }
+    .el_main-loading_div{
+        position: relative;
+        left: 330px;
+        top:-220px
     }
 </style>

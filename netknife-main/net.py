@@ -33,6 +33,7 @@ class AppNet():
 
     def send_command(self,login_dict,command_data):
         device_list=[]
+        device_mix_unit_list=[]
         device_type_map={
             'huaweissh':'huawei',
             'huaweitelnet':'huawei_telnet',
@@ -46,9 +47,16 @@ class AppNet():
         for mix_unit in login_dict:
             device_dict['device_type']=device_type_map[mix_unit[0]+mix_unit[1]]
             for ip in ap.processing_check_ip(mix_unit[3]):
+                # if device_list['device_type'] not in 
+                if {'device_type':device_dict['device_type'],'ip':ip,'port':mix_unit[2]} in device_mix_unit_list:
+                    continue
                 device_list+=[{'device_type':device_dict['device_type'],
                               'port':mix_unit[2],'ip':ip,'username':mix_unit[4],
                               'password':mix_unit[5],'secret':mix_unit[6]}]
+                device_mix_unit_list+=[{'device_type':device_dict['device_type'],
+                                        'ip':ip,
+                                       'port':mix_unit[2],
+                                       }]
             device_dict={}
 
         def send_commands(device_info, command_data):

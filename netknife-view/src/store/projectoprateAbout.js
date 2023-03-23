@@ -1,24 +1,31 @@
-import { send_post,pop_info } from "./tools";
+import { Loading } from "element-ui";
+import { send_post,get_time } from "./tools";
 
 
 export const  projectoprateAbout={
     namespaced:true,
     actions:{},
     mutations:{
+        SET_GO_BACK_STATE(state){
+            state.textarea=''
+            state.response_data_list=[]
+            state.effect_connect_percent=0
+
+        },
         COMMIT_COMMAND(state,command){
-            //goback的时候清空textarea中内容
-            if(command===''){
-                state.textarea=''
-                state.effect_connect_percent=0
-                return
-            }
-            //
+            state.loading_able=true
+            state.response_data_list=[]
+            state.textarea=''
             send_post('/commit_command',{
                 'base_effect_range':state.choose_project[0],
                 'command':command
             },response=>{
+                state.loading_able=false
+                state.response_data_list=[]
                 state.response_data_list=response.data
+                state.response_date_time=get_time()
             },reason=>{
+                state=false
             
             })
         },
@@ -29,19 +36,24 @@ export const  projectoprateAbout={
            if (this.time!==undefined){clearTimeout(this.time)}
            this.time=setTimeout(() => {
                 send_post('/get_effect_data',{'base_effect_range':state.choose_project[0],'command':command},response=>{
-                    console.log(response.data)
                     state.effect_connect_percent=response.data['effect_connect_percent']
-        
                 },reason=>{  
                 })
             }, 300);
         },
         SET_TEXT_AREA(state,check_list){
             state.textarea=''
+            let flag=true
             state.response_data_list.forEach(item => {
                 check_list.forEach(e=>{
-                    if(item.type+item.ip+':'+item.port===e){
-                        state.textarea+=item.response
+                    if(item.type+item.ip+':'+item.port===e ){
+                        if(flag){
+                            state.textarea+=`===============================================================================\n设备类型:${item.type}设备登录IP:${item.ip}设备登录端口:${item.port}\n时间:${state.response_date_time}\n===============================================================================`+item.response
+                            flag=false
+                        }else{
+                            state.textarea+=`\n===============================================================================\n设备类型:${item.type}设备登录IP:${item.ip}设备登录端口:${item.port}\n时间:${state.response_date_time}\n===============================================================================`+item.response
+                        }
+                       
                     }
                 }) 
             });
@@ -51,6 +63,8 @@ export const  projectoprateAbout={
         textarea:'',
         choose_project:[],
         effect_connect_percent:0,
-        response_data_list:[]
+        response_data_list:[],
+        response_date_time:'',
+        loading_able:false
     }
 }

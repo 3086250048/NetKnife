@@ -46,3 +46,21 @@ export function pop_info(state,title,type){
         },3000)
     }
 }
+
+export function get_time(){
+    const options = { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric',
+        hour12: false,
+        timeZone: 'Asia/Shanghai'
+      };
+      
+      const date = new Date();
+      const formatter = new Intl.DateTimeFormat('zh-CN', options);
+      const formattedDate = formatter.format(date);
+      return formattedDate
+}
