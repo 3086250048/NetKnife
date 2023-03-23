@@ -1,39 +1,47 @@
 <template>
-    <el-container style="margin-left: -30px;" >
-        <el-header height="15px"  >
-            <div style="margin-top: -20px;">
-                <el-button @click="goBack">返回</el-button>
-                <div style="margin-left:80px;margin-top: -40px;" > <h1  style="font-size:30px;">当前所在项目:{{ choose_project[0].slice(0,80) }}</h1></div>
+    <el-container class="el_container">
+        <el-header  height="15px"  >
+            <div class="el_header-div" >
+                <el-button class="el_header-div-el_button" @click="goBack">返回</el-button>
+                <div class="el_header-div-div" >
+                    <h1  class="el_header-div-div-h1">
+                        当前所在项目:{{ choose_project[0].slice(0,25) }}
+                    </h1>
+                </div>
             </div>
         </el-header>
         <el-main>
-            <el-input style="margin-top: -10px;margin-bottom: 10px;" v-model="command" clearable placeholder="请输入内容" @change="commit_command" @input="set_effect">
+            <el-input class="el_main-el_input" v-model="command" clearable placeholder="请输入内容"
+             @change="commit_command" @input="set_effect">
             <template slot="prepend">CLI</template>
             </el-input><br>
-            <div style="margin-top: -5px;">
-                    <span>影响连接百分比</span><el-progress style="width: 200px;margin-left: 130px;margin-top: -20px;" :percentage="effect_connect_percent"></el-progress>
+            <div class="el_main-div">
+                <span>影响连接百分比</span>
+                <el-progress class="el_main-div-el_progress" :percentage="effect_connect_percent"></el-progress>
             </div>
-            <div style="margin-left: 330px;margin-top: -20px;">
-                <span>设备执行进度</span><el-progress style="width: 200px;margin-left: 110px;margin-top: -20px;" :percentage="96"></el-progress>
+            <div class="el_main--div">
+                <span>设备执行进度</span>
+                <el-progress class="el_main--div-el_progress" :percentage="96"></el-progress>
             </div>
             <el-input
             type="textarea"
             :rows="15"
             v-model="textarea"
             resize="none"
-            class="info_box"
-            style="font-size: larger;width: 650px;"
+            class="el_main--el_input"
             >
             </el-input>
-            <ul style="position: relative;left: 660px;top: -363px;overflow-y:scroll;height: 362px;">
-                <li v-for="ip in ip_list" :key="ip" style="list-style: none;margin-bottom: 3px;">
-                    <el-checkbox style="width: 300px;" :border="true"  >{{ip}}</el-checkbox>
-                </li>
+            <ul class="el_main-ul" >
+                <el-checkbox-group v-model="check_list">
+                    <li v-for="item,index in response_data_list" :key="index" class="el_main-ul-li">
+                        <el-checkbox :label="item.type+item.ip+':'+item.port" class="el_main-ul-li-el_checkbox" :border="true">
+                        {{ item.type }} {{item.ip}} {{ item.port }}
+                        </el-checkbox>
+                    </li>
+                </el-checkbox-group>
             </ul>
         </el-main>
-    </el-container>
-       
-        
+    </el-container> 
 </template>
 
 <script>
@@ -43,12 +51,13 @@ export default {
     data(){
         return {
             command:'',
-            ip_list:['192.168.1.0','192.168.2.0','192.168.3.0','192.168.4.0','192.168.5.0','192.168.6.0','192.168.7.0','192.168.8.0','192.168.9.0','192.168.10.0','192.168.11.0']
+            check_list:[]
         }
     },
     methods:{
         ...mapMutations('devicestateAbout',{SET_PROJECT_VIEW_ABLE:'SET_PROJECT_VIEW_ABLE'}),
-        ...mapMutations('projectoprateAbout',{COMMIT_COMMAND:'COMMIT_COMMAND',SET_EFFECT:'SET_EFFECT'}),
+        ...mapMutations('projectoprateAbout',{COMMIT_COMMAND:'COMMIT_COMMAND',
+        SET_EFFECT:'SET_EFFECT',SET_TEXT_AREA:'SET_TEXT_AREA'}),
         goBack(){
             this.COMMIT_COMMAND('')
             this.$router.push({
@@ -77,11 +86,19 @@ export default {
         },
         choose_project(){
             return this.$store.state.projectoprateAbout.choose_project
+        },
+        response_data_list(){
+            return this.$store.state.projectoprateAbout.response_data_list
         }
     },
     beforeDestroy(){
         // 销毁前将PROJECT_VIEW_ABLE设置为true
         this.SET_PROJECT_VIEW_ABLE(true)
+    },
+    watch:{
+        check_list(new_value){
+            this.SET_TEXT_AREA(new_value)
+        }
     },
     mounted(){
         this.set_effect()
@@ -89,9 +106,69 @@ export default {
 }
 </script>
 
-<style>
-    .info_box{
-        width: 800px;
+<style scoped>
+  
+    .el_container{
+        margin-left: -30px;
+    }
+    .el_header-div{
+        margin-top: -20px;
+    }
+    .el_header-div-el_button{
+        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)
+    }
+    .el_header-div-div{
+        margin-left:80px;
+        margin-top: -40px;
+    }
+    .el_header-div-div-h1{
+        font-size:30px;
+       
+    }
+    .el_main-el_input{
+        margin-top: -10px;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04)
+    }
+    .el_main-div{
+        margin-top: -5px;
+    }
+    .el_main-div-el_progress{
+        width: 200px;
+        margin-left: 130px;
+        margin-top: -20px;
+    
+    }
+    .el_main--div{
+        margin-left: 330px;
+        margin-top: -20px;
+    }
+    .el_main--div-el_progress{
+        width: 200px;
+        margin-left: 110px;
+        margin-top: -20px; 
+       
+    }
+    .el_main--el_input{
         margin-top: 10px;
+        font-size: larger;
+        width: 650px;
+        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)
+    }
+    .el_main-ul{
+        position: relative;
+        width: 300px;
+        left: 660px;
+        top: -363px;
+        overflow-y:scroll;
+        height: 362px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04)
+    }
+    .el_main-ul-li{
+        list-style: none;
+        margin-bottom: 3px;
+    }
+    .el_main-ul-li-el_checkbox{
+        width: 300px;
     }
 </style>

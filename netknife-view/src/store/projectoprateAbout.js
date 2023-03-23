@@ -17,9 +17,7 @@ export const  projectoprateAbout={
                 'base_effect_range':state.choose_project[0],
                 'command':command
             },response=>{
-                console.log(response.data)
-                state.textarea=''
-                state.textarea=response.data.toString()
+                state.response_data_list=response.data
             },reason=>{
             
             })
@@ -37,11 +35,22 @@ export const  projectoprateAbout={
                 },reason=>{  
                 })
             }, 300);
+        },
+        SET_TEXT_AREA(state,check_list){
+            state.textarea=''
+            state.response_data_list.forEach(item => {
+                check_list.forEach(e=>{
+                    if(item.type+item.ip+':'+item.port===e){
+                        state.textarea+=item.response
+                    }
+                }) 
+            });
         }
     },
     state:{
-        textarea:'test',
+        textarea:'',
         choose_project:[],
-        effect_connect_percent:0
+        effect_connect_percent:0,
+        response_data_list:[]
     }
 }

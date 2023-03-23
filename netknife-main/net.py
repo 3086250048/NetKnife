@@ -60,7 +60,11 @@ class AppNet():
                 if command_data['config']:
                     config_out += connect.send_config_set(command_data['config'])
                     connect.save_config()
-                return config_out + select_out
+                print('收到响应')
+                return {'ip':device_info['ip'] ,
+                        'response':config_out + select_out,
+                        'port':device_info['port'],
+                        'type':device_info['device_type']}
 
         def process_device(device_info, command_data):
             result = send_commands(device_info, command_data)
@@ -71,7 +75,7 @@ class AppNet():
             for future in futures:
                 result = future.result()
                 results.append(result)
-        return ''.join(results)
+        return results
 
 if __name__ == '__main__':
     net =AppNet()
