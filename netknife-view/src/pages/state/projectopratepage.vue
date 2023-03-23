@@ -10,7 +10,7 @@
                 </div>
             </div>
         </el-header>
-        <el-main >
+        <el-main class="el_main">
             <el-input class="el_main-el_input" v-model="command" clearable placeholder="请输入内容"
              @keyup.enter.native="commit_command" @input="set_effect">
             <template slot="prepend">CLI</template>
@@ -21,7 +21,7 @@
             </div>
             <div class="el_main--div">
                 <span>设备执行进度</span>
-                <el-progress class="el_main--div-el_progress" :percentage="96"></el-progress>
+                <el-progress class="el_main--div-el_progress" :percentage="response_percent"></el-progress>
             </div>
             <el-input
             type="textarea"
@@ -47,12 +47,14 @@
 
 <script>
 import { mapMutations } from 'vuex'
+
 export default {
     name:'ProjectOprate',
     data(){
         return {
             command:'',
             check_list:[],
+            response_percent:0
            
         }
     },
@@ -61,8 +63,6 @@ export default {
         ...mapMutations('projectoprateAbout',{COMMIT_COMMAND:'COMMIT_COMMAND',
         SET_EFFECT:'SET_EFFECT',SET_TEXT_AREA:'SET_TEXT_AREA',SET_GO_BACK_STATE:'SET_GO_BACK_STATE'}),
         goBack(){
-            this.commit_command=false
-            this.SET_GO_BACK_STATE()
             this.$router.push({
                 name:'state',
             })
@@ -99,8 +99,11 @@ export default {
         }
     },
     beforeDestroy(){
+        
+        this.SET_GO_BACK_STATE()
         // 销毁前将PROJECT_VIEW_ABLE设置为true
         this.SET_PROJECT_VIEW_ABLE(true)
+        
     },
     watch:{
         check_list(new_value){
@@ -116,11 +119,13 @@ export default {
 <style scoped>
     
     .el_container{
-        margin-left: -30px;
-    }
-    .el_header-div{
+        margin-left: -28px;
         margin-top: -20px;
+        height: 500px;
+        width: 990px;
+       
     }
+ 
     .el_header-div-el_button{
         box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)
     }
@@ -132,7 +137,10 @@ export default {
         font-size:30px;
        
     }
-
+    .el_main{
+      
+        margin-top: 25px;
+    }
     .el_main-el_input{
         margin-top: -10px;
         margin-bottom: 10px;
@@ -161,11 +169,11 @@ export default {
         margin-top: 10px;
         font-size: larger;
         width: 650px;
-        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)
+        box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04)
     }
     .el_main-ul{
         position: relative;
-        width: 300px;
+        width: 290px;
         left: 660px;
         top: -363px;
         overflow-y:scroll;

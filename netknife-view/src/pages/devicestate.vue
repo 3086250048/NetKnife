@@ -1,5 +1,5 @@
 <template>
-    <el-container>
+    <el-container >
         <el-header v-if="project_view_able" style="margin-top: -20px;" height="30px">
             <el-autocomplete
             style="width: 500px;margin-left: 200px;"
@@ -122,21 +122,7 @@ li{
 }
 li:not(:first-child){
     margin-top: 8px;
-}
-
-.normal{
-    background-color:#409EFF;
-}
-.success{
-    background-color: #67C23A;
-}
-.warning{
-    background-color:#E6A23C ;
-}
-.error{
-    background-color: #F56C6C;
-}
- 
+} 
 .head_card{
     height: 40px;
 }

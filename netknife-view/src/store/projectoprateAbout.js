@@ -9,7 +9,7 @@ export const  projectoprateAbout={
             state.textarea=''
             state.response_data_list=[]
             state.effect_connect_percent=0
-
+            state.loading_able=false
         },
         COMMIT_COMMAND(state,command){
             state.loading_able=true

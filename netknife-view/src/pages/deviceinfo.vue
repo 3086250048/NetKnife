@@ -14,12 +14,6 @@
 
 <script>
 import { send_get } from '@/store/tools'
-
-
-
-
-
-
 export default{
     name:'DeviceInfo',
     data(){
@@ -29,7 +23,6 @@ export default{
     },
     methods:{
         handleClick(tab,event){
-            console.log(111111)
             if(this.activeName==='second'){
                 this.$router.push({
                     name:'create'

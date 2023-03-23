@@ -1,5 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
 
+
 from multiping import MultiPing
 from tcping import Ping
 
@@ -65,10 +66,11 @@ class AppNet():
                 config_out = ''
                 if command_data['select']:
                     select_out += connect.send_command(command_data['select'])
+                    # 
                 if command_data['config']:
                     config_out += connect.send_config_set(command_data['config'])
                     connect.save_config()
-                print('收到响应')
+                    # 
                 return {'ip':device_info['ip'] ,
                         'response':config_out + select_out,
                         'port':device_info['port'],

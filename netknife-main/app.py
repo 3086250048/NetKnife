@@ -1,20 +1,25 @@
 from flask import Flask,request,render_template
 from flask_cors import CORS
+from flask_socketio import SocketIO
 import json
 
 from data import AppInfo
 from storage import AppStorage
 from net import AppNet
 from processing import AppProcessing
-#以下都是单列对象
+
 data=AppInfo()
 storage=AppStorage()
 net=AppNet()
 ap=AppProcessing()
-#################
 
 netknife=Flask(__name__)
-CORS(netknife,resource=r'/*')
+CORS(netknife, resources={r"/*": {"origins": "*"}})
+
+
+
+
+
 
 
 @netknife.route('/')
