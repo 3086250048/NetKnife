@@ -1,5 +1,5 @@
 <template>
-    <el-container >
+    <el-container class="el_container" >
         <el-header v-if="project_view_able" style="margin-top: -20px;" height="30px">
             <el-autocomplete
             style="width: 500px;margin-left: 200px;"
@@ -131,5 +131,8 @@ li:not(:first-child){
     float: right;
     margin-left: 10px;
     margin-top: -6px;
+}
+.el_container{
+    height:"490px"
 }
 </style>

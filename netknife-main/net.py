@@ -61,20 +61,28 @@ class AppNet():
             device_dict={}
 
         def send_commands(device_info, command_data):
-            with ConnectHandler(**device_info) as connect:
-                select_out = ''
-                config_out = ''
-                if command_data['select']:
-                    select_out += connect.send_command(command_data['select'])
-                    # 
-                if command_data['config']:
-                    config_out += connect.send_config_set(command_data['config'])
-                    connect.save_config()
-                    # 
-                return {'ip':device_info['ip'] ,
-                        'response':config_out + select_out,
+            try:
+                with ConnectHandler(**device_info) as connect:
+                    select_out = ''
+                    config_out = ''
+                    if command_data['select']:
+                        select_out += connect.send_command(command_data['select'])
+                        # 
+                    if command_data['config']:
+                        config_out += connect.send_config_set(command_data['config'])
+                        connect.save_config()
+                        # 
+                    return {'ip':device_info['ip'] ,
+                            'response': select_out +'\n'+config_out,
+                            'port':device_info['port'],
+                            'type':device_info['device_type']}
+            except Exception as e:
+                return {'ip':device_info['ip'],
+                        'response':f'连接错误:{e}',
                         'port':device_info['port'],
-                        'type':device_info['device_type']}
+                        'type':device_info['device_type']
+                        }
+
 
         def process_device(device_info, command_data):
             result = send_commands(device_info, command_data)

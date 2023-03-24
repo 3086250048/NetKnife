@@ -41,6 +41,7 @@ class AppInfo():
     def command_str(self):
         return self.__command_str
 
+
     @login_dict.setter
     def login_dict(self,login_dict):
         self.__login_dict=login_dict
@@ -65,6 +66,7 @@ class AppInfo():
     @command_str.setter
     def command_str(self,command_data):
         self.__command_str=ap.processing_command_data(command_data)
+  
 
 if __name__ =='__main__':
     a1=AppInfo()

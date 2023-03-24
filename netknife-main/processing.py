@@ -130,6 +130,7 @@ class AppProcessing():
         # else:
         #     ex_effect_range[0]['project']=effect_login_dict['base_effect_range']
         #     full_effect_dict=ex_effect_range[0]
+
         input_data = command_data['command']
         where_dict={}
         where_pattern = r"(?<=where\s)(.*?)(?=\sconfig|\sselect|\saction|$)"
@@ -175,7 +176,13 @@ class AppProcessing():
             command_dict['config']=_lis
         else:
             command_dict['config']=None
+        if command_data['parameter']:
+            for k,v in command_data['parameter'].items():
+                if v=='none':
+                    command_data['parameter'][k]=None
+            command_dict['parameter']=command_data['parameter']
         return command_dict
+
 if __name__ == '__main__':
     ap=AppProcessing()
     # lis=[[('Myproject', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '100.100.100.100')], [('默认项目', '默认区域', 'telnet', '23', 'admin', '11', '', '192.168.123.1'), ('默认项目', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '2.1.1.1')], [('默认项目1', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2'), ('默认项目1', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.3')], [('默认项目11', '默认区域', 'telnet', '23', '1', '1', '', '2.2.2.2')], [('默认项目2', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2')], [('默认项目3', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2')], [('默认项目4', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2'), ('默认项目4', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.3')]]

@@ -19,10 +19,11 @@
                 <span>影响连接百分比</span>
                 <el-progress class="el_main-div-el_progress" :percentage="effect_connect_percent"></el-progress>
             </div>
-            <div class="el_main--div">
+            <!-- <div class="el_main--div">
                 <span>设备执行进度</span>
                 <el-progress class="el_main--div-el_progress" :percentage="response_percent"></el-progress>
-            </div>
+            </div> -->
+            <el-button style="position:absolute;top:144px" type="text" @click="dialogFormVisible = true">设置发送命令参数</el-button>
             <el-input
             type="textarea"
             :rows="15"
@@ -138,8 +139,7 @@ export default {
        
     }
     .el_main{
-      
-        margin-top: 25px;
+        margin-top: 25px;  
     }
     .el_main-el_input{
         margin-top: -10px;
@@ -148,6 +148,7 @@ export default {
     }
     .el_main-div{
         margin-top: -5px;
+        margin-left: 320px;
     }
     .el_main-div-el_progress{
         width: 200px;
@@ -169,16 +170,17 @@ export default {
         margin-top: 10px;
         font-size: larger;
         width: 650px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04)
+        box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
+        
     }
     .el_main-ul{
-        position: relative;
-        width: 290px;
-        left: 660px;
-        top: -363px;
-        overflow-y:scroll;
+        position: absolute;
+        left: 789px;
+        top:180px;
+        width: 300px;
         height: 362px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04)
+        overflow-y:scroll;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
     }
     .el_main-ul-li{
         list-style: none;

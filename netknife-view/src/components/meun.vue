@@ -1,5 +1,5 @@
 <template>
-    <el-container>
+    <el-container >
         <el-header height="35px">
             <el-tabs v-model="activeName" @tab-click="handleClick">
                 <el-tab-pane label="设备信息" name="first"></el-tab-pane>
