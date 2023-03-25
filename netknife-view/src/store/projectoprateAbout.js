@@ -15,24 +15,14 @@ export const  projectoprateAbout={
             state.loading_able=true
             state.response_data_list=[]
             state.textarea=''
+            console.log(parameter_dict)
             send_post('/commit_command',{
                 'base_effect_range':state.choose_project[0],
                 'command':command,
                 'parameter':{
-                    expect_string:'none',
-                    read_timeout:10.0,
-                    delay_factor:'none',
-                    max_loops:'none',
-                    auto_find_prompt:true,
-                    strip_prompt:true,
-                    strip_command:true,
-                    normalize:true,
-                    use_textfsm:false,
-                    textfsm_template:'none',
-                    use_ttp:false,
-                    ttp_template:'none',
-                    use_genie:false,
-                    cmd_verify:true,
+                    strip_prompt:parameter_dict.device_title_able,
+                    strip_command:parameter_dict.command_able,
+                    read_timeout:parameter_dict.read_timeout,
                 }
             },response=>{
                 state.loading_able=false

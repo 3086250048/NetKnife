@@ -66,10 +66,10 @@ class AppNet():
                     select_out = ''
                     config_out = ''
                     if command_data['select']:
-                        select_out += connect.send_command(command_data['select'])
+                        select_out += connect.send_command(command_data['select'],command_data['parameter'])
                         # 
                     if command_data['config']:
-                        config_out += connect.send_config_set(command_data['config'])
+                        config_out += connect.send_config_set(command_data['config'],command_data['parameter'])
                         connect.save_config()
                         # 
                     return {'ip':device_info['ip'] ,

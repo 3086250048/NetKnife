@@ -23,7 +23,32 @@
                 <span>设备执行进度</span>
                 <el-progress class="el_main--div-el_progress" :percentage="response_percent"></el-progress>
             </div> -->
+            
             <el-button style="position:absolute;top:144px" type="text" @click="dialogFormVisible = true">设置发送命令参数</el-button>
+            <el-dialog title="设置发送命令参数" :visible.sync="dialogFormVisible" width="700px" >
+                <el-form :model="command_parameter">
+                    <el-form-item label="是否显示命令" :label-width="'120px'" style="margin-left: -30px;">
+                        <el-switch
+                            v-model="command_parameter.command_able"
+                            active-color="#13ce66">
+                        </el-switch>
+                    </el-form-item>
+                    <el-form-item label="是否显示设备提示符" :label-width="'140px'" style="position:absolute;left: 160px;top:84px">
+                        <el-switch
+                            v-model="command_parameter.device_title_able"
+                            active-color="#13ce66">
+                        </el-switch>
+                    </el-form-item>
+                    <el-form-item label="命令输出的超时时间" :label-width="'140px'" style="position: absolute;top: 84px;left: 346px;">
+                        <el-input-number v-model="command_parameter.read_timeout" :min="10" :max="1000" label="读取回显的超时时间"></el-input-number>
+                    </el-form-item>
+                </el-form>
+                <div slot="footer" class="dialog-footer">
+                    <el-button @click="dialogFormVisible = false">取 消</el-button>
+                    <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+                </div>
+            </el-dialog>
+
             <el-input
             type="textarea"
             :rows="15"
@@ -55,8 +80,13 @@ export default {
         return {
             command:'',
             check_list:[],
-            response_percent:0
-           
+            response_percent:0,
+            dialogFormVisible:false,
+            command_parameter:{
+                device_title_able:false,
+                command_able:false,
+                read_timeout:10
+            }
         }
     },
     methods:{
@@ -70,11 +100,13 @@ export default {
         },
         commit_command(){
             this.check_list=[]
-            this.COMMIT_COMMAND(this.command)
+            this.COMMIT_COMMAND(this.command,this.command_parameter)
         },
         set_effect(){
             this.SET_EFFECT(this.command)
-        }
+        },
+        // 关于命令发送参数函数
+       
     },
     computed:{
         able(){

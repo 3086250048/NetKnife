@@ -181,6 +181,7 @@ class AppProcessing():
                 if v=='none':
                     command_data['parameter'][k]=None
             command_dict['parameter']=command_data['parameter']
+        print(command_dict['parameter'])
         return command_dict
 
 if __name__ == '__main__':
