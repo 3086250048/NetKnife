@@ -72,7 +72,35 @@ class AppNet():
                     if command_data['config']:
                         config_out += connect.send_config_set(command_data['config'],**command_data['send_parameter'])
                         connect.save_config()
-
+                    '''
+                    upload 命令支持设备类型
+                    arista_eos
+                    arista_eos_ssh
+                    ciena_saos
+                    ciena_saos_ssh
+                    cisco_asa
+                    cisco_asa_ssh
+                    cisco_ios
+                    cisco_ios_ssh
+                    cisco_nxos
+                    cisco_nxos_ssh
+                    cisco_xe
+                    cisco_xe_ssh
+                    cisco_xr
+                    cisco_xr_ssh
+                    dell_os10
+                    dell_os10_ssh
+                    extreme_exos
+                    extreme_exos_ssh
+                    juniper_junos
+                    juniper_junos_ssh
+                    linux
+                    linux_ssh
+                    mikrotik_routeros
+                    mikrotik_routeros_ssh
+                    nokia_sros
+                    nokia_sros_ssh
+                    '''
                     if command_data['upload']:
                         upload_out+=file_transfer(connect,
                         source_file=command_data['action_parameter']['upload_src_file_path']+command_data['upload'][0],
@@ -83,7 +111,7 @@ class AppNet():
                         )
 
                     return {'ip':device_info['ip'] ,
-                            'response': select_out +'\n'+config_out+'\n'+upload_out,
+                            'response': select_out +'\n'+config_out,
                             'port':device_info['port'],
                             'type':device_info['device_type']}
             except Exception as e:

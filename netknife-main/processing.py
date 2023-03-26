@@ -159,10 +159,10 @@ class AppProcessing():
         # if not self.__path == self.__path+'/textfsm/data':
         #     os.chdir(self.__path+'/textfsm/data')
         input_data = command_data['command']
-        select_pattern = r"(?<=select\s)(.*?)(?=\swhere|\sset|\saction|\supload|\sdownload$)"
-        config_pattern = r"(?<=set\s)(.*?)(?=\swhere|\sselect|\saction|\supload|\sdownload$)"
-        action_pattern = r"(?<=action\s)(.*?)(?=\swhere|\sselect|\sset|\supload|\sdownload$)"
-        upload_pattern = r"(?<=upload\s)(.*?)(?=\swhere|\sselect|\saction|\sdownload|\sset$)"
+        select_pattern = r"(?<=select\s)(.*?)(?=\swhere|\sset|\saction|\supload|$)"
+        config_pattern = r"(?<=set\s)(.*?)(?=\swhere|\sselect|\saction|\supload|$)"
+        action_pattern = r"(?<=action\s)(.*?)(?=\swhere|\sselect|\sset|\supload|$)"
+        upload_pattern = r"(?<=upload\s)(.*?)(?=\swhere|\sselect|\saction|\sset|$)"
         # download_pattern = r"(?<=upload\s)(.*?)(?=\swhere|\sselect|\saction|\supload|\sset$)"
 
         select_match = re.search(select_pattern, input_data)
@@ -194,10 +194,6 @@ class AppProcessing():
         else:
             command_dict['upload']=None
         
-        # if download_match:
-        #     command_dict['download']=download_match.group(1).split(' ')
-        # else:
-        #     command_dict['download']=None
 
         if command_data['send_parameter']:
             for k,v in command_data['send_parameter'].items():
