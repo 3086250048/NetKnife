@@ -8,9 +8,11 @@ from netmiko import ConnectHandler
 
 from storage import AppStorage
 from processing import AppProcessing
+from action import AppAction
 
 storage=AppStorage()
 ap=AppProcessing()
+aa=AppAction()
 
 class AppNet():
     def __new__(cls,*args, **kwds):
@@ -66,12 +68,12 @@ class AppNet():
                     select_out = ''
                     config_out = ''
                     if command_data['select']:
-                        select_out += connect.send_command(command_data['select'],command_data['parameter'])
+                        select_out += connect.send_command(command_data['select'],**command_data['parameter'])
                         # 
                     if command_data['config']:
-                        config_out += connect.send_config_set(command_data['config'],command_data['parameter'])
+                        config_out += connect.send_config_set(command_data['config'],**command_data['parameter'])
                         connect.save_config()
-                        # 
+                        # wipe
                     return {'ip':device_info['ip'] ,
                             'response': select_out +'\n'+config_out,
                             'port':device_info['port'],
@@ -93,6 +95,8 @@ class AppNet():
             for future in futures:
                 result = future.result()
                 results.append(result)
+        if command_data['action']:
+            aa.action_main(command_data['action'][0],command_data['action'][1],ap.processing_export_data(results))
         return results
 
 if __name__ == '__main__':

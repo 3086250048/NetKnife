@@ -162,9 +162,11 @@ class AppProcessing():
         input_data = command_data['command']
         select_pattern = r"(?<=select\s)(.*?)(?=\swhere|\sconfig|\saction|$)"
         config_pattern = r"(?<=config\s)(.*?)(?=\swhere|\sselect|\saction|$)"
-       
+        action_pattern = r"(?<=action\s)(.*?)(?=\swhere|\sselect|\sconfig|$)"
+
         select_match = re.search(select_pattern, input_data)
         config_match = re.search(config_pattern, input_data)
+        action_match = re.search(action_pattern, input_data)
 
         command_dict={}
         if select_match:
@@ -176,19 +178,38 @@ class AppProcessing():
             command_dict['config']=_lis
         else:
             command_dict['config']=None
+
+        if action_match:
+            command_dict['action']=action_match.group(1).split(' ')
+        else:
+            command_dict['action']=None
+
         if command_data['parameter']:
             for k,v in command_data['parameter'].items():
-                if v=='none':
-                    command_data['parameter'][k]=None
+                if isinstance(v,int) and not isinstance(v,bool):
+                    command_data['parameter'][k]=float(command_data['parameter'][k])
             command_dict['parameter']=command_data['parameter']
-        print(command_dict['parameter'])
+        
+        print(command_dict)
+
         return command_dict
 
+    def processing_export_data(self,export_data):
+        _lis=[v['response'] for v in export_data]
+        return ''.join(_lis)
 if __name__ == '__main__':
     ap=AppProcessing()
     # lis=[[('Myproject', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '100.100.100.100')], [('默认项目', '默认区域', 'telnet', '23', 'admin', '11', '', '192.168.123.1'), ('默认项目', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '2.1.1.1')], [('默认项目1', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2'), ('默认项目1', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.3')], [('默认项目11', '默认区域', 'telnet', '23', '1', '1', '', '2.2.2.2')], [('默认项目2', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2')], [('默认项目3', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2')], [('默认项目4', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2'), ('默认项目4', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.3')]]
     # ap.processing_effect_command({'base_effect_range':'Myproject','command':'where area=默认区域,protocol=ssh,port=1000,ip=172.168.1.1'})
-    print(ap.processing_command_data({'base_effect_range':'默认项目','command':''}))
+    # print(ap.processing_command_data({'base_effect_range':'默认项目','command':''}))
+    _lis=[{'ip':'1.1.1.1' ,
+        'response':'aaaaaaaaaa' +'\n'+'bbbbbb',
+        'port':'65532',
+        'type':'ruijie_telnet_os'
+        }]
+    print(ap.processing_export_data(_lis))
+
+
 
    
 

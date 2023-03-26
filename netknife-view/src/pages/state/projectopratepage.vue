@@ -12,7 +12,7 @@
         </el-header>
         <el-main class="el_main">
             <el-input class="el_main-el_input" v-model="command" clearable placeholder="请输入内容"
-             @keyup.enter.native="commit_command" @input="set_effect">
+             @keyup.enter.native="commit_command" @keydown.tab.prevent.native="tab_command"  @input="set_effect" >
             <template slot="prepend">CLI</template>
             </el-input><br>
             <div class="el_main-div">
@@ -27,19 +27,19 @@
             <el-button style="position:absolute;top:144px" type="text" @click="dialogFormVisible = true">设置发送命令参数</el-button>
             <el-dialog title="设置发送命令参数" :visible.sync="dialogFormVisible" width="700px" >
                 <el-form :model="command_parameter">
-                    <el-form-item label="是否显示命令" :label-width="'120px'" style="margin-left: -30px;">
+                    <el-form-item label="是否关闭显示命令" :label-width="'130px'" style="margin-left: -20px;">
                         <el-switch
                             v-model="command_parameter.command_able"
                             active-color="#13ce66">
                         </el-switch>
                     </el-form-item>
-                    <el-form-item label="是否显示设备提示符" :label-width="'140px'" style="position:absolute;left: 160px;top:84px">
+                    <el-form-item label="是否关闭设备提示符" :label-width="'140px'" style="position:absolute;left: 170px;top:84px">
                         <el-switch
                             v-model="command_parameter.device_title_able"
                             active-color="#13ce66">
                         </el-switch>
                     </el-form-item>
-                    <el-form-item label="命令输出的超时时间" :label-width="'140px'" style="position: absolute;top: 84px;left: 346px;">
+                    <el-form-item label="命令输出的超时时间" :label-width="'140px'" style="position: absolute;top: 84px;left: 356px;">
                         <el-input-number v-model="command_parameter.read_timeout" :min="10" :max="1000" label="读取回显的超时时间"></el-input-number>
                     </el-form-item>
                 </el-form>
@@ -86,7 +86,12 @@ export default {
                 device_title_able:false,
                 command_able:false,
                 read_timeout:10
-            }
+            },
+            command_list:[
+                'display',
+                'routing-table',
+                'interface',
+            ]
         }
     },
     methods:{
@@ -100,8 +105,12 @@ export default {
         },
         commit_command(){
             this.check_list=[]
-            this.COMMIT_COMMAND(this.command,this.command_parameter)
+            this.COMMIT_COMMAND({command:this.command,command_parameter:this.command_parameter})
         },
+        tab_command(){
+            console.log('按下Tab')
+        }
+        ,
         set_effect(){
             this.SET_EFFECT(this.command)
         },

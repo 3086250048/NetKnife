@@ -11,18 +11,17 @@ export const  projectoprateAbout={
             state.effect_connect_percent=0
             state.loading_able=false
         },
-        COMMIT_COMMAND(state,command,parameter_dict){
+        COMMIT_COMMAND(state,payload){
             state.loading_able=true
             state.response_data_list=[]
             state.textarea=''
-            console.log(parameter_dict)
             send_post('/commit_command',{
                 'base_effect_range':state.choose_project[0],
-                'command':command,
+                'command':payload.command,
                 'parameter':{
-                    strip_prompt:parameter_dict.device_title_able,
-                    strip_command:parameter_dict.command_able,
-                    read_timeout:parameter_dict.read_timeout,
+                    strip_prompt:payload.command_parameter.device_title_able,
+                    strip_command:payload.command_parameter.command_able,
+                    read_timeout:payload.command_parameter.read_timeout,
                 }
             },response=>{
                 state.loading_able=false
