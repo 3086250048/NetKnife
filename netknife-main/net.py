@@ -1,11 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
-
-
 from multiping import MultiPing
 from tcping import Ping
-
 from netmiko import ConnectHandler,file_transfer
-
 from storage import AppStorage
 from processing import AppProcessing
 from action import AppAction
@@ -65,50 +61,13 @@ class AppNet():
         def send_commands(device_info, command_data):
             try:
                 with ConnectHandler(**device_info) as connect:
-                    select_out,config_out,upload_out,download_out = '','','',''
+                    select_out,config_out= '',''
                     if command_data['select']:
                         select_out += connect.send_command(command_data['select'],**command_data['send_parameter'])
                          
                     if command_data['config']:
                         config_out += connect.send_config_set(command_data['config'],**command_data['send_parameter'])
                         connect.save_config()
-                    '''
-                    upload 命令支持设备类型
-                    arista_eos
-                    arista_eos_ssh
-                    ciena_saos
-                    ciena_saos_ssh
-                    cisco_asa
-                    cisco_asa_ssh
-                    cisco_ios
-                    cisco_ios_ssh
-                    cisco_nxos
-                    cisco_nxos_ssh
-                    cisco_xe
-                    cisco_xe_ssh
-                    cisco_xr
-                    cisco_xr_ssh
-                    dell_os10
-                    dell_os10_ssh
-                    extreme_exos
-                    extreme_exos_ssh
-                    juniper_junos
-                    juniper_junos_ssh
-                    linux
-                    linux_ssh
-                    mikrotik_routeros
-                    mikrotik_routeros_ssh
-                    nokia_sros
-                    nokia_sros_ssh
-                    '''
-                    if command_data['upload']:
-                        upload_out+=file_transfer(connect,
-                        source_file=command_data['action_parameter']['upload_src_file_path']+command_data['upload'][0],
-                        dest_file=command_data['action_parameter']['upload_des_file_path']+command_data['upload'][1],
-                        file_system=command_data['action_parameter']['file_system'],
-                        direction="put",
-                        overwrite_file=command_data['action_parameter']['overwrite_file']
-                        )
 
                     return {'ip':device_info['ip'] ,
                             'response': select_out +'\n'+config_out,

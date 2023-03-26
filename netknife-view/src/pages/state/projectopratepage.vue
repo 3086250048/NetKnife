@@ -57,27 +57,6 @@
                             <template slot="prepend">PATH</template>
                         </el-input>
                     </el-form-item>
-                    <el-form-item label="UPLOAD源路径"  :label-width="'130px'">
-                        <el-input  placeholder="upload源文件路径" v-model="action_parameter.upload_src_file_path">
-                            <template slot="prepend">PATH</template>
-                        </el-input>
-                    </el-form-item>
-                    <el-form-item label="UPLOAD目的路径"  :label-width="'130px'">
-                        <el-input  placeholder="upload目的路径" v-model="action_parameter.upload_des_file_path">
-                            <template slot="prepend">PATH</template>
-                        </el-input>
-                    </el-form-item>
-                    <el-form-item label="文件系统"  :label-width="'130px'">
-                        <el-input  placeholder="" v-model="action_parameter.file_system">
-                            <template slot="prepend">SYSTEM</template>
-                        </el-input>
-                    </el-form-item>
-                    <el-form-item label="是否覆盖同名文件"  :label-width="'130px'">
-                        <el-switch
-                            v-model="send_parameter.overwrite_file"
-                            active-color="#13ce66">
-                        </el-switch>
-                    </el-form-item>
                 </el-form>
                 <div slot="footer" class="dialog-footer">
                     <el-button @click="action_dialog_able = false">取 消</el-button>
@@ -126,10 +105,6 @@ export default {
             },
             action_parameter:{
                 export_file_path:'C:/Users/30862/Desktop/',
-                upload_src_file_path:'C:/Users/30862/Desktop/',
-                upload_des_file_path:'',
-                file_system:'flash:',
-                overwrite_file:false
             }
             ,
      

@@ -25,10 +25,7 @@ export const  projectoprateAbout={
                 },
                 'action_parameter':{
                     export_file_path:payload.action_parameter.export_file_path,
-                    upload_src_file_path:payload.action_parameter.upload_src_file_path,
-                    upload_des_file_path:payload.action_parameter.upload_des_file_path,
-                    file_system:payload.action_parameter.file_system,
-                    overwrite_file:payload.action_parameter.overwrite_file
+        
                 }
             },response=>{
                 state.loading_able=false

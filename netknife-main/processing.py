@@ -159,17 +159,13 @@ class AppProcessing():
         # if not self.__path == self.__path+'/textfsm/data':
         #     os.chdir(self.__path+'/textfsm/data')
         input_data = command_data['command']
-        select_pattern = r"(?<=select\s)(.*?)(?=\swhere|\sset|\saction|\supload|$)"
-        config_pattern = r"(?<=set\s)(.*?)(?=\swhere|\sselect|\saction|\supload|$)"
-        action_pattern = r"(?<=action\s)(.*?)(?=\swhere|\sselect|\sset|\supload|$)"
-        upload_pattern = r"(?<=upload\s)(.*?)(?=\swhere|\sselect|\saction|\sset|$)"
-        # download_pattern = r"(?<=upload\s)(.*?)(?=\swhere|\sselect|\saction|\supload|\sset$)"
+        select_pattern = r"(?<=select\s)(.*?)(?=\swhere|\sset|\saction|$)"
+        config_pattern = r"(?<=set\s)(.*?)(?=\swhere|\sselect|\saction|$)"
+        action_pattern = r"(?<=action\s)(.*?)(?=\swhere|\sselect|\sset|$)"
 
         select_match = re.search(select_pattern, input_data)
         config_match = re.search(config_pattern, input_data)
         action_match = re.search(action_pattern, input_data)
-        upload_match = re.search(upload_pattern,input_data)
-        # download_match = re.search(download_pattern,input_data)
 
         command_dict={}
         
@@ -188,13 +184,7 @@ class AppProcessing():
             command_dict['action']=action_match.group(1).split(' ')
         else:
             command_dict['action']=None
-
-        if upload_match:
-            command_dict['upload']=upload_match.group(1).split(' ')
-        else:
-            command_dict['upload']=None
         
-
         if command_data['send_parameter']:
             for k,v in command_data['send_parameter'].items():
                 if isinstance(v,int) and not isinstance(v,bool):
