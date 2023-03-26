@@ -13,3 +13,13 @@
 实现对用户名信息、用户名密码、secret密码的浏览器本地存储功能
 实现项目如果存在于sqlite数据库中时，点击区域input时，显示在这个project下的区域列表
 
+使用Netmiko向设备传送文件:
+    with ConnectHandler(**sw1) as connect:
+     print ("已经成功登陆交换机" + sw1['ip'])
+     output = file_transfer(connect,
+                source_file="test.txt",
+                dest_file="test.txt",
+                file_system="flash:",
+                direction="put")
+     print (output)
+Netmiko配合Jinja2配置模板给设备做配置:

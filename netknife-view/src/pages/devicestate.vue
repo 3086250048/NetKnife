@@ -2,6 +2,7 @@
     <el-container class="el_container" >
         <el-header v-if="project_view_able" style="margin-top: -20px;" height="30px">
             <el-autocomplete
+            prefix-icon="el-icon-search"
             style="width: 500px;margin-left: 200px;"
             v-model="input"
             :fetch-suggestions="querySearchAsync"

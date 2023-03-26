@@ -4,7 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 from multiping import MultiPing
 from tcping import Ping
 
-from netmiko import ConnectHandler
+from netmiko import ConnectHandler,file_transfer
 
 from storage import AppStorage
 from processing import AppProcessing
@@ -65,17 +65,25 @@ class AppNet():
         def send_commands(device_info, command_data):
             try:
                 with ConnectHandler(**device_info) as connect:
-                    select_out = ''
-                    config_out = ''
+                    select_out,config_out,upload_out,download_out = '','','',''
                     if command_data['select']:
-                        select_out += connect.send_command(command_data['select'],**command_data['parameter'])
-                        # 
+                        select_out += connect.send_command(command_data['select'],**command_data['send_parameter'])
+                         
                     if command_data['config']:
-                        config_out += connect.send_config_set(command_data['config'],**command_data['parameter'])
+                        config_out += connect.send_config_set(command_data['config'],**command_data['send_parameter'])
                         connect.save_config()
-                        # wipe
+
+                    if command_data['upload']:
+                        upload_out+=file_transfer(connect,
+                        source_file=command_data['action_parameter']['upload_src_file_path']+command_data['upload'][0],
+                        dest_file=command_data['action_parameter']['upload_des_file_path']+command_data['upload'][1],
+                        file_system=command_data['action_parameter']['file_system'],
+                        direction="put",
+                        overwrite_file=command_data['action_parameter']['overwrite_file']
+                        )
+
                     return {'ip':device_info['ip'] ,
-                            'response': select_out +'\n'+config_out,
+                            'response': select_out +'\n'+config_out+'\n'+upload_out,
                             'port':device_info['port'],
                             'type':device_info['device_type']}
             except Exception as e:
@@ -95,8 +103,16 @@ class AppNet():
             for future in futures:
                 result = future.result()
                 results.append(result)
+        
+        def EXPORT():
+            aa.action_main('export',command_data['action_parameter']['export_file_path']+command_data['action'][1],ap.processing_export_data(results))
+
+        ACTION_MAP={
+            'export':EXPORT,
+        }
         if command_data['action']:
-            aa.action_main(command_data['action'][0],command_data['action'][1],ap.processing_export_data(results))
+            ACTION_MAP[command_data['action'][0]]()
+        
         return results
 
 if __name__ == '__main__':

@@ -11,8 +11,8 @@
             </div>
         </el-header>
         <el-main class="el_main">
-            <el-input class="el_main-el_input" v-model="command" clearable placeholder="请输入内容"
-             @keyup.enter.native="commit_command" @keydown.tab.prevent.native="tab_command"  @input="set_effect" >
+            <el-input class="el_main-el_input" v-model="command" clearable placeholder="请输入命令"
+             @keyup.enter.native="commit_command"  @input="set_effect" >
             <template slot="prepend">CLI</template>
             </el-input><br>
             <div class="el_main-div">
@@ -24,30 +24,66 @@
                 <el-progress class="el_main--div-el_progress" :percentage="response_percent"></el-progress>
             </div> -->
             
-            <el-button style="position:absolute;top:144px" type="text" @click="dialogFormVisible = true">设置发送命令参数</el-button>
-            <el-dialog title="设置发送命令参数" :visible.sync="dialogFormVisible" width="700px" >
-                <el-form :model="command_parameter">
+            <el-button style="position:absolute;top:144px" type="text" @click="send_dialog_able = true">设置发送命令参数</el-button>
+            <el-dialog title="设置发送命令参数" :visible.sync="send_dialog_able" width="700px" >
+                <el-form :model="send_parameter">
                     <el-form-item label="是否关闭显示命令" :label-width="'130px'" style="margin-left: -20px;">
                         <el-switch
-                            v-model="command_parameter.command_able"
+                            v-model="send_parameter.command_able"
                             active-color="#13ce66">
                         </el-switch>
                     </el-form-item>
                     <el-form-item label="是否关闭设备提示符" :label-width="'140px'" style="position:absolute;left: 170px;top:84px">
                         <el-switch
-                            v-model="command_parameter.device_title_able"
+                            v-model="send_parameter.device_title_able"
                             active-color="#13ce66">
                         </el-switch>
                     </el-form-item>
                     <el-form-item label="命令输出的超时时间" :label-width="'140px'" style="position: absolute;top: 84px;left: 356px;">
-                        <el-input-number v-model="command_parameter.read_timeout" :min="10" :max="1000" label="读取回显的超时时间"></el-input-number>
+                        <el-input-number v-model="send_parameter.read_timeout" :min="10" :max="1000" label="读取回显的超时时间"></el-input-number>
                     </el-form-item>
                 </el-form>
                 <div slot="footer" class="dialog-footer">
-                    <el-button @click="dialogFormVisible = false">取 消</el-button>
-                    <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+                    <el-button @click="send_dialog_able = false">取 消</el-button>
+                    <el-button type="primary" @click="send_dialog_able = false">确 定</el-button>
                 </div>
-            </el-dialog>
+            </el-dialog>    
+
+            <el-button style="position:absolute;top:144px;left: 250px;" type="text" @click="action_dialog_able= true">设置文件路径参数</el-button>
+            <el-dialog title="设置文件路径参数" :visible.sync="action_dialog_able" width="700px" >
+                <el-form :model="action_parameter">
+                    <el-form-item label="EXPORT导出路径"  :label-width="'130px'">
+                        <el-input  placeholder="export文件导出路径" v-model="action_parameter.export_file_path">
+                            <template slot="prepend">PATH</template>
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item label="UPLOAD源路径"  :label-width="'130px'">
+                        <el-input  placeholder="upload源文件路径" v-model="action_parameter.upload_src_file_path">
+                            <template slot="prepend">PATH</template>
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item label="UPLOAD目的路径"  :label-width="'130px'">
+                        <el-input  placeholder="upload目的路径" v-model="action_parameter.upload_des_file_path">
+                            <template slot="prepend">PATH</template>
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item label="文件系统"  :label-width="'130px'">
+                        <el-input  placeholder="" v-model="action_parameter.file_system">
+                            <template slot="prepend">SYSTEM</template>
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item label="是否覆盖同名文件"  :label-width="'130px'">
+                        <el-switch
+                            v-model="send_parameter.overwrite_file"
+                            active-color="#13ce66">
+                        </el-switch>
+                    </el-form-item>
+                </el-form>
+                <div slot="footer" class="dialog-footer">
+                    <el-button @click="action_dialog_able = false">取 消</el-button>
+                    <el-button type="primary" @click="action_dialog_able = false">确 定</el-button>
+                </div>
+            </el-dialog>    
 
             <el-input
             type="textarea"
@@ -81,17 +117,22 @@ export default {
             command:'',
             check_list:[],
             response_percent:0,
-            dialogFormVisible:false,
-            command_parameter:{
+            send_dialog_able:false,
+            action_dialog_able:false,
+            send_parameter:{
                 device_title_able:false,
                 command_able:false,
                 read_timeout:10
             },
-            command_list:[
-                'display',
-                'routing-table',
-                'interface',
-            ]
+            action_parameter:{
+                export_file_path:'C:/Users/30862/Desktop/',
+                upload_src_file_path:'C:/Users/30862/Desktop/',
+                upload_des_file_path:'',
+                file_system:'flash:',
+                overwrite_file:false
+            }
+            ,
+     
         }
     },
     methods:{
@@ -105,12 +146,12 @@ export default {
         },
         commit_command(){
             this.check_list=[]
-            this.COMMIT_COMMAND({command:this.command,command_parameter:this.command_parameter})
+            this.COMMIT_COMMAND({
+                command:this.command,
+                send_parameter:this.send_parameter,
+                action_parameter:this.action_parameter
+            })
         },
-        tab_command(){
-            console.log('按下Tab')
-        }
-        ,
         set_effect(){
             this.SET_EFFECT(this.command)
         },
@@ -160,6 +201,7 @@ export default {
 
 <style scoped>
     
+
     .el_container{
         margin-left: -28px;
         margin-top: -20px;
@@ -182,11 +224,13 @@ export default {
     .el_main{
         margin-top: 25px;  
     }
-    .el_main-el_input{
+    .el_main-el_input  {
+        
         margin-top: -10px;
         margin-bottom: 10px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04)
     }
+
     .el_main-div{
         margin-top: -5px;
         margin-left: 320px;

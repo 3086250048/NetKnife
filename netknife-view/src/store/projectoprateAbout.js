@@ -18,10 +18,17 @@ export const  projectoprateAbout={
             send_post('/commit_command',{
                 'base_effect_range':state.choose_project[0],
                 'command':payload.command,
-                'parameter':{
-                    strip_prompt:payload.command_parameter.device_title_able,
-                    strip_command:payload.command_parameter.command_able,
-                    read_timeout:payload.command_parameter.read_timeout,
+                'send_parameter':{
+                    strip_prompt:payload.send_parameter.device_title_able,
+                    strip_command:payload.send_parameter.command_able,
+                    read_timeout:payload.send_parameter.read_timeout,
+                },
+                'action_parameter':{
+                    export_file_path:payload.action_parameter.export_file_path,
+                    upload_src_file_path:payload.action_parameter.upload_src_file_path,
+                    upload_des_file_path:payload.action_parameter.upload_des_file_path,
+                    file_system:payload.action_parameter.file_system,
+                    overwrite_file:payload.action_parameter.overwrite_file
                 }
             },response=>{
                 state.loading_able=false

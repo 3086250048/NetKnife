@@ -91,7 +91,7 @@ class AppProcessing():
         #     full_effect_dict=ex_effect_range[0]
         input_data = command_data['command']
         where_dict={}
-        where_pattern = r"(?<=where\s)(.*?)(?=\sconfig|\sselect|\saction|$)"
+        where_pattern = r"(?<=where\s)(.*?)(?=\sset|\sselect|\saction|$)"
         where_match = re.search(where_pattern,input_data)
         if where_match:
             where_key_value_list=where_match.group(1).split(',')
@@ -154,25 +154,30 @@ class AppProcessing():
             where_dict['project']=command_data['base_effect_range']
             # print(where_dict)
             return storage.get_full_login_list(where_dict)
-                    
- 
+                     
     def processing_command_data(self,command_data):
         # if not self.__path == self.__path+'/textfsm/data':
         #     os.chdir(self.__path+'/textfsm/data')
         input_data = command_data['command']
-        select_pattern = r"(?<=select\s)(.*?)(?=\swhere|\sconfig|\saction|$)"
-        config_pattern = r"(?<=config\s)(.*?)(?=\swhere|\sselect|\saction|$)"
-        action_pattern = r"(?<=action\s)(.*?)(?=\swhere|\sselect|\sconfig|$)"
+        select_pattern = r"(?<=select\s)(.*?)(?=\swhere|\sset|\saction|\supload|\sdownload$)"
+        config_pattern = r"(?<=set\s)(.*?)(?=\swhere|\sselect|\saction|\supload|\sdownload$)"
+        action_pattern = r"(?<=action\s)(.*?)(?=\swhere|\sselect|\sset|\supload|\sdownload$)"
+        upload_pattern = r"(?<=upload\s)(.*?)(?=\swhere|\sselect|\saction|\sdownload|\sset$)"
+        # download_pattern = r"(?<=upload\s)(.*?)(?=\swhere|\sselect|\saction|\supload|\sset$)"
 
         select_match = re.search(select_pattern, input_data)
         config_match = re.search(config_pattern, input_data)
         action_match = re.search(action_pattern, input_data)
+        upload_match = re.search(upload_pattern,input_data)
+        # download_match = re.search(download_pattern,input_data)
 
         command_dict={}
+        
         if select_match:
             command_dict['select']=select_match.group(1)
         else:
             command_dict['select']=None
+
         if config_match:
             _lis=config_match.group(1).split(',')
             command_dict['config']=_lis
@@ -184,12 +189,25 @@ class AppProcessing():
         else:
             command_dict['action']=None
 
-        if command_data['parameter']:
-            for k,v in command_data['parameter'].items():
-                if isinstance(v,int) and not isinstance(v,bool):
-                    command_data['parameter'][k]=float(command_data['parameter'][k])
-            command_dict['parameter']=command_data['parameter']
+        if upload_match:
+            command_dict['upload']=upload_match.group(1).split(' ')
+        else:
+            command_dict['upload']=None
         
+        # if download_match:
+        #     command_dict['download']=download_match.group(1).split(' ')
+        # else:
+        #     command_dict['download']=None
+
+        if command_data['send_parameter']:
+            for k,v in command_data['send_parameter'].items():
+                if isinstance(v,int) and not isinstance(v,bool):
+                    command_data['send_parameter'][k]=float(command_data['send_parameter'][k])
+            command_dict['send_parameter']=command_data['send_parameter']
+        
+        if command_data['action_parameter']:
+            command_dict['action_parameter']=command_data['action_parameter']
+
         print(command_dict)
 
         return command_dict
@@ -197,6 +215,8 @@ class AppProcessing():
     def processing_export_data(self,export_data):
         _lis=[v['response'] for v in export_data]
         return ''.join(_lis)
+    
+    
 if __name__ == '__main__':
     ap=AppProcessing()
     # lis=[[('Myproject', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '100.100.100.100')], [('默认项目', '默认区域', 'telnet', '23', 'admin', '11', '', '192.168.123.1'), ('默认项目', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '2.1.1.1')], [('默认项目1', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2'), ('默认项目1', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.3')], [('默认项目11', '默认区域', 'telnet', '23', '1', '1', '', '2.2.2.2')], [('默认项目2', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2')], [('默认项目3', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2')], [('默认项目4', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2'), ('默认项目4', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.3')]]
