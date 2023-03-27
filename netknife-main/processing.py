@@ -79,19 +79,9 @@ class AppProcessing():
         return return_result
                 
     def processing_effect_command(self,command_data):
-        # if not self.__path == self.__path+'/textfsm/data':
-        #     os.chdir(self.__path+'/textfsm/data')
-        # result={}
-        # ex_effect_range=AppProcessing.oprate_dict(self.__file['effect'],command_data['command'])
-        
-        # if len(ex_effect_range)==0:
-        #     full_effect_dict={'project':command_data['base_effect_range']}
-        # else:
-        #     ex_effect_range[0]['project']=command_data['base_effect_range']
-        #     full_effect_dict=ex_effect_range[0]
         input_data = command_data['command']
         where_dict={}
-        where_pattern = r"(?<=where\s)(.*?)(?=\sset|\sselect|\saction|$)"
+        where_pattern = r"(?<=where\s)(.*?)(?=\sset|\sselect|\saction|\supload|\sdownload|$)"
         where_match = re.search(where_pattern,input_data)
         if where_match:
             where_key_value_list=where_match.group(1).split(',')
@@ -122,18 +112,9 @@ class AppProcessing():
         return result
 
     def processing_effect_login_data(self,command_data):
-        # if not self.__path == self.__path+'/textfsm/data':
-        #     os.chdir(self.__path+'/textfsm/data')
-        # ex_effect_range=AppProcessing.oprate_dict(self.__file['effect'],effect_login_dict['command'])
-        # if len(ex_effect_range)==0:
-        #     full_effect_dict={'project':effect_login_dict['base_effect_range']}
-        # else:
-        #     ex_effect_range[0]['project']=effect_login_dict['base_effect_range']
-        #     full_effect_dict=ex_effect_range[0]
-
         input_data = command_data['command']
         where_dict={}
-        where_pattern = r"(?<=where\s)(.*?)(?=\sconfig|\sselect|\saction|$)"
+        where_pattern = r"(?<=where\s)(.*?)(?=\sset|\sselect|\saction|\supload|\sdownload|$)"
         where_match = re.search(where_pattern,input_data)
         if where_match:
             where_key_value_list=where_match.group(1).split(',')
@@ -159,13 +140,17 @@ class AppProcessing():
         # if not self.__path == self.__path+'/textfsm/data':
         #     os.chdir(self.__path+'/textfsm/data')
         input_data = command_data['command']
-        select_pattern = r"(?<=select\s)(.*?)(?=\swhere|\sset|\saction|$)"
-        config_pattern = r"(?<=set\s)(.*?)(?=\swhere|\sselect|\saction|$)"
-        action_pattern = r"(?<=action\s)(.*?)(?=\swhere|\sselect|\sset|$)"
+        select_pattern = r"(?<=select\s)(.*?)(?=\swhere|\sset|\saction|\supload|\sdownload|$)"
+        config_pattern = r"(?<=set\s)(.*?)(?=\swhere|\sselect|\saction|\supload|\sdownload|$)"
+        action_pattern = r"(?<=action\s)(.*?)(?=\swhere|\sselect|\sset|\supload|\sdownload|$)"
+        upload_pattern = r"(?<=upload\s)(.*?)(?=\swhere|\sselect|\sset|\saction|\sdownload|$)"
+        download_pattern = r"(?<=download\s)(.*?)(?=\swhere|\sselect|\sset|\saction|\supload|$)"
 
         select_match = re.search(select_pattern, input_data)
         config_match = re.search(config_pattern, input_data)
         action_match = re.search(action_pattern, input_data)
+        upload_match = re.search(upload_pattern,input_data)
+        download_match = re.search(download_pattern,input_data)
 
         command_dict={}
         
@@ -179,6 +164,18 @@ class AppProcessing():
             command_dict['config']=_lis
         else:
             command_dict['config']=None
+
+        if upload_match:
+            _lis=upload_match.group(1).split(' ')
+            command_dict['upload']=_lis
+        else:
+            command_dict['upload']=None
+
+        if download_match:
+            _lis=download_match.group(1).split(' ')
+            command_dict['download']=_lis
+        else:
+            command_dict['download']=None
 
         if action_match:
             command_dict['action']=action_match.group(1).split(' ')

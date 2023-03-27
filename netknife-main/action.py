@@ -8,7 +8,7 @@ class AppAction():
             file.write(content)
     def action_main(self,action_command,parameter,content):
         action_map={
-            'export':self.export
+            'export':self.export  
         }
         action_map[action_command](parameter,content)
 

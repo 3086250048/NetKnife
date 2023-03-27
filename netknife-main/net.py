@@ -1,10 +1,18 @@
 from concurrent.futures import ThreadPoolExecutor
 from multiping import MultiPing
 from tcping import Ping
-from netmiko import ConnectHandler,file_transfer
+from netmiko import ConnectHandler
+
 from storage import AppStorage
 from processing import AppProcessing
 from action import AppAction
+
+import threading
+from pyftpdlib.authorizers import DummyAuthorizer
+from pyftpdlib.handlers import FTPHandler
+from pyftpdlib.servers import FTPServer
+
+
 
 storage=AppStorage()
 ap=AppProcessing()
@@ -13,10 +21,18 @@ aa=AppAction()
 class AppNet():
     def __new__(cls,*args, **kwds):
         if not hasattr(cls,'_instance'):
+            def run_ftp_server():
+                authorizer = DummyAuthorizer()
+                authorizer.add_user("netknife_user", "netknife_pwd", "C:/Users/30862/Desktop/", perm="elradfmw")
+                handler = FTPHandler
+                handler.authorizer = authorizer
+                server = FTPServer(("0.0.0.0", 21), handler)
+                server.serve_forever()
+                server.close_all()
+            ftp_server_thread = threading.Thread(target=run_ftp_server)
+            ftp_server_thread.start()
             cls._instance=super().__new__(cls,*args,**kwds)
-        return cls._instance     
-    def __init__(self) :
-        pass
+        return cls._instance           
     def check_ip_icmp(self,check_ip_tuple):
         print(check_ip_tuple)
         mp=MultiPing(check_ip_tuple)
@@ -61,16 +77,27 @@ class AppNet():
         def send_commands(device_info, command_data):
             try:
                 with ConnectHandler(**device_info) as connect:
-                    select_out,config_out= '',''
+                    select_out,config_out,upload_out,download_out= '','','',''
                     if command_data['select']:
                         select_out += connect.send_command(command_data['select'],**command_data['send_parameter'])
-                         
                     if command_data['config']:
                         config_out += connect.send_config_set(command_data['config'],**command_data['send_parameter'])
                         connect.save_config()
+                    if command_data['upload']:
+                        if device_info['device_type'].split('_')[0]=='ruijie':
+                            upload_cmd=f"copy ftp://netknife_user:netknife_pwd@{command_data['upload'][0]}/{command_data['upload'][1]} {command_data['upload'][2]}"
+                        if device_info['device_type'].split('_')[0]=='huawei':
+                            pass
+                        upload_out+=connect.send_command(upload_cmd,**command_data['send_parameter'])
+                    if command_data['download']:
+                        if device_info['device_type'].split('_')[0]=='ruijie':
+                            download_cmd=f"copy {command_data['download'][2]} ftp://netknife_user:netknife_pwd@{command_data['download'][0]}/{command_data['download'][1]}"
+                        if device_info['device_type'].split('_')[0]=='huawei':
+                            pass
+                        download_out+=connect.send_command(download_cmd,**command_data['send_parameter'])
 
                     return {'ip':device_info['ip'] ,
-                            'response': select_out +'\n'+config_out,
+                            'response': select_out +'\n'+config_out+'\n'+upload_out+'\n'+download_out,
                             'port':device_info['port'],
                             'type':device_info['device_type']}
             except Exception as e:
