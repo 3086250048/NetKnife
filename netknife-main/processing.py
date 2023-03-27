@@ -166,14 +166,25 @@ class AppProcessing():
             command_dict['config']=None
 
         if upload_match:
-            _lis=upload_match.group(1).split(' ')
+            _lis=upload_match.group(1).split(',')
             command_dict['upload']=_lis
         else:
             command_dict['upload']=None
 
         if download_match:
-            _lis=download_match.group(1).split(' ')
-            command_dict['download']=_lis
+            _lis=download_match.group(1).split(',')
+            pattern = r"\[.+\]"
+            matches = re.search(pattern,_lis[1])
+            if matches:
+                _tup=matches.span()
+                _lis2=matches.group(0).split('[')
+                _lis3=_lis2[1].split(']')
+                _lis4=_lis3[0].split('-')
+                _lis5=[  f'{_lis[1][:_tup[0]]}{i}{_lis[1][_tup[1]:]}'  for i in range(int(_lis4[0]),int(_lis4[1])+1)]
+                command_dict['download']=_lis
+                command_dict['download'][1]=_lis5
+            else:
+                command_dict['download']=_lis
         else:
             command_dict['download']=None
 

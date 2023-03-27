@@ -11,8 +11,9 @@ import threading
 from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import FTPServer
-
-
+import os
+from copy import deepcopy
+from pprint import pprint
 
 storage=AppStorage()
 ap=AppProcessing()
@@ -21,9 +22,10 @@ aa=AppAction()
 class AppNet():
     def __new__(cls,*args, **kwds):
         if not hasattr(cls,'_instance'):
+            desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
             def run_ftp_server():
                 authorizer = DummyAuthorizer()
-                authorizer.add_user("netknife_user", "netknife_pwd", "C:/Users/30862/Desktop/", perm="elradfmw")
+                authorizer.add_user("netknife_user", "netknife_pwd", desktop_path, perm="elradfmw")
                 handler = FTPHandler
                 handler.authorizer = authorizer
                 server = FTPServer(("0.0.0.0", 21), handler)
@@ -113,11 +115,34 @@ class AppNet():
             return result
         results = []
         with ThreadPoolExecutor(max_workers=len(device_list)) as executor:
-            futures = [executor.submit(process_device, device_info, command_data) for device_info in device_list]
-            for future in futures:
-                result = future.result()
-                results.append(result)
-        
+            if command_data['download']:
+                if len(command_data['download'][1])>1:
+                    print(1111111111111111111111111111111111111111111111111111111111111111111111111111111)
+                    command_data_list=[]
+                    for source_path  in command_data['download'][1]:
+                        new_command_data=deepcopy(command_data)
+                       
+                        new_command_data['download'][1]=source_path
+                        print(new_command_data['download'][1])   
+                        command_data_list.append(new_command_data)
+                    print(len(device_list))
+                    device_and_command_list=list(map(lambda x,y:(x,y),device_list,command_data_list))
+                    pprint(device_and_command_list)
+                    futures = [executor.submit(process_device, item[0], item[1]) for item in device_and_command_list]
+                    for future in futures:
+                        result = future.result()
+                        results.append(result)
+                else:
+                    print(2222222222222222222222222222222222222222222222222222222222222222222222222222222)
+                    futures = [executor.submit(process_device, device_info, command_data) for device_info in device_list]
+                    for future in futures:
+                        result = future.result()
+                        results.append(result)
+            else:
+                futures = [executor.submit(process_device, device_info, command_data) for device_info in device_list]
+                for future in futures:
+                    result = future.result()
+                    results.append(result)
         def EXPORT():
             aa.action_main('export',command_data['action_parameter']['export_file_path']+command_data['action'][1],ap.processing_export_data(results))
 
