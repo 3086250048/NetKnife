@@ -82,7 +82,10 @@ class AppNet():
                 with ConnectHandler(**device_info) as connect:
                     select_out,config_out,upload_out,download_out= '','','',''
                     if command_data['select']:
-                        select_out += connect.send_command(command_data['select'],**command_data['send_parameter'])
+                        if device_info['device_type'].split('_')[0]=='hp':
+                            select_out += connect.send_command_timing(command_data['select'],**command_data['send_parameter'])
+                        else:
+                            select_out += connect.send_command(command_data['select'],**command_data['send_parameter'])
                     if command_data['config']:
                         config_out += connect.send_config_set(command_data['config'],**command_data['send_parameter'])
                         connect.save_config()
@@ -90,10 +93,10 @@ class AppNet():
                         if device_info['device_type'].split('_')[0]=='ruijie':
                             upload_cmd=f"copy ftp://netknife_user:netknife_pwd@{command_data['upload'][0]}/{command_data['upload'][1]} {command_data['upload'][2]}"
                             upload_out+=connect.send_command(upload_cmd,**command_data['send_parameter'])
-                        if device_info['device_type'].split('_')[0]=='huawei':
-                            upload_cmd_list=[(f"ftp {command_data['upload'][0]}",fr"User({command_data['upload'][0]}:(none)):"),(f"netknife_user",fr"Enter password:"),f"netknife_pwd",f"get {command_data['upload'][1]} {command_data['upload'][2]}"]
-                            upload_out+=connect.send_command_timing(upload_cmd_list[0][0],**command_data['send_parameter'])
-                            upload_out+=connect.send_command_timing(upload_cmd_list[1][0],**command_data['send_parameter'])
+                        if device_info['device_type'].split('_')[0]=='huawei' or device_info['device_type'].split('_')[0]=='hp':
+                            upload_cmd_list=[f"ftp {command_data['upload'][0]}",f"netknife_user",f"netknife_pwd",f"get {command_data['upload'][1]} {command_data['upload'][2]}"]
+                            upload_out+=connect.send_command_timing(upload_cmd_list[0],**command_data['send_parameter'])
+                            upload_out+=connect.send_command_timing(upload_cmd_list[1],**command_data['send_parameter'])
                             upload_out+=connect.send_command_timing(upload_cmd_list[2],**command_data['send_parameter'])
                             upload_out+=connect.send_command_timing(upload_cmd_list[3],**command_data['send_parameter'])
                             upload_out+=connect.send_command_timing('quit',**command_data['send_parameter'])
@@ -102,10 +105,10 @@ class AppNet():
                             download_cmd=f"copy {command_data['download'][2]} ftp://netknife_user:netknife_pwd@{command_data['download'][0]}/{command_data['download'][1]}"
                             download_out+=connect.send_command(download_cmd,**command_data['send_parameter'])
                         if device_info['device_type'].split('_')[0]=='huawei':
-                            download_cmd_list=[(f"ftp {command_data['download'][0]}",fr"User({command_data['download'][0]}:(none)):"),(f"netknife_user",fr"Enter password:"),f"netknife_pwd",f"put {command_data['download'][2]} {command_data['download'][1]}"]
+                            download_cmd_list=[f"ftp {command_data['download'][0]}",f"netknife_user",f"netknife_pwd",f"put {command_data['download'][2]} {command_data['download'][1]}"]
                             path_list=command_data['download'][1].split('/')
-                            download_out+=connect.send_command_timing(download_cmd_list[0][0],**command_data['send_parameter'])
-                            download_out+=connect.send_command_timing(download_cmd_list[1][0],**command_data['send_parameter'])
+                            download_out+=connect.send_command_timing(download_cmd_list[0],**command_data['send_parameter'])
+                            download_out+=connect.send_command_timing(download_cmd_list[1],**command_data['send_parameter'])
                             download_out+=connect.send_command_timing(download_cmd_list[2],**command_data['send_parameter'])
                             if len(path_list)>1:
                                 chage_path='/'.join(path_list[:-1])
@@ -116,6 +119,13 @@ class AppNet():
                                 download_out+=connect.send_command_timing(put_cmd,**command_data['send_parameter'])
                                 download_out+=connect.send_command_timing('quit',**command_data['send_parameter'])
                             else:
+                                download_out+=connect.send_command_timing(download_cmd_list[3],**command_data['send_parameter'])
+                                download_out+=connect.send_command_timing('quit',**command_data['send_parameter'])
+                        if device_info['device_type'].split('_')[0]=='hp':
+                                download_cmd_list=[f"ftp {command_data['download'][0]}",f"netknife_user",f"netknife_pwd",f"put {command_data['download'][2]} {command_data['download'][1]}"]
+                                download_out+=connect.send_command_timing(download_cmd_list[0],**command_data['send_parameter'])
+                                download_out+=connect.send_command_timing(download_cmd_list[1],**command_data['send_parameter'])
+                                download_out+=connect.send_command_timing(download_cmd_list[2],**command_data['send_parameter'])
                                 download_out+=connect.send_command_timing(download_cmd_list[3],**command_data['send_parameter'])
                                 download_out+=connect.send_command_timing('quit',**command_data['send_parameter'])
                     return {'ip':device_info['ip'] ,
@@ -140,13 +150,9 @@ class AppNet():
                     command_data_list=[]
                     for source_path  in command_data['download'][1]:
                         new_command_data=deepcopy(command_data)
-                       
-                        new_command_data['download'][1]=source_path
-                        print(new_command_data['download'][1])   
+                        new_command_data['download'][1]=source_path  
                         command_data_list.append(new_command_data)
-                    print(len(device_list))
                     device_and_command_list=list(map(lambda x,y:(x,y),device_list,command_data_list))
-                    pprint(device_and_command_list)
                     futures = [executor.submit(process_device, item[0], item[1]) for item in device_and_command_list]
                     for future in futures:
                         result = future.result()

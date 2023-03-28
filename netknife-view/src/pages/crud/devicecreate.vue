@@ -14,6 +14,7 @@
                 <el-input class="input-with-select input" placeholder="自定义设备类型" v-model="device_info.device_class">
                     <el-select class="select" v-model="device_info.device_class" placeholder="类型" slot="prepend">
                         <el-option label="Huawei" value="huawei"></el-option>
+                        <el-option label="H3c" value="h3c"></el-option>
                         <el-option label="Ruijie" value="ruijie"></el-option>
                         <el-option label="Cisco" value="cisco"></el-option>
                         <el-option label="Linux" value="linux"></el-option>
