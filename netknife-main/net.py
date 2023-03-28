@@ -15,13 +15,14 @@ import os
 from copy import deepcopy
 from pprint import pprint
 
+
 storage=AppStorage()
 ap=AppProcessing()
 aa=AppAction()
 
 class AppNet():
     def __new__(cls,*args, **kwds):
-        if not hasattr(cls,'_instance'):
+        if not hasattr(cls,'_instance'): 
             desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
             def run_ftp_server():
                 authorizer = DummyAuthorizer()
@@ -88,16 +89,35 @@ class AppNet():
                     if command_data['upload']:
                         if device_info['device_type'].split('_')[0]=='ruijie':
                             upload_cmd=f"copy ftp://netknife_user:netknife_pwd@{command_data['upload'][0]}/{command_data['upload'][1]} {command_data['upload'][2]}"
+                            upload_out+=connect.send_command(upload_cmd,**command_data['send_parameter'])
                         if device_info['device_type'].split('_')[0]=='huawei':
-                            pass
-                        upload_out+=connect.send_command(upload_cmd,**command_data['send_parameter'])
+                            upload_cmd_list=[(f"ftp {command_data['upload'][0]}",fr"User({command_data['upload'][0]}:(none)):"),(f"netknife_user",fr"Enter password:"),f"netknife_pwd",f"get {command_data['upload'][1]} {command_data['upload'][2]}"]
+                            upload_out+=connect.send_command_timing(upload_cmd_list[0][0],**command_data['send_parameter'])
+                            upload_out+=connect.send_command_timing(upload_cmd_list[1][0],**command_data['send_parameter'])
+                            upload_out+=connect.send_command_timing(upload_cmd_list[2],**command_data['send_parameter'])
+                            upload_out+=connect.send_command_timing(upload_cmd_list[3],**command_data['send_parameter'])
+                            upload_out+=connect.send_command_timing('quit',**command_data['send_parameter'])
                     if command_data['download']:
                         if device_info['device_type'].split('_')[0]=='ruijie':
                             download_cmd=f"copy {command_data['download'][2]} ftp://netknife_user:netknife_pwd@{command_data['download'][0]}/{command_data['download'][1]}"
+                            download_out+=connect.send_command(download_cmd,**command_data['send_parameter'])
                         if device_info['device_type'].split('_')[0]=='huawei':
-                            pass
-                        download_out+=connect.send_command(download_cmd,**command_data['send_parameter'])
-
+                            download_cmd_list=[(f"ftp {command_data['download'][0]}",fr"User({command_data['download'][0]}:(none)):"),(f"netknife_user",fr"Enter password:"),f"netknife_pwd",f"put {command_data['download'][2]} {command_data['download'][1]}"]
+                            path_list=command_data['download'][1].split('/')
+                            download_out+=connect.send_command_timing(download_cmd_list[0][0],**command_data['send_parameter'])
+                            download_out+=connect.send_command_timing(download_cmd_list[1][0],**command_data['send_parameter'])
+                            download_out+=connect.send_command_timing(download_cmd_list[2],**command_data['send_parameter'])
+                            if len(path_list)>1:
+                                chage_path='/'.join(path_list[:-1])
+                                download_out+=connect.send_command_timing(f'cd {chage_path}',**command_data['send_parameter'])
+                                put_list=download_cmd_list[3].split(' ')
+                                put_list[-1]=path_list[-1]
+                                put_cmd=' '.join(put_list)
+                                download_out+=connect.send_command_timing(put_cmd,**command_data['send_parameter'])
+                                download_out+=connect.send_command_timing('quit',**command_data['send_parameter'])
+                            else:
+                                download_out+=connect.send_command_timing(download_cmd_list[3],**command_data['send_parameter'])
+                                download_out+=connect.send_command_timing('quit',**command_data['send_parameter'])
                     return {'ip':device_info['ip'] ,
                             'response': select_out +'\n'+config_out+'\n'+upload_out+'\n'+download_out,
                             'port':device_info['port'],
@@ -117,7 +137,6 @@ class AppNet():
         with ThreadPoolExecutor(max_workers=len(device_list)) as executor:
             if command_data['download']:
                 if len(command_data['download'][1])>1:
-                    print(1111111111111111111111111111111111111111111111111111111111111111111111111111111)
                     command_data_list=[]
                     for source_path  in command_data['download'][1]:
                         new_command_data=deepcopy(command_data)
@@ -133,7 +152,6 @@ class AppNet():
                         result = future.result()
                         results.append(result)
                 else:
-                    print(2222222222222222222222222222222222222222222222222222222222222222222222222222222)
                     futures = [executor.submit(process_device, device_info, command_data) for device_info in device_list]
                     for future in futures:
                         result = future.result()

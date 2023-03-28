@@ -121,4 +121,4 @@ def commit_command():
 
 
 if __name__ == '__main__':
-    netknife.run('0.0.0.0',use_reloader=False,port=3000,debug=True)
+    netknife.run('0.0.0.0',port=3000,debug=True)
