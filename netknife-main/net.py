@@ -5,39 +5,21 @@ from netmiko import ConnectHandler
 
 from storage import AppStorage
 from processing import AppProcessing
+from processing import NetProcessing
 from action import AppAction
-
-import threading
-from pyftpdlib.authorizers import DummyAuthorizer
-from pyftpdlib.handlers import FTPHandler
-from pyftpdlib.servers import FTPServer
-import os
-from copy import deepcopy
-from pprint import pprint
 
 
 storage=AppStorage()
 ap=AppProcessing()
 aa=AppAction()
+np=NetProcessing()
 
 class AppNet():
     def __new__(cls,*args, **kwds):
         if not hasattr(cls,'_instance'): 
-            desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
-            def run_ftp_server():
-                authorizer = DummyAuthorizer()
-                authorizer.add_user("netknife_user", "netknife_pwd", desktop_path, perm="elradfmw")
-                handler = FTPHandler
-                handler.authorizer = authorizer
-                server = FTPServer(("0.0.0.0", 21), handler)
-                server.serve_forever()
-                server.close_all()
-            ftp_server_thread = threading.Thread(target=run_ftp_server)
-            ftp_server_thread.start()
             cls._instance=super().__new__(cls,*args,**kwds)
         return cls._instance           
     def check_ip_icmp(self,check_ip_tuple):
-        print(check_ip_tuple)
         mp=MultiPing(check_ip_tuple)
         mp.send()
         no_responses=mp.receive(2)[1]
@@ -50,32 +32,15 @@ class AppNet():
         return fault_tcp_ping
 
     def send_command(self,login_dict,command_data):
-        device_list=[]
-        device_mix_unit_list=[]
-        device_type_map={
-            'huaweissh':'huawei',
-            'huaweitelnet':'huawei_telnet',
-            'ruijiessh':'ruijie_os',
-            'ruijietelnet':'ruijie_os_telnet',
-            'h3cssh':'hp_comware',
-            'h3ctelnet':'hp_comware_telnet',
-            'linuxssh':'linux'
-        }
-        device_dict={}
-        for mix_unit in login_dict:
-            device_dict['device_type']=device_type_map[mix_unit[0]+mix_unit[1]]
-            for ip in ap.processing_check_ip(mix_unit[3]):
-                # if device_list['device_type'] not in 
-                if {'device_type':device_dict['device_type'],'ip':ip,'port':mix_unit[2]} in device_mix_unit_list:
-                    continue
-                device_list+=[{'device_type':device_dict['device_type'],
-                              'port':mix_unit[2],'ip':ip,'username':mix_unit[4],
-                              'password':mix_unit[5],'secret':mix_unit[6]}]
-                device_mix_unit_list+=[{'device_type':device_dict['device_type'],
-                                        'ip':ip,
-                                       'port':mix_unit[2],
-                                       }]
-            device_dict={}
+        SEND_COMMANDS_MAP,DEVICE_TYPE_MAP={},{}
+
+        DEVICE_TYPE_MAP['huaweissh']='huawei'
+        DEVICE_TYPE_MAP['huaweitelnet']='huawei_telnet'
+        DEVICE_TYPE_MAP['ruijiessh']='ruijie_os'
+        DEVICE_TYPE_MAP['ruijietelnet']='ruijie_os_telnet'
+        DEVICE_TYPE_MAP['h3cssh']='hp_comware'
+        DEVICE_TYPE_MAP['h3ctelnet']='hp_comware_telnet'
+        DEVICE_TYPE_MAP['linuxssh']='linux'
 
         def h3c_send_commands(connect,device_info,command_data):
             select_out,config_out,upload_out,download_out= '','','',''
@@ -159,10 +124,13 @@ class AppNet():
                     'type':device_info['device_type']
                     }
 
-        SEND_COMMANDS_MAP={}
         SEND_COMMANDS_MAP['hp']=h3c_send_commands
         SEND_COMMANDS_MAP['huawei']=huawei_send_commands
         SEND_COMMANDS_MAP['ruijie']=ruijie_send_commands
+
+
+        DEVICE_LIST=np.get_device_list(login_dict,DEVICE_TYPE_MAP)
+       
 
         def send_commands(device_info, command_data):
             try:
@@ -174,43 +142,32 @@ class AppNet():
                         'port':device_info['port'],
                         'type':device_info['device_type']
                         }
-
-
         def process_device(device_info, command_data):
             result = send_commands(device_info, command_data)
             return result
+        
         results = []
-        with ThreadPoolExecutor(max_workers=len(device_list)) as executor:
-            if command_data['download']:
+        with ThreadPoolExecutor(max_workers=len(DEVICE_LIST)) as executor:
+            if command_data['download'] :
                 if len(command_data['download'][1])>1:
-                    command_data_list=[]
-                    for source_path  in command_data['download'][1]:
-                        new_command_data=deepcopy(command_data)
-                        new_command_data['download'][1]=source_path  
-                        command_data_list.append(new_command_data)
-                    device_and_command_list=list(map(lambda x,y:(x,y),device_list,command_data_list))
+                    device_and_command_list=np.get_device_and_command_list(command_data,DEVICE_LIST)
                     futures = [executor.submit(process_device, item[0], item[1]) for item in device_and_command_list]
                     for future in futures:
                         result = future.result()
                         results.append(result)
                 else:
-                    futures = [executor.submit(process_device, device_info, command_data) for device_info in device_list]
+                    futures = [executor.submit(process_device, device_info, command_data) for device_info in DEVICE_LIST]
                     for future in futures:
                         result = future.result()
                         results.append(result)
             else:
-                futures = [executor.submit(process_device, device_info, command_data) for device_info in device_list]
+                futures = [executor.submit(process_device, device_info, command_data) for device_info in DEVICE_LIST]
                 for future in futures:
                     result = future.result()
                     results.append(result)
-        def EXPORT():
-            aa.action_main('export',command_data['action_parameter']['export_file_path']+command_data['action'][1],ap.processing_export_data(results))
 
-        ACTION_MAP={
-            'export':EXPORT,
-        }
-        if command_data['action']:
-            ACTION_MAP[command_data['action'][0]]()
+        if command_data['action'] and results:
+             aa.action_class_map(command_data['action'][0],command_data['action_parameter']['export_file_path']+command_data['action'][1],np.get_export_data(results))
         
         return results
 

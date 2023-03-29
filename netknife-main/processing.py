@@ -3,7 +3,7 @@ from itertools import chain
 import os,re
 from ordered_set import OrderedSet
 from storage import AppStorage
-
+from copy import deepcopy
 storage=AppStorage()
 
 
@@ -33,7 +33,6 @@ class AppProcessing():
         if not self.__path == self.__path+'/textfsm/data':
             os.chdir(self.__path+'/textfsm/data')
         address_dict=AppProcessing.oprate_dict(self.__file['check_ip'],check_ip)[0]
-        # print(address_dict)
         if address_dict['Aend'] == '':address_dict['Aend']=address_dict['Astart']
         if address_dict['Bend'] == '':address_dict['Bend']=address_dict['Bstart']
         if address_dict['Cend'] == '':address_dict['Cend']=address_dict['Cstart']
@@ -137,8 +136,7 @@ class AppProcessing():
             return storage.get_full_login_list(where_dict)
                      
     def processing_command_data(self,command_data):
-        # if not self.__path == self.__path+'/textfsm/data':
-        #     os.chdir(self.__path+'/textfsm/data')
+
         input_data = command_data['command']
         select_pattern = r"(?<=select\s)(.*?)(?=\swhere|\sset|\saction|\supload|\sdownload|$)"
         config_pattern = r"(?<=set\s)(.*?)(?=\swhere|\sselect|\saction|\supload|\sdownload|$)"
@@ -202,15 +200,44 @@ class AppProcessing():
         if command_data['action_parameter']:
             command_dict['action_parameter']=command_data['action_parameter']
 
-        print(command_dict)
 
         return command_dict
 
-    def processing_export_data(self,export_data):
+class NetProcessing():
+    def __new__(cls,*args, **kwds):
+        if not hasattr(cls,'_instance'):
+            cls._instance=super().__new__(cls,*args,**kwds)
+        return cls._instance 
+    def get_device_and_command_list(self,command_data,device_list):
+        command_data_list=[]
+        for source_path  in command_data['download'][1]:
+            new_command_data=deepcopy(command_data)
+            new_command_data['download'][1]=source_path  
+            command_data_list.append(new_command_data)
+        return list(map(lambda x,y:(x,y),device_list,command_data_list))
+    def get_device_list(self,login_dict,DEVICE_TYPE_MAP):
+        ap=AppProcessing()
+        device_list, device_mix_unit_list,device_dict=[],[],{}
+        for mix_unit in login_dict:
+            device_dict['device_type']=DEVICE_TYPE_MAP[mix_unit[0]+mix_unit[1]]
+            for ip in ap.processing_check_ip(mix_unit[3]):
+                # if device_list['device_type'] not in 
+                if {'device_type':device_dict['device_type'],'ip':ip,'port':mix_unit[2]} in device_mix_unit_list:
+                    continue
+                device_list+=[{'device_type':device_dict['device_type'],
+                              'port':mix_unit[2],'ip':ip,'username':mix_unit[4],
+                              'password':mix_unit[5],'secret':mix_unit[6]}]
+                device_mix_unit_list+=[{'device_type':device_dict['device_type'],
+                                        'ip':ip,
+                                       'port':mix_unit[2],
+                                       }]
+            device_dict={}
+        return device_list
+    def get_export_data(self,export_data):
         _lis=[v['response'] for v in export_data]
         return ''.join(_lis)
-    
-    
+
+
 if __name__ == '__main__':
     ap=AppProcessing()
     # lis=[[('Myproject', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '100.100.100.100')], [('默认项目', '默认区域', 'telnet', '23', 'admin', '11', '', '192.168.123.1'), ('默认项目', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '2.1.1.1')], [('默认项目1', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2'), ('默认项目1', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.3')], [('默认项目11', '默认区域', 'telnet', '23', '1', '1', '', '2.2.2.2')], [('默认项目2', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2')], [('默认项目3', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2')], [('默认项目4', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2'), ('默认项目4', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.3')]]
@@ -222,7 +249,6 @@ if __name__ == '__main__':
         'type':'ruijie_telnet_os'
         }]
     print(ap.processing_export_data(_lis))
-
 
 
    

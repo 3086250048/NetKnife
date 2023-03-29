@@ -9,6 +9,8 @@ class AppStorage():
         self.__path=os.path.dirname(os.path.abspath(__file__))+'/appdata.db'
         self.__add_login_info_sql='''INSERT INTO LOGININFO (ID,PROJECT,CLASS,AREA,PROTOCOL,PORT,USERNAME,PASSWORD,SECRET,IP_EXPRESSION)
                             VALUES (?,?,?,?,?,?,?,?,?,?);'''
+        self.__add_filepath_info_sql='''INSERT INTO FILEPATH (ID,PROJECT,AREA,CLASS)
+                            VALUES (?,?,?,?);'''
         self.__get_project_list_sql='''SELECT PROJECT FROM LOGININFO GROUP BY PROJECT ;'''
         
         #初始化创建数据库和表
@@ -31,11 +33,20 @@ class AppStorage():
                 UNIQUE(PROJECT,AREA,PORT,PROTOCOL,IP_EXPRESSION)
                 );'''
                 )
+                cur.execute(
+                    '''CREATE TABLE FILEPATH (
+                ID             TEXT    PRIMARY KEY NOT NULL,
+                PROJECT        TEXT    NOT NULL,
+                AREA           TEXT    NOT NULL,
+                CLASS          TEXT    NOT NULL,
+                UNIQUE(PROJECT,AREA,CLASS)
+                );'''
+                )
                 uid =str(uuid.uuid4())
                 suid=''.join(uid.split('-'))
                 cur.execute(self.__add_login_info_sql,[suid]*10)
+                cur.execute(self.__add_filepath_info_sql,[suid]*4)
                 con.commit()
-                print('-----------------创建成功-------------------')
             except sqlite3.Error as e:
                 print(e)
                 con.rollback()
@@ -239,8 +250,10 @@ class AppStorage():
             return cur.fetchall()
         result=self.oprate_sql('select count(*) from logininfo',{},callback)
         return result
-        
-        
+
+    def add_(self):
+        pass    
+    
 if __name__ == '__main__':
     ap=AppStorage()
     # s1.add_login_info()
