@@ -21,18 +21,18 @@ storage=AppStorage()
 net=AppNet()
 ap=AppProcessing()
 
-root_path = os.path.join(os.path.expanduser("~"), "Desktop") and storage.get_file_path_parameter()
+# root_path = os.path.join(os.path.expanduser("~"), "Desktop") and storage.get_file_path_parameter()
 
-def run_ftp_server(root_path=root_path):
-    authorizer = DummyAuthorizer()
-    authorizer.add_user("netknife_user", "netknife_pwd", root_path, perm="elradfmw")
-    handler = FTPHandler
-    handler.authorizer = authorizer
-    server = FTPServer(("0.0.0.0", 21), handler)
-    server.serve_forever()
-    server.close_all()
-ftp_server_thread = threading.Thread(target=run_ftp_server,args=(root_path,))
-ftp_server_thread.start()
+# def run_ftp_server(root_path=root_path):
+#     authorizer = DummyAuthorizer()
+#     authorizer.add_user("netknife_user", "netknife_pwd", root_path, perm="elradfmw")
+#     handler = FTPHandler
+#     handler.authorizer = authorizer
+#     server = FTPServer(("0.0.0.0", 21), handler)
+#     server.serve_forever()
+#     server.close_all()
+# ftp_server_thread = threading.Thread(target=run_ftp_server,args=(root_path,))
+# ftp_server_thread.start()
 
 
 netknife=Flask(__name__)
@@ -140,6 +140,80 @@ def commit_command():
     data.command_str=json.loads(request.get_data(as_text=True))
     result=net.send_command(data.effect_login_dict,data.command_str)
     return result
+
+@netknife.route('/add_filepath_parameter',methods=['POST'])
+def add_filepath_parameter():
+    result=storage.add_filepath_parameter(json.loads(request.get_data(as_text=True)))
+    if result:
+        return 'ADD_SUCCESS'
+    else:
+        return 'ADD_FAULT'
+    
+@netknife.route('/change_filepath_parameter',methods=['POST'])
+def change_filepath_parameter():
+    result=storage.change_filepath_parameter(json.loads(request.get_data(as_text=True)))
+    if result:
+        return 'CHANGE_SUCCESS'
+    else:
+        return 'CHANGE_FAULT'
+@netknife.route('/get_filepath_parameter',methods=['POST'])
+def get_filepath_parameter():
+    print('get_filepath_parameter')
+    result=storage.get_filepath_parameter(json.loads(request.get_data(as_text=True)))
+    if result:
+        print('filepath的result'+result)
+        return result
+
+    
+@netknife.route('/delete_filepath_parameter',methods=['POST'])
+def delete_filepath_parameter():
+    result=storage.delete_filepath_parameter(json.loads(request.get_data(as_text=True)))
+    if result:
+        return 'DELETE_SUCCESS'
+    else:
+        return 'DELETE_FAULT'
+
+
+@netknife.route('/add_sendcommand_parameter',methods=['POST'])
+def add_sendcommand_parameter():
+    result=storage.add_sendcommand_parameter(json.loads(request.get_data(as_text=True)))
+    if result:
+        return 'ADD_SUCCESS'
+    else:
+        return 'ADD_FAULT'
+    
+@netknife.route('/change_sendcommand_parameter',methods=['POST'])
+def change_sendcommand_parameter():
+    result=storage.change_sendcommand_parameter(json.loads(request.get_data(as_text=True)))
+    if result:
+        return 'CHANGE_SUCCESS'
+    else:
+        return 'CHANGE_FAULT'
+    
+@netknife.route('/get_sendcommand_parameter',methods=['POST'])
+def get_sendcommand_parameter():
+
+    print('get_sendcommand_parameter')
+
+    result=storage.get_sendcommand_parameter(json.loads(request.get_data(as_text=True)))
+    
+    if result:
+        print('sendcommand的result'+result)
+        return result
+
+    
+@netknife.route('/delete_sendcommand_parameter',methods=['POST'])
+def delete_sendcommand_parameter():
+    result=storage.delete_sendcommand_parameter(json.loads(request.get_data(as_text=True)))
+    if result:
+        return 'DELETE_SUCCESS'
+    else:
+        return 'DELETE_FAULT'
+
+
+
+
+
 
 
 if __name__ == '__main__':

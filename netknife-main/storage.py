@@ -1,4 +1,6 @@
 import sqlite3,os,uuid
+from processing import StorageProcessing
+sp=StorageProcessing()
 
 class AppStorage():
     def __new__(cls,*args, **kwds):
@@ -9,10 +11,12 @@ class AppStorage():
         self.__path=os.path.dirname(os.path.abspath(__file__))+'/appdata.db'
         self.__add_login_info_sql='''INSERT INTO LOGININFO (ID,PROJECT,CLASS,AREA,PROTOCOL,PORT,USERNAME,PASSWORD,SECRET,IP_EXPRESSION)
                             VALUES (?,?,?,?,?,?,?,?,?,?);'''
-        self.__add_filepath_info_sql='''INSERT INTO FILEPATH (ID,PROJECT,AREA,CLASS)
-                            VALUES (?,?,?,?);'''
+        self.__add_filepath_info_sql='''INSERT INTO FILEPATH (ID,PROJECT,AREA,TXT_EXPORT_PATH,FTP_ROOT_PATH,FTP_UPLOAD_PATH,FTP_DOWNLOAD_PATH)
+                            VALUES (?,?,?,?,?,?,?);'''
+        self.__add_sendcommand_parameter_info_sql='''INSERT INTO SENDCOMMAND_PARAMETER (ID,PROJECT,AREA,DEVICE_TITLE_ABLE,COMMAND_ABLE,READ_TIMEOUT)
+                            VALUES (?,?,?,?,?,?);'''
         self.__get_project_list_sql='''SELECT PROJECT FROM LOGININFO GROUP BY PROJECT ;'''
-        
+      
         #初始化创建数据库和表
         if not os.path.exists(self.__path):
             try:
@@ -33,19 +37,40 @@ class AppStorage():
                 UNIQUE(PROJECT,AREA,PORT,PROTOCOL,IP_EXPRESSION)
                 );'''
                 )
+                print('LOGININFO')
                 cur.execute(
                     '''CREATE TABLE FILEPATH (
                 ID             TEXT    PRIMARY KEY NOT NULL,
                 PROJECT        TEXT    NOT NULL,
                 AREA           TEXT    NOT NULL,
-                CLASS          TEXT    NOT NULL,
-                UNIQUE(PROJECT,AREA,CLASS)
+                TXT_EXPORT_PATH TEXT   NOT NULL,
+                FTP_ROOT_PATH   TEXT    NOT NULL,
+                FTP_UPLOAD_PATH TEXT     NOT NULL,
+                FTP_DOWNLOAD_PATH   TEXT NOT NULL,
+                UNIQUE(PROJECT,AREA)
                 );'''
                 )
+                print('FILEPATH')
+                cur.execute(
+                    '''CREATE TABLE SENDCOMMAND_PARAMETER (
+                ID             TEXT    PRIMARY KEY NOT NULL,
+                PROJECT        TEXT    NOT NULL,
+                AREA           TEXT    NOT NULL,
+                DEVICE_TITLE_ABLE  TEXT    NOT NULL,
+                COMMAND_ABLE    TEXT    NOT NULL,
+                READ_TIMEOUT    TEXT    NOT NULL,
+                UNIQUE(PROJECT,AREA)
+                );'''
+                )
+                print('SENDCOMMAND_PARAMETER')
                 uid =str(uuid.uuid4())
                 suid=''.join(uid.split('-'))
                 cur.execute(self.__add_login_info_sql,[suid]*10)
-                cur.execute(self.__add_filepath_info_sql,[suid]*4)
+                print('INSERT-1')
+                cur.execute(self.__add_filepath_info_sql,[suid]*7)
+                print('INSERT-2')
+                cur.execute(self.__add_sendcommand_parameter_info_sql,[suid]*6)
+                print('INSERT-3')
                 con.commit()
             except sqlite3.Error as e:
                 print(e)
@@ -251,9 +276,86 @@ class AppStorage():
         result=self.oprate_sql('select count(*) from logininfo',{},callback)
         return result
 
-    def add_(self):
-        pass    
+# sendcommand 参数相关
+    def get_sendcommand_parameter(self,select_parameter_dict):
+        print(select_parameter_dict)
+        def callback(cur,con):
+            result=cur.fetchall()    
+            if len(result)<=0:
+               return 'None'
+            else:
+                return result
+        sql=AppStorage.dynamic_sql_return('select device_title_able,command_able,read_timeout from sendcommand_parameter','where','and',select_parameter_dict)
+        return self.oprate_sql(sql,{},callback)
+         
+    def add_sendcommand_parameter(self,add_parameter_dict):
+        print(add_parameter_dict)
+        uid =str(uuid.uuid4())
+        suid=''.join(uid.split('-'))
+        add_parameter_list=list(add_parameter_dict.values())
+        add_parameter_list.insert(0,suid)
+        print(add_parameter_list)
+        def callback(cur,con):
+            con.commit()
+            return True
+        return self.oprate_sql(self.__add_sendcommand_parameter_info_sql,add_parameter_list,callback)
+
+    def change_sendcommand_parameter(self,data_dict):
+        def callback(cur,con):
+            con.commit()
+            return True
+        where_sql=AppStorage.dynamic_sql_return('','where','and',data_dict['where'])
+        update_sql=AppStorage.dynamic_sql_return('update sendcommand_parameter','set',',',data_dict['update'])
+        sql=update_sql+where_sql
+        return self.oprate_sql(sql,{},callback)
     
+    def delete_sendcommand_parameter(self,where_dict) -> bool:
+        def callback(cur,con):
+            con.commit()
+            return True
+        delete_sql=AppStorage.dynamic_sql_return('DELETE FROM sendcommand_parameter','WHERE','AND',where_dict)
+        return self.oprate_sql(delete_sql,where_dict,callback)
+# filepath 参数相关
+
+    def get_filepath_parameter(self,select_parameter_dict):
+        print(select_parameter_dict)
+        def callback(cur,con):
+            result=cur.fetchall()    
+            if len(result)<=0:
+                return 'None'
+            else:
+                return result
+        sql=AppStorage.dynamic_sql_return('select TXT_EXPORT_PATH,FTP_ROOT_PATH ,FTP_UPLOAD_PATH ,FTP_DOWNLOAD_PATH from filepath','where','and',select_parameter_dict)
+        return self.oprate_sql(sql,{},callback)
+         
+    def add_filepath_parameter(self,add_parameter_dict):
+        uid =str(uuid.uuid4())
+        suid=''.join(uid.split('-'))
+        add_parameter_list=list(add_parameter_dict.values())
+        add_parameter_list.insert(0,suid)
+        ['e528bc3720e74c859ff84338bf56f5d9', '默认项目11', '默认区域', 'default', 'default', 'default', 'default']
+        _add_parameter_list=sp.get_add_parameter_list(add_parameter_list)
+        def callback(cur,con):
+            con.commit()
+            return True
+        return self.oprate_sql(self.__add_filepath_info_sql,_add_parameter_list,callback)
+
+    def change_filepath_parameter(self,data_dict):
+        def callback(cur,con):
+            con.commit()
+            return True
+        where_sql=AppStorage.dynamic_sql_return('','where','and',data_dict['where'])
+        update_sql=AppStorage.dynamic_sql_return('update filepath','set',',',data_dict['update'])
+        sql=update_sql+where_sql
+        return self.oprate_sql(sql,{},callback)
+
+    def delete_filepath_parameter(self,where_dict) -> bool:
+        def callback(cur,con):
+            con.commit()
+            return True
+        delete_sql=AppStorage.dynamic_sql_return('DELETE FROM FILEPATH','WHERE','AND',where_dict)
+        return self.oprate_sql(delete_sql,where_dict,callback)
+
 if __name__ == '__main__':
     ap=AppStorage()
     # s1.add_login_info()

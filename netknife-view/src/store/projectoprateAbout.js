@@ -1,4 +1,4 @@
-import { send_post,get_time } from "./tools";
+import { send_post,get_time, send_get } from "./tools";
 
 
 export const  projectoprateAbout={
@@ -69,6 +69,9 @@ export const  projectoprateAbout={
                     }
                 }) 
             });
+        },
+        GET_SEND_COMMAND_PARAMETER(){
+            send_post('/')
         }
     },
     state:{

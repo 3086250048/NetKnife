@@ -44,23 +44,38 @@
                     </el-form-item>
                 </el-form>
                 <div slot="footer" class="dialog-footer">
-                    <el-button @click="send_dialog_able = false">取 消</el-button>
-                    <el-button type="primary" @click="send_dialog_able = false">确 定</el-button>
+                    <el-button @click="sendcommand_handler_cancel">取 消</el-button>
+                    <el-button type="primary" @click="sendcommand_handler_commit">确 定</el-button>
                 </div>
             </el-dialog>    
 
-            <el-button style="position:absolute;top:144px;left: 250px;" type="text" @click="action_dialog_able= true">设置文件路径参数</el-button>
-            <el-dialog title="设置文件路径参数" :visible.sync="action_dialog_able" width="700px" >
-                <el-form :model="action_parameter">
-                    <el-form-item label="EXPORT导出路径"  :label-width="'130px'">
-                        <el-input  placeholder="export文件导出路径" v-model="action_parameter.export_file_path">
+            <el-button style="position:absolute;top:144px;left: 250px;" type="text" @click="path_dialog_able= true">设置文件路径参数</el-button>
+            <el-dialog title="设置文件路径参数" :visible.sync="path_dialog_able" width="700px" >
+                <el-form :model="path_parameter">
+                    <el-form-item label="TXT导出路径"  :label-width="'130px'">
+                        <el-input  placeholder="TXT文件导出路径" v-model="path_parameter.txt_export_path">
+                            <template slot="prepend">PATH</template>
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item label="FTP根路径"  :label-width="'130px'">
+                        <el-input  placeholder="FTP根路径" v-model="path_parameter.ftp_root_path">
+                            <template slot="prepend">PATH</template>
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item label="FTP上传文件路径"  :label-width="'130px'">
+                        <el-input  placeholder="FTP上传文件路径" v-model="path_parameter.ftp_upload_path">
+                            <template slot="prepend">PATH</template>
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item label="FTP下载文件路径"  :label-width="'130px'">
+                        <el-input  placeholder="FTP下载文件路径" v-model="path_parameter.ftp_download_path">
                             <template slot="prepend">PATH</template>
                         </el-input>
                     </el-form-item>
                 </el-form>
                 <div slot="footer" class="dialog-footer">
-                    <el-button @click="action_dialog_able = false">取 消</el-button>
-                    <el-button type="primary" @click="action_dialog_able = false">确 定</el-button>
+                    <el-button @click="file_path_handler_cancel">取 消</el-button>
+                    <el-button type="primary" @click="file_path_handler_commit">确 定</el-button>
                 </div>
             </el-dialog>    
 
@@ -87,6 +102,7 @@
 </template>
 
 <script>
+import { send_post } from '@/store/tools'
 import { mapMutations } from 'vuex'
 
 export default {
@@ -97,14 +113,17 @@ export default {
             check_list:[],
             response_percent:0,
             send_dialog_able:false,
-            action_dialog_able:false,
+            path_dialog_able:false,
             send_parameter:{
                 device_title_able:false,
                 command_able:false,
                 read_timeout:10
             },
-            action_parameter:{
-                export_file_path:'C:/Users/30862/Desktop/',
+            path_parameter:{
+                txt_export_path:'C:/Users/30862/Desktop/',
+                ftp_root_path:'',
+                ftp_upload_path:'',
+                ftp_download_path:''
             }
             ,
      
@@ -124,13 +143,52 @@ export default {
             this.COMMIT_COMMAND({
                 command:this.command,
                 send_parameter:this.send_parameter,
-                action_parameter:this.action_parameter
+                path_parameter:this.path_parameter
             })
         },
         set_effect(){
             this.SET_EFFECT(this.command)
         },
-        // 关于命令发送参数函数
+
+
+
+        file_path_handler_cancel(){
+            this.path_dialog_able=false
+        },
+        file_path_handler_commit(){
+            this.path_dialog_able=true
+            send_post('/change_filepath_parameter',{
+                'where':{
+                    'project':this.choose_project[0],
+                    'area':'None',
+                },
+                'update':{
+                    'text_export_path': this.path_parameter.txt_export_path,
+                    'ftp_root_path':this.path_parameter.ftp_root_path,  
+                    'ftp_upload_path':this.path_parameter.ftp_upload_path,
+                    'ftp_download_path':this.path_parameter.ftp_download_path,
+                }
+            },response=>{},reason=>{})
+        },
+        sendcommand_handler_cancel(){
+            this.send_dialog_able=false
+
+        },
+        sendcommand_handler_commit(){
+            this.send_dialog_able=true
+            send_post('/change_sendcommand_parameter',{
+                'where':{
+                    'project':this.choose_project[0],
+                    'area':'None',
+                },
+                'update':{
+                    device_title_able:this.send_parameter.device_title_able,
+                    command_able:this.send_parameter.command_able,
+                    read_timeout:this.send_parameter.read_timeout
+                }
+            })
+        }
+
        
     },
     computed:{
@@ -166,10 +224,36 @@ export default {
     watch:{
         check_list(new_value){
             this.SET_TEXT_AREA(new_value)
+        },
+        send_dialog_able(new_value){
+            if(new_value){
+                send_post('/get_filepath_parameter',{
+                    'project':this.choose_project[0],
+                    'area':'None'
+                },response=>{
+                    this.send_parameter.device_title_able=response.data.device_title_able
+                    this.send_parameter.command_able=response.data.command_able
+                    this.send_parameter.read_timeout=response.data.read_timeout
+                },reason=>{})
+            }
+        },
+        path_dialog_able(new_value){
+            if(new_value){
+                send_post('/get_sendcommand_parameter',{
+                    'project':this.choose_project[0],
+                    'area':'None'
+                },response=>{
+                    this.path_parameter.txt_export_path=response.data.txt_export_path
+                    this.path_parameter.ftp_root_path=response.data.ftp_root_path
+                    this.path_parameter.ftp_upload_path=response.data.ftp_upload_path
+                    this.path_parameter.ftp_download_path=response.data.ftp_download_path
+                },reason=>{})
+            }
         }
     },
     mounted(){
         this.set_effect()
+        
     }
 }
 </script>

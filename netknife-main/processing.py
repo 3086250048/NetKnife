@@ -2,9 +2,8 @@ from textfsm import TextFSM
 from itertools import chain
 import os,re
 from ordered_set import OrderedSet
-from storage import AppStorage
 from copy import deepcopy
-storage=AppStorage()
+
 
 
 class AppProcessing():
@@ -99,6 +98,8 @@ class AppProcessing():
             where_dict['project']=command_data['base_effect_range']
                     
         result={}
+        from storage import AppStorage
+        storage=AppStorage()
         ap=AppProcessing()
         _full_connect_lis=[]
         _effect_connect_lis=[]
@@ -236,6 +237,20 @@ class NetProcessing():
     def get_export_data(self,export_data):
         _lis=[v['response'] for v in export_data]
         return ''.join(_lis)
+
+class StorageProcessing():
+    def __new__(cls,*args, **kwds):
+        if not hasattr(cls,'_instance'):
+            cls._instance=super().__new__(cls,*args,**kwds)
+        return cls._instance 
+    def get_add_parameter_list(self,add_parameter_list):
+        _add_parameter_list=[]
+        for v in add_parameter_list:
+            if v=='default':
+                _add_parameter_list.append(os.path.join(os.path.expanduser("~"), "Desktop"))
+            else:
+                _add_parameter_list.append(v)
+        return _add_parameter_list
 
 
 if __name__ == '__main__':

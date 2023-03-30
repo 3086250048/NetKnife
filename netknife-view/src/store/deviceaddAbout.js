@@ -69,6 +69,76 @@ export const deviceaddAbout={
                         if(response.data==='ADD_SUCCESS'){
                             pop_info(state,'设备信息提交成功','success')
                             devicestateAbout.mutations.GET_PROJECT_UNIT_LIST(devicestateAbout.state)
+                            
+                            send_post('/get_filepath_parameter',
+                            {
+                                'project':state.device_info.project
+                            },response=>{
+                                console.log(response)
+                                if(response.data==='None'){
+                                    send_post('/add_filepath_parameter',{
+                                        'project':state.device_info.project,
+                                        'area':'None',
+                                        'text_export_path': 'default',
+                                        'ftp_root_path':'default',  
+                                        'ftp_upload_path':'default',
+                                        'ftp_download_path':'default',
+                                    },response=>{},reason=>{})
+                                    send_post('/add_filepath_parameter',{
+                                        'project':state.device_info.project,
+                                        'area':state.device_info.area,
+                                        'text_export_path': 'default',
+                                        'ftp_root_path':'default',  
+                                        'ftp_upload_path':'default',
+                                        'ftp_download_path':'default',
+                                    },response=>{},reason=>{})        
+                                }else{
+                                    send_post('/add_filepath_parameter',{
+                                        'project':state.device_info.project,
+                                        'area':state.device_info.area,
+                                        'text_export_path': 'default',
+                                        'ftp_root_path':'default',  
+                                        'ftp_upload_path':'default',
+                                        'ftp_download_path':'default',
+                                    },response=>{},reason=>{})        
+                                }
+                            },reason=>{
+                                console.log(reason)
+                            })
+
+                            send_post('/get_sendcommand_parameter',{
+                                'project':state.device_info.project
+                            },response=>{
+                                console.log(response)
+                                if(response.data==='None'){
+                                    send_post('/add_sendcommand_parameter',{
+                                        'project':state.device_info.project,
+                                        'area':'None',
+                                        'device_title_able':false,
+                                        'command_able':false,
+                                        'read_timeout':10  
+                                    },response=>{},reason=>{})
+                                    send_post('/add_sendcommand_parameter',{
+                                        'project':state.device_info.project,
+                                        'area':state.device_info.area,
+                                        'device_title_able':false,
+                                        'command_able':false,
+                                        'read_timeout':10  
+                                    },response=>{},reason=>{})
+                                }else{
+                                    send_post('/add_sendcommand_parameter',{
+                                        'project':state.device_info.project,
+                                        'area':state.device_info.area,
+                                        'device_title_able':false,
+                                        'command_able':false,
+                                        'read_timeout':10  
+                                    },response=>{},reason=>{})
+                                }
+                            },reason=>{
+                             
+                            })
+                            
+
                         }
                         else{
                             pop_info(state,'设备信息提交失败','warning')
