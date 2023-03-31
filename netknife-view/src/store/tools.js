@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-export function create_post_request() {
+  export function create_post_request() {
     const requests = {};
     return function send_post(url, data, success_fun, fault_fun) {
       const axios_post = axios.create({
@@ -27,11 +27,8 @@ export function create_post_request() {
       });
     }
   }
-  
   export const send_post = create_post_request();
     
-
-
   export function create_get_request() {
     const requests = {};
   
@@ -58,9 +55,30 @@ export function create_post_request() {
       });
     }
   }
-  
   export const send_get = create_get_request();
 
+  export function areListsEqual(list1, list2) {
+    if (list1.length !== list2.length) {
+      return false;
+    }
+    
+    for (let i = 0; i < list1.length; i++) {
+      const item1 = list1[i];
+      const item2 = list2[i];
+      
+      if (Array.isArray(item1) && Array.isArray(item2)) {
+        if (!areListsEqual(item1, item2)) {
+          return false;
+        }
+      } else if (item1 !== item2) {
+        return false;
+      }
+    }
+    
+    return true;
+  }
+
+  
 export function pop_info(state,title,type){
     state.pop_info.able=true
     state.pop_info.title=title

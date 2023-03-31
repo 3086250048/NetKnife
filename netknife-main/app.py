@@ -77,22 +77,10 @@ def check_where():
         return 'NOT_EXIST'
     return 'EXIST'
 
+@netknife.route('/get_project_area_data')
+def get_project_area_data():
+    return storage.get_project_area_data()
 
-@netknife.route('/get_where_data',methods=['POST'])
-def get_where_data():
-    data.where_dict=json.loads(request.get_data(as_text=True))
-    result=storage.get_where_data(data.where_dict)
-    if result:
-        return result
-    return 'NOT_EXIST'
-
-
-@netknife.route('/get_all_project_and_area_data')
-def get_all_project_and_area_data():
-    result=storage.get_all_project_and_area_data()
-    if result:
-        return result
-    return 'NOT_EXIST'
 
 #更新数据库中的记录
 #使用时先向/check_where发送更新条件,再向这个接口发送更新请求,需要附带数据,结构如下

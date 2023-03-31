@@ -172,22 +172,12 @@ class AppStorage():
             return False
         return self.oprate_sql(AppStorage.dynamic_sql_return('SELECT * FROM LOGININFO','WHERE','AND',where_dict),where_dict,callback)
     
-    def get_where_data(self,where_dict):
+    def get_project_area_data(self):
         def callback(cur,con):
-            result=cur.fetchall()
-            if len(result)>0:
-                return result
-            return False
-        return self.oprate_sql(AppStorage.dynamic_sql_return('SELECT * FROM LOGININFO','WHERE','AND',where_dict),where_dict,callback)
-
-    def get_all_project_and_area_data(self):
-        def callback(cur,con):
-            result=cur.fetchall()
-            if len(result)>0:
-                return result
-            return False
-        return self.oprate_sql('SELECT PROJECT,AREA FROM LOGININFO',{},callback)
-
+            return cur.fetchall()
+        return self.oprate_sql('SELECT DISTINCT PROJECT,AREA FROM LOGININFO;',{},callback)
+ 
+ 
     #更新数据库中某条记录
     #返回:布尔值
     #传入:
