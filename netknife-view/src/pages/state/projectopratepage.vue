@@ -40,7 +40,7 @@
                         </el-switch>
                     </el-form-item>
                     <el-form-item label="命令输出的超时时间" :label-width="'140px'" style="position: absolute;top: 84px;left: 356px;">
-                        <el-input-number v-model="send_parameter.read_timeout" :min="10" :max="1000" label="读取回显的超时时间"></el-input-number>
+                        <el-input-number v-model="send_parameter.read_timeout" :min="0" :max="1000" label="读取回显的超时时间"></el-input-number>
                     </el-form-item>
                 </el-form>
                 <div slot="footer" class="dialog-footer">
@@ -74,8 +74,8 @@
                     </el-form-item>
                 </el-form>
                 <div slot="footer" class="dialog-footer">
-                    <el-button @click="file_path_handler_cancel">取 消</el-button>
-                    <el-button type="primary" @click="file_path_handler_commit">确 定</el-button>
+                    <el-button @click="filepath_handler_cancel">取 消</el-button>
+                    <el-button type="primary" @click="filepath_handler_commit">确 定</el-button>
                 </div>
             </el-dialog>    
 
@@ -152,30 +152,11 @@ export default {
 
 
 
-        file_path_handler_cancel(){
-            this.path_dialog_able=false
-        },
-        file_path_handler_commit(){
-            this.path_dialog_able=true
-            send_post('/change_filepath_parameter',{
-                'where':{
-                    'project':this.choose_project[0],
-                    'area':'None',
-                },
-                'update':{
-                    'text_export_path': this.path_parameter.txt_export_path,
-                    'ftp_root_path':this.path_parameter.ftp_root_path,  
-                    'ftp_upload_path':this.path_parameter.ftp_upload_path,
-                    'ftp_download_path':this.path_parameter.ftp_download_path,
-                }
-            },response=>{},reason=>{})
-        },
         sendcommand_handler_cancel(){
             this.send_dialog_able=false
-
         },
         sendcommand_handler_commit(){
-            this.send_dialog_able=true
+            this.send_dialog_able=false
             send_post('/change_sendcommand_parameter',{
                 'where':{
                     'project':this.choose_project[0],
@@ -186,9 +167,30 @@ export default {
                     command_able:this.send_parameter.command_able,
                     read_timeout:this.send_parameter.read_timeout
                 }
-            })
+            },response=>{
+                console.log(response.data)
+            },reason=>{})
+        },
+        filepath_handler_cancel(){
+            this.path_dialog_able=false
+        },
+        filepath_handler_commit(){
+            this.path_dialog_able=false
+            send_post('/change_filepath_parameter',{
+                'where':{
+                    'project':this.choose_project[0],
+                    'area':'None',
+                },
+                'update':{
+                    'txt_export_path': this.path_parameter.txt_export_path,
+                    'ftp_root_path':this.path_parameter.ftp_root_path,  
+                    'ftp_upload_path':this.path_parameter.ftp_upload_path,
+                    'ftp_download_path':this.path_parameter.ftp_download_path,
+                }
+            },response=>{
+                console.log(response.data)
+            },reason=>{})
         }
-
        
     },
     computed:{
@@ -227,33 +229,65 @@ export default {
         },
         send_dialog_able(new_value){
             if(new_value){
-                send_post('/get_filepath_parameter',{
+                send_post('/get_sendcommand_parameter',{
                     'project':this.choose_project[0],
                     'area':'None'
                 },response=>{
-                    this.send_parameter.device_title_able=response.data.device_title_able
-                    this.send_parameter.command_able=response.data.command_able
-                    this.send_parameter.read_timeout=response.data.read_timeout
+                    if(response.data[0][0]=='False'){
+                        this.send_parameter.device_title_able=false
+                    }else{
+                        this.send_parameter.device_title_able=true
+                    }
+                    if(response.data[0][1]=='False'){
+                        this.send_parameter.command_able=false
+                    }else{
+                        this.send_parameter.command_able=true
+                    }
+                    this.send_parameter.read_timeout=response.data[0][2]
                 },reason=>{})
             }
         },
         path_dialog_able(new_value){
             if(new_value){
-                send_post('/get_sendcommand_parameter',{
+                send_post('/get_filepath_parameter',{
                     'project':this.choose_project[0],
                     'area':'None'
                 },response=>{
-                    this.path_parameter.txt_export_path=response.data.txt_export_path
-                    this.path_parameter.ftp_root_path=response.data.ftp_root_path
-                    this.path_parameter.ftp_upload_path=response.data.ftp_upload_path
-                    this.path_parameter.ftp_download_path=response.data.ftp_download_path
+                    this.path_parameter.txt_export_path=response.data[0][0]
+                    this.path_parameter.ftp_root_path=response.data[0][1]
+                    this.path_parameter.ftp_upload_path=response.data[0][2]
+                    this.path_parameter.ftp_download_path=response.data[0][3]
                 },reason=>{})
             }
         }
     },
     mounted(){
         this.set_effect()
-        
+        send_post('/get_filepath_parameter',{
+            'project':this.choose_project[0],
+            'area':'None'
+        },response=>{
+            this.path_parameter.txt_export_path=response.data[0][0]
+            this.path_parameter.ftp_root_path=response.data[0][1]
+            this.path_parameter.ftp_upload_path=response.data[0][2]
+            this.path_parameter.ftp_download_path=response.data[0][3]
+        },reason=>{})
+        send_post('/get_sendcommand_parameter',{
+            'project':this.choose_project[0],
+            'area':'None'
+        },response=>{
+            if(response.data[0][0]=='False'){
+                this.send_parameter.device_title_able=false
+            }else{
+                this.send_parameter.device_title_able=true
+            }
+            if(response.data[0][1]=='False'){
+                this.send_parameter.command_able=false
+            }else{
+                this.send_parameter.command_able=true
+            }
+            this.send_parameter.read_timeout=response.data[0][2]
+        },reason=>{})
     }
 }
 </script>

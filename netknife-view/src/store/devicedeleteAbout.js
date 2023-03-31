@@ -44,7 +44,7 @@ export const devicedeleteAbout={
             },response=>{
                 if(response.data=='DELETE_SUCCESS'){
                     pop_info(state,'数据删除成功','success')
-                    devicestateAbout.mutations.GET_PROJECT_UNIT_LIST(devicestateAbout.state)
+                    devicestateAbout.mutations.GET_PROJECT_UNIT_LIST(devicestateAbout.state)    
                 }else{
                     pop_info(state,'数据删除失败','warning')
                 }

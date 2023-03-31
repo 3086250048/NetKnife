@@ -1,38 +1,65 @@
 import axios from 'axios'
-export let cancel=null
-export function send_post(url,data,success_fun,fault_fun){
-    const axios_post=axios.create({
-        baseURL:'http://127.0.0.1:3000'
-    })
-    if( cancel !== null ) cancel()
-    axios_post.post(url,data,{cancelToken: new axios.CancelToken(c=>{cancel=c})}).then(
-        response=>{
-            success_fun(response)
-            cancel=null
-        }
-    ).catch(
-        reason=>{
-             fault_fun(reason)
-        }
-    )
-}
 
-export function send_get(url,success_fun,fault_fun){
-    const axios_get=axios.create({
-        baseURL:'http://127.0.0.1:3000'
-    })
-    if( cancel !== null ) cancel()
-    axios_get.get(url,{cancelToken: new axios.CancelToken(c=>{cancel=c})}).then(
-        response=>{
-            success_fun(response)
-            cancel=null
-        }
-    ).catch(
-        reason=>{
-             fault_fun(reason)
-        }
-    )
-}
+export function create_post_request() {
+    const requests = {};
+    return function send_post(url, data, success_fun, fault_fun) {
+      const axios_post = axios.create({
+        baseURL: 'http://127.0.0.1:3000'
+      });
+  
+      const requestKey = JSON.stringify({ url, data });
+  
+      // 如果已经有相同的请求，则取消旧的请求
+      if (requests[requestKey]) {
+        requests[requestKey]();
+      }
+  
+      axios_post.post(url, data, {
+        cancelToken: new axios.CancelToken(c => {
+          requests[requestKey] = c;
+        })
+      }).then(response => {
+        success_fun(response);
+        delete requests[requestKey];
+      }).catch(reason => {
+        fault_fun(reason);
+        delete requests[requestKey];
+      });
+    }
+  }
+  
+  export const send_post = create_post_request();
+    
+
+
+  export function create_get_request() {
+    const requests = {};
+  
+    return function send_get(url, success_fun, fault_fun) {
+      const axios_get = axios.create({
+        baseURL: 'http://127.0.0.1:3000'
+      });
+  
+      const requestKey = url;
+  
+      // 如果已经有相同的请求，则取消旧的请求
+      if (requests[requestKey]) {
+        requests[requestKey]();
+      }
+  
+      axios_get.get(url, {cancelToken: new axios.CancelToken(c => {
+        requests[requestKey] = c;
+      })}).then(response => {
+        success_fun(response);
+        delete requests[requestKey];
+      }).catch(reason => {
+        fault_fun(reason);
+        delete requests[requestKey];
+      });
+    }
+  }
+  
+  export const send_get = create_get_request();
 
 export function pop_info(state,title,type){
     state.pop_info.able=true

@@ -10,29 +10,13 @@ from data import AppInfo
 from storage import AppStorage
 from net import AppNet
 from processing import AppProcessing
-import os
-from pyftpdlib.authorizers import DummyAuthorizer
-from pyftpdlib.handlers import FTPHandler
-from pyftpdlib.servers import FTPServer
-import threading
+
 
 data=AppInfo()
 storage=AppStorage()
 net=AppNet()
 ap=AppProcessing()
 
-# root_path = os.path.join(os.path.expanduser("~"), "Desktop") and storage.get_file_path_parameter()
-
-# def run_ftp_server(root_path=root_path):
-#     authorizer = DummyAuthorizer()
-#     authorizer.add_user("netknife_user", "netknife_pwd", root_path, perm="elradfmw")
-#     handler = FTPHandler
-#     handler.authorizer = authorizer
-#     server = FTPServer(("0.0.0.0", 21), handler)
-#     server.serve_forever()
-#     server.close_all()
-# ftp_server_thread = threading.Thread(target=run_ftp_server,args=(root_path,))
-# ftp_server_thread.start()
 
 
 netknife=Flask(__name__)
@@ -92,6 +76,24 @@ def check_where():
     if result:
         return 'NOT_EXIST'
     return 'EXIST'
+
+
+@netknife.route('/get_where_data',methods=['POST'])
+def get_where_data():
+    data.where_dict=json.loads(request.get_data(as_text=True))
+    result=storage.get_where_data(data.where_dict)
+    if result:
+        return result
+    return 'NOT_EXIST'
+
+
+@netknife.route('/get_all_project_and_area_data')
+def get_all_project_and_area_data():
+    result=storage.get_all_project_and_area_data()
+    if result:
+        return result
+    return 'NOT_EXIST'
+
 #更新数据库中的记录
 #使用时先向/check_where发送更新条件,再向这个接口发送更新请求,需要附带数据,结构如下
 #{'project':,'class':,'area':,'protocol':,'port':,'username':,'password':,
@@ -158,10 +160,9 @@ def change_filepath_parameter():
         return 'CHANGE_FAULT'
 @netknife.route('/get_filepath_parameter',methods=['POST'])
 def get_filepath_parameter():
-    print('get_filepath_parameter')
     result=storage.get_filepath_parameter(json.loads(request.get_data(as_text=True)))
     if result:
-        print('filepath的result'+result)
+        print(result)
         return result
 
     
@@ -198,7 +199,7 @@ def get_sendcommand_parameter():
     result=storage.get_sendcommand_parameter(json.loads(request.get_data(as_text=True)))
     
     if result:
-        print('sendcommand的result'+result)
+        print(result)
         return result
 
     

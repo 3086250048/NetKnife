@@ -172,6 +172,22 @@ class AppStorage():
             return False
         return self.oprate_sql(AppStorage.dynamic_sql_return('SELECT * FROM LOGININFO','WHERE','AND',where_dict),where_dict,callback)
     
+    def get_where_data(self,where_dict):
+        def callback(cur,con):
+            result=cur.fetchall()
+            if len(result)>0:
+                return result
+            return False
+        return self.oprate_sql(AppStorage.dynamic_sql_return('SELECT * FROM LOGININFO','WHERE','AND',where_dict),where_dict,callback)
+
+    def get_all_project_and_area_data(self):
+        def callback(cur,con):
+            result=cur.fetchall()
+            if len(result)>0:
+                return result
+            return False
+        return self.oprate_sql('SELECT PROJECT,AREA FROM LOGININFO',{},callback)
+
     #更新数据库中某条记录
     #返回:布尔值
     #传入:
@@ -294,7 +310,6 @@ class AppStorage():
         suid=''.join(uid.split('-'))
         add_parameter_list=list(add_parameter_dict.values())
         add_parameter_list.insert(0,suid)
-        print(add_parameter_list)
         def callback(cur,con):
             con.commit()
             return True
@@ -307,6 +322,7 @@ class AppStorage():
         where_sql=AppStorage.dynamic_sql_return('','where','and',data_dict['where'])
         update_sql=AppStorage.dynamic_sql_return('update sendcommand_parameter','set',',',data_dict['update'])
         sql=update_sql+where_sql
+        print(sql)
         return self.oprate_sql(sql,{},callback)
     
     def delete_sendcommand_parameter(self,where_dict) -> bool:
