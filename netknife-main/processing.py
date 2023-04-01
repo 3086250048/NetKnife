@@ -17,7 +17,8 @@ class AppProcessing():
         self.__file={'check_ip':'processing_check_ip',
                      'effect':'processing_effect_command',
                      'command':'processing_command'}
-
+        from storage import AppStorage
+        self.__storage=AppStorage()        
     @classmethod
     def oprate_dict(cls,file,value):
         temp=TextFSM(open(file))
@@ -98,15 +99,12 @@ class AppProcessing():
             where_dict['project']=command_data['base_effect_range']
                     
         result={}
-        from storage import AppStorage
-        storage=AppStorage()
-        ap=AppProcessing()
         _full_connect_lis=[]
         _effect_connect_lis=[]
-        for i in storage.get_effect_ip_expression_list({'project':command_data['base_effect_range']}):
-            _full_connect_lis+=list(ap.processing_check_ip(i))
-        for i in storage.get_effect_ip_expression_list(where_dict):
-            _effect_connect_lis+=list(ap.processing_check_ip(i))
+        for i in self.__storage.get_effect_ip_expression_list({'project':command_data['base_effect_range']}):
+            _full_connect_lis+=list(self.processing_check_ip(i))
+        for i in self.__storage.get_effect_ip_expression_list(where_dict):
+            _effect_connect_lis+=list(self.processing_check_ip(i))
   
         result['effect_connect_percent']=int(len(_effect_connect_lis)/len(_full_connect_lis)*100)
         return result
@@ -130,11 +128,11 @@ class AppProcessing():
            
             where_dict['project']=command_data['base_effect_range']
             # print(where_dict)
-            return storage.get_full_login_list(where_dict)
+            return self.__storage.get_full_login_list(where_dict)
         else:
             where_dict['project']=command_data['base_effect_range']
             # print(where_dict)
-            return storage.get_full_login_list(where_dict)
+            return self.__storage.get_full_login_list(where_dict)
                      
     def processing_command_data(self,command_data):
 
@@ -193,13 +191,12 @@ class AppProcessing():
             command_dict['action']=None
         
         if command_data['send_parameter']:
-            for k,v in command_data['send_parameter'].items():
-                if isinstance(v,int) and not isinstance(v,bool):
-                    command_data['send_parameter'][k]=float(command_data['send_parameter'][k])
+            read_timeout=command_data['send_parameter']['read_timeout']
+            command_data['send_parameter']['read_timeout']=float(read_timeout)
             command_dict['send_parameter']=command_data['send_parameter']
         
-        if command_data['action_parameter']:
-            command_dict['action_parameter']=command_data['action_parameter']
+        if command_data['path_parameter']:
+            command_dict['path_parameter']=command_data['path_parameter']
 
 
         return command_dict

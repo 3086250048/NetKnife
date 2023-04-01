@@ -10,13 +10,13 @@ from data import AppInfo
 from storage import AppStorage
 from net import AppNet
 from processing import AppProcessing
-
+from server import APPserver
 
 data=AppInfo()
 storage=AppStorage()
 net=AppNet()
 ap=AppProcessing()
-
+_as=APPserver()
 
 
 netknife=Flask(__name__)
@@ -199,7 +199,14 @@ def delete_sendcommand_parameter():
     else:
         return 'DELETE_FAULT'
 
-
+@netknife.route('/start_ftp_server',methods=['POST'])
+def start_ftp_serve():
+    result=_as.start_ftp_server(json.loads(request.get_data(as_text=True)))
+    return result
+@netknife.route('/stop_ftp_serve')
+def stop_ftp_serve():
+   result= _as.stop_ftp_serve()
+   return result
 
 
 

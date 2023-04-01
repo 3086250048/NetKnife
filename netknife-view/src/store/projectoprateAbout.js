@@ -23,9 +23,11 @@ export const  projectoprateAbout={
                     strip_command:payload.send_parameter.command_able,
                     read_timeout:payload.send_parameter.read_timeout,
                 },
-                'action_parameter':{
-                    export_file_path:payload.action_parameter.export_file_path,
-        
+                'path_parameter':{
+                    txt_export_path:payload.path_parameter.txt_export_path,
+                    ftp_root_path:payload.path_parameter.ftp_root_path,
+                    ftp_upload_path:payload.path_parameter.ftp_upload_path,
+                    ftp_download_path:payload.path_parameter.ftp_download_path
                 }
             },response=>{
                 state.loading_able=false

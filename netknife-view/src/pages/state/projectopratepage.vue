@@ -102,7 +102,7 @@
 </template>
 
 <script>
-import { send_post } from '@/store/tools'
+import { send_get, send_post } from '@/store/tools'
 import { mapMutations } from 'vuex'
 
 export default {
@@ -120,7 +120,7 @@ export default {
                 read_timeout:10
             },
             path_parameter:{
-                txt_export_path:'C:/Users/30862/Desktop/',
+                txt_export_path:'',
                 ftp_root_path:'',
                 ftp_upload_path:'',
                 ftp_download_path:''
@@ -217,7 +217,7 @@ export default {
         }
     },
     beforeDestroy(){
-        
+        send_get('/stop_ftp_serve')
         this.SET_GO_BACK_STATE()
         // 销毁前将PROJECT_VIEW_ABLE设置为true
         this.SET_PROJECT_VIEW_ABLE(true)
@@ -267,10 +267,12 @@ export default {
             'project':this.choose_project[0],
             'area':'None'
         },response=>{
+            console.log(response.data)
             this.path_parameter.txt_export_path=response.data[0][0]
             this.path_parameter.ftp_root_path=response.data[0][1]
             this.path_parameter.ftp_upload_path=response.data[0][2]
             this.path_parameter.ftp_download_path=response.data[0][3]
+            send_post('/start_ftp_server',{'ftp_root_path':this.path_parameter.ftp_root_path})
         },reason=>{})
         send_post('/get_sendcommand_parameter',{
             'project':this.choose_project[0],
@@ -288,7 +290,8 @@ export default {
             }
             this.send_parameter.read_timeout=response.data[0][2]
         },reason=>{})
-    }
+    },
+
 }
 </script>
 
