@@ -1,7 +1,7 @@
 
 
 
-__ver='1.0'
+__version__ = '1.0.0'
 
 from flask import Flask,request,render_template
 from flask_cors import CORS
@@ -182,7 +182,7 @@ def change_sendcommand_parameter():
 @netknife.route('/get_sendcommand_parameter',methods=['POST'])
 def get_sendcommand_parameter():
 
-    print('get_sendcommand_parameter')
+    print('get_sendcommand_parameter')  
 
     result=storage.get_sendcommand_parameter(json.loads(request.get_data(as_text=True)))
     

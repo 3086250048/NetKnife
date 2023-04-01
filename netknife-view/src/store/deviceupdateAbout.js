@@ -1,5 +1,6 @@
-import { send_post,pop_info, send_get,areListsEqual } from './tools'
+import { send_post,pop_info, send_get,findNonexistentItems,combineFromStartAndEnd} from './tools'
 import { devicestateAbout } from './devicestateAbout'
+
 
 export const deviceupdateAbout={
     namespaced:true,
@@ -58,22 +59,22 @@ export const deviceupdateAbout={
                         devicestateAbout.mutations.GET_PROJECT_UNIT_LIST(devicestateAbout.state)
                         send_get('/get_project_area_data',response=>{
                             state.update_after_project_area_list=response.data
-                            console.log(state.update_before_project_area_list)
-                            console.log('-------------------------之前')
-                            console.log(state.update_after_project_area_list)
-                            console.log('-------------------------之后')
                             const before_len=state.update_before_project_area_list.length
                             const after_len=state.update_after_project_area_list.length
                             const _before_lis=state.update_before_project_area_list
                             const _after_lis=state.update_after_project_area_list
-                            let merge_list=[]
-                            let diff_list=[]
+                            state.update_item_list=[]
+                            state.diff_item_list=[]
+                            console.log(_before_lis)
+                            console.log('-----------------之前')
+                            console.log(_after_lis)
+                            console.log('-----------------之后')
                             if(before_len===after_len){
-                                for (let i = 0; i < before_len; i++) {
-                                    merge_list.push([_before_lis[i], _after_lis[i]]);
-                                }
-                                merge_list.forEach(e=>{
-                                    if(!areListsEqual(e[0],e[1])){
+                                console.log('相等')
+                                state.update_item_list=combineFromStartAndEnd(findNonexistentItems(_before_lis,_after_lis))
+                                console.log(state.update_item_list)
+                                state.update_item_list.forEach(e=>{
+                                        //根据原始项目名称和区域名称以及更新后的项目名称和区域名称，更新filepath数据库
                                         send_post('/change_filepath_parameter',{
                                             'where':{
                                                 'project':e[0][0],
@@ -84,7 +85,10 @@ export const deviceupdateAbout={
                                                 'area':e[1][1]
                                             }
                                         },response=>{
+                                            // 判断更新后的原项目是否只剩余None区域，如果是则将原来的None区域的项目名称改为新的项目名称
                                             send_post('/get_filepath_parameter',{'project':e[0][0]},response=>{
+                                                console.log('---------------是否只剩原来的区域的response-----------')
+                                                console.log(response.data)
                                                 if(response.data.length==1){
                                                     send_post('/change_filepath_parameter',{
                                                         where:{
@@ -96,7 +100,29 @@ export const deviceupdateAbout={
                                                     })
                                                 }  
                                             })
+                                            //判断更新None区域项目是否存在冲突的None，如果存在则删除原有的None区域
+                                            send_post('/get_filepath_parameter',{'project':e[1][0],'area':'None'},response=>{
+                                                if(response.data.length===1){
+                                                    send_post('/delete_filepath_parameter',{'project':e[0][0],'area':'None'})
+                                                }
+                                            })
+                                            // 判断更新后新增的表项的项目名是否唯一，如果唯一则说明是新项目要追加None区域
+                                            send_post('/get_filepath_parameter',{'project':e[1][0]},response=>{
+                                                console.log('-------------新增的项目是否是唯一的response-----------')
+                                                console.log(response.data)
+                                                if(response.data.length==1){
+                                                    send_post('/add_filepath_parameter',{
+                                                        'project':e[1][0],
+                                                        'area':'None',
+                                                        'txt_export_path': 'default',
+                                                        'ftp_root_path':'default',  
+                                                        'ftp_upload_path':'default',
+                                                        'ftp_download_path':'default',
+                                                    })
+                                                }
+                                            })
                                         })
+                                        //根据原始项目名称和区域名称以及更新后的项目名称和区域名称，更新sendcommand数据库
                                         send_post('/change_sendcommand_parameter',{
                                             'where':{
                                                 'project':e[0][0],
@@ -107,7 +133,10 @@ export const deviceupdateAbout={
                                                 'area':e[1][1]
                                             }
                                         },response=>{
+                                        // 判断更新后的原项目是否只剩余None区域，如果是则将原来的None区域的项目名称改为新的项目名称
                                             send_post('/get_sendcommand_parameter',{'project':e[0][0]},response=>{
+                                                console.log('---------------是否只剩原来的区域的response-----------')
+                                                console.log(response.data)
                                                 if(response.data.length==1){
                                                     send_post('/change_sendcommand_parameter',{
                                                         where:{
@@ -117,20 +146,41 @@ export const deviceupdateAbout={
                                                             'project':e[1][0]
                                                         }
                                                     })
-                                                }  
+                                                }
                                             })
-                                        })
-                                       
-                                    }
+                                        //判断更新None区域项目是否存在冲突的None，如果存在则删除原有的None区域
+                                            send_post('/get_sendcommand_parameter',{'project':e[1][0],'area':'None'},response=>{
+                                                if(response.data.length===1){
+                                                    send_post('/delete_sendcommand_parameter',{'project':e[0][0],'area':'None'})
+                                                }
+                                            })
+                                        // 判断更新后新增的表项的项目名是否唯一，如果唯一则说明是新项目要追加None区域
+                                            send_post('/get_sendcommand_parameter',{'project':e[1][0]},response=>{
+                                                console.log('-------------新增的项目是否是唯一的response-----------')
+                                                console.log(response.data)
+                                                if(response.data.length==1){
+                                                    send_post('/add_sendcommand_parameter',{
+                                                        'project':e[1][0],
+                                                        'area':'None',
+                                                        'device_title_able':'False',
+                                                        'command_able':'False',
+                                                        'read_timeout':10  
+                                                    })
+                                                }
+                                            })   
+                                        })  
                                 })
                             }
                             if(before_len>after_len){
+                                console.log('减少')
                                 _before_lis.forEach(element => {
                                     if(! _after_lis.some(item => JSON.stringify(item) === JSON.stringify(element))){
-                                        diff_list.push(element)
+                                        state.diff_item_list.push(element)
                                     }
                                 });
-                                diff_list.forEach(e=>{
+                                console.log(state.diff_item_list)
+                                console.log('------------------------difflist--------------')
+                                state.diff_item_list.forEach(e=>{
                                     send_post('/delete_filepath_parameter',{'project':e[0],'area':e[1]},response=>{
                                         send_post('/get_filepath_parameter',{'project':e[0]},response=>{
                                                 if(response.data.length==1){
@@ -148,12 +198,16 @@ export const deviceupdateAbout={
                                 })  
                             }   
                             if(before_len<after_len){
+                                console.log('增加')
                                 _after_lis.forEach(element => {
                                     if(! _before_lis.some(item => JSON.stringify(item) === JSON.stringify(element))){
-                                        diff_list.push(element)
+                                        console.log(element)
+                                        state.diff_item_list.push(element)
                                     }
                                 });
-                                diff_list.forEach(e=>{
+                                console.log(state.diff_item_list)
+                                console.log('------------------------difflist--------------')
+                                state.diff_item_list.forEach(e=>{
                                     send_post('/get_filepath_parameter',
                                     {
                                         'project':e[0]
@@ -162,7 +216,7 @@ export const deviceupdateAbout={
                                             send_post('/add_filepath_parameter',{
                                                 'project':e[0],
                                                 'area':'None',
-                                                'text_export_path': 'default',
+                                                'txt_export_path': 'default',
                                                 'ftp_root_path':'default',  
                                                 'ftp_upload_path':'default',
                                                 'ftp_download_path':'default',
@@ -170,7 +224,7 @@ export const deviceupdateAbout={
                                             send_post('/add_filepath_parameter',{
                                                 'project':e[0],
                                                 'area':e[1],
-                                                'text_export_path': 'default',
+                                                'txt_export_path': 'default',
                                                 'ftp_root_path':'default',  
                                                 'ftp_upload_path':'default',
                                                 'ftp_download_path':'default',
@@ -193,7 +247,7 @@ export const deviceupdateAbout={
                                             send_post('/add_filepath_parameter',{
                                                 'project':e[0],
                                                 'area':e[1],
-                                                'text_export_path': 'default',
+                                                'txt_export_path': 'default',
                                                 'ftp_root_path':'default',  
                                                 'ftp_upload_path':'default',
                                                 'ftp_download_path':'default',
@@ -272,7 +326,9 @@ export const deviceupdateAbout={
         ip_expression_flag:false,
         port_flag:false,
         update_before_project_area_list:[],
-        update_after_project_area_list:[]
+        update_after_project_area_list:[],
+        update_item_list:[],
+        diff_item_list:[]
     }
 
 }

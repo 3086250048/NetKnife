@@ -86,7 +86,41 @@ import axios from 'axios'
     return true;
   }
 
+ export function findNonexistentItems(oldList, newList) {
+    const oldListMap = new Map(oldList.map(item => [JSON.stringify(item), true]));
+    const newListMap = new Map(newList.map(item => [JSON.stringify(item), true]));
+    const nonexistentItems = [];
   
+    for (const item of oldList) {
+      if (!newListMap.has(JSON.stringify(item))) {
+        nonexistentItems.push(item);
+      }
+    }
+  
+    for (const item of newList) {
+      if (!oldListMap.has(JSON.stringify(item))) {
+        nonexistentItems.push(item);
+      }
+    }
+  
+    return nonexistentItems;
+  }
+ export function combineFromStartAndEnd(arr) {
+    const result = [];
+    let left = 0;
+    let right = arr.length - 1;
+  
+    while (left < right) {
+      result.push([arr[left], arr[right]]);
+      left++;
+      right--;
+    }
+  
+    return result;
+  }
+
+
+
 export function pop_info(state,title,type){
     state.pop_info.able=true
     state.pop_info.title=title

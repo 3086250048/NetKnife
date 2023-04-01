@@ -41,7 +41,7 @@ export const deviceaddAbout={
                     send_post('/add_filepath_parameter',{
                         'project':state.device_info.project,
                         'area':'None',
-                        'text_export_path': 'default',
+                        'txt_export_path': 'default',
                         'ftp_root_path':'default',  
                         'ftp_upload_path':'default',
                         'ftp_download_path':'default',
@@ -49,7 +49,7 @@ export const deviceaddAbout={
                     send_post('/add_filepath_parameter',{
                         'project':state.device_info.project,
                         'area':state.device_info.area,
-                        'text_export_path': 'default',
+                        'txt_export_path': 'default',
                         'ftp_root_path':'default',  
                         'ftp_upload_path':'default',
                         'ftp_download_path':'default',
@@ -58,7 +58,7 @@ export const deviceaddAbout={
                     send_post('/add_filepath_parameter',{
                         'project':state.device_info.project,
                         'area':state.device_info.area,
-                        'text_export_path': 'default',
+                        'txt_export_path': 'default',
                         'ftp_root_path':'default',  
                         'ftp_upload_path':'default',
                         'ftp_download_path':'default',
