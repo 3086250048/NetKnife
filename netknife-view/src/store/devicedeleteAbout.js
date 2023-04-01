@@ -60,20 +60,19 @@ export const devicedeleteAbout={
                             send_post('/delete_filepath_parameter',{'project':e[0],'area':e[1]},response=>{
                                 send_post('/get_filepath_parameter',{'project':e[0]},response=>{
                                         if(response.data.length==1){
-                                            send_post('/delete_filepath_parameter',{'project':e[0]},response=>{},reason=>{})
+                                            send_post('/delete_filepath_parameter',{'project':e[0]})
                                         }
-                                },reason=>{})
-                            },reason=>{})
+                                })
+                            })
                             send_post('/delete_sendcommand_parameter',{'project':e[0],'area':e[1]},response=>{
                                 send_post('/get_sendcommand_parameter',{'project':e[0]},response=>{
                                     if(response.data.length==1){
-                                        send_post('/delete_sendcommand_parameter',{'project':e[0]},response=>{},reason=>{})
+                                        send_post('/delete_sendcommand_parameter',{'project':e[0]})
                                     }  
-                                },reason=>{})
-                            },reason=>{})
-                        })
-                       
-                    },reason=>{})
+                                })
+                            })
+                        })  
+                    })
                   
                 }else{
                     pop_info(state,'数据删除失败','warning')

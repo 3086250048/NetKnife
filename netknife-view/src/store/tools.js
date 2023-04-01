@@ -19,10 +19,14 @@ import axios from 'axios'
           requests[requestKey] = c;
         })
       }).then(response => {
-        success_fun(response);
+        if(typeof success_fun === 'function'){
+          success_fun(response);
+        }
         delete requests[requestKey];
       }).catch(reason => {
-        fault_fun(reason);
+        if(typeof fault_fun ==='function'){
+          fault_fun(reason);
+        }
         delete requests[requestKey];
       });
     }
@@ -47,10 +51,14 @@ import axios from 'axios'
       axios_get.get(url, {cancelToken: new axios.CancelToken(c => {
         requests[requestKey] = c;
       })}).then(response => {
-        success_fun(response);
+        if(typeof success_fun === 'function'){
+          success_fun(response);
+        }
         delete requests[requestKey];
       }).catch(reason => {
-        fault_fun(reason);
+        if(typeof fault_fun === 'function'){
+          fault_fun(reason);
+        }
         delete requests[requestKey];
       });
     }
