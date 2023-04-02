@@ -44,15 +44,21 @@ class AppNet():
 
         def h3c_send_commands(connect,device_info,command_data):
             select_out,config_out,upload_out,download_out= '','','',''
+            if command_data['delete']:
+                _cmd=f"delete {command_data['delete']}"
+                select_out += connect.send_command_timing(_cmd,**command_data['send_parameter'])
+                select_out += connect.send_command_timing('Y',**command_data['send_parameter'])
+                select_out += connect.send_command_timing('reset recycle-bin ',**command_data['send_parameter'])
+                select_out += connect.send_command_timing('Y',**command_data['send_parameter'])
             if command_data['upload']:
-                upload_cmd_list=[f"ftp {command_data['upload'][0]}",f"netknife_user",f"netknife_pwd",f"get {command_data['upload'][1]} {command_data['upload'][2]}"]
+                upload_cmd_list=[f"ftp {command_data['upload'][0]}",f"netknife_user",f"netknife_pwd",f"get  {command_data['path_parameter']['ftp_upload_path']}{command_data['upload'][1]} {command_data['upload'][2]}"]
                 upload_out+=connect.send_command_timing(upload_cmd_list[0],**command_data['send_parameter'])
                 upload_out+=connect.send_command_timing(upload_cmd_list[1],**command_data['send_parameter'])
                 upload_out+=connect.send_command_timing(upload_cmd_list[2],**command_data['send_parameter'])
                 upload_out+=connect.send_command_timing(upload_cmd_list[3],**command_data['send_parameter'])
                 upload_out+=connect.send_command_timing('quit',**command_data['send_parameter'])
             if command_data['download']:
-                download_cmd_list=[f"ftp {command_data['download'][0]}",f"netknife_user",f"netknife_pwd",f"put {command_data['download'][2]} {command_data['download'][1]}"]
+                download_cmd_list=[f"ftp {command_data['download'][0]}",f"netknife_user",f"netknife_pwd",f"put {command_data['download'][2]} {command_data['path_parameter']['ftp_download_path']}{command_data['download'][1]}"]
                 download_out+=connect.send_command_timing(download_cmd_list[0],**command_data['send_parameter'])
                 download_out+=connect.send_command_timing(download_cmd_list[1],**command_data['send_parameter'])
                 download_out+=connect.send_command_timing(download_cmd_list[2],**command_data['send_parameter'])
@@ -69,35 +75,32 @@ class AppNet():
                             'type':device_info['device_type']}
         def huawei_send_commands(connect,device_info,command_data):
             select_out,config_out,upload_out,download_out= '','','',''
+            if command_data['delete']:
+                _cmd=f"delete {command_data['delete']}"
+                select_out += connect.send_command_timing(_cmd,**command_data['send_parameter'])
+                select_out += connect.send_command_timing('Y',**command_data['send_parameter'])
+                select_out += connect.send_command_timing('reset recycle-bin ',**command_data['send_parameter'])
+                select_out += connect.send_command_timing('Y',**command_data['send_parameter'])
             if command_data['select']:
                 select_out += connect.send_command(command_data['select'],**command_data['send_parameter'])
             if command_data['config']:
                 config_out += connect.send_config_set(command_data['config'],**command_data['send_parameter'])
                 connect.save_config()
             if command_data['upload']:
-                upload_cmd_list=[f"ftp {command_data['upload'][0]}",f"netknife_user",f"netknife_pwd",f"get {command_data['upload'][1]} {command_data['upload'][2]}"]
+                print(command_data['upload'][1])
+                upload_cmd_list=[f"ftp {command_data['upload'][0]}",f"netknife_user",f"netknife_pwd",f"get  {command_data['path_parameter']['ftp_upload_path']}{command_data['upload'][1]} {command_data['upload'][2]}"]
                 upload_out+=connect.send_command_timing(upload_cmd_list[0],**command_data['send_parameter'])
                 upload_out+=connect.send_command_timing(upload_cmd_list[1],**command_data['send_parameter'])
                 upload_out+=connect.send_command_timing(upload_cmd_list[2],**command_data['send_parameter'])
                 upload_out+=connect.send_command_timing(upload_cmd_list[3],**command_data['send_parameter'])
                 upload_out+=connect.send_command_timing('quit',**command_data['send_parameter'])
             if command_data['download']:
-                download_cmd_list=[f"ftp {command_data['download'][0]}",f"netknife_user",f"netknife_pwd",f"put {command_data['download'][2]} {command_data['download'][1]}"]
-                path_list=command_data['download'][1].split('/')
+                download_cmd_list=[f"ftp {command_data['download'][0]}",f"netknife_user",f"netknife_pwd",f"put {command_data['download'][2]} {command_data['path_parameter']['ftp_download_path']}{command_data['download'][1]}"]
                 download_out+=connect.send_command_timing(download_cmd_list[0],**command_data['send_parameter'])
                 download_out+=connect.send_command_timing(download_cmd_list[1],**command_data['send_parameter'])
-                download_out+=connect.send_command_timing(download_cmd_list[2],**command_data['send_parameter'])
-                if len(path_list)>1:
-                    chage_path='/'.join(path_list[:-1])
-                    download_out+=connect.send_command_timing(f'cd {chage_path}',**command_data['send_parameter'])
-                    put_list=download_cmd_list[3].split(' ')
-                    put_list[-1]=path_list[-1]
-                    put_cmd=' '.join(put_list)
-                    download_out+=connect.send_command_timing(put_cmd,**command_data['send_parameter'])
-                    download_out+=connect.send_command_timing('quit',**command_data['send_parameter'])
-                else:
-                    download_out+=connect.send_command_timing(download_cmd_list[3],**command_data['send_parameter'])
-                    download_out+=connect.send_command_timing('quit',**command_data['send_parameter'])
+                download_out+=connect.send_command_timing(download_cmd_list[2],**command_data['send_parameter'])   
+                download_out+=connect.send_command_timing(download_cmd_list[3],**command_data['send_parameter'])
+                download_out+=connect.send_command_timing('quit',**command_data['send_parameter'])
             return {'ip':device_info['ip'] ,
                             'response': select_out +'\n'+config_out+'\n'+upload_out+'\n'+download_out,
                             'port':device_info['port'],

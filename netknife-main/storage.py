@@ -175,8 +175,12 @@ class AppStorage():
     def get_project_area_data(self):
         def callback(cur,con):
             return cur.fetchall()
-        return self.oprate_sql('SELECT DISTINCT PROJECT,AREA FROM LOGININFO;',{},callback)
- 
+        return self.oprate_sql('SELECT PROJECT,AREA FROM LOGININFO;',{},callback)
+    
+    def get_parameter_project_area_data(self):
+        def callback(cur,con):
+            return cur.fetchall()
+        return self.oprate_sql('SELECT PROJECT,AREA FROM FILEPATH;',{},callback)
  
     #更新数据库中某条记录
     #返回:布尔值
@@ -207,12 +211,10 @@ class AppStorage():
     def get_project_unit_list(self) -> list:
         def callback(cur,con):
             return cur.fetchall()
-        project_list=[ v[0] for v in self.oprate_sql(self.__get_project_list_sql,{},callback)[1:]]
+        project_list=[ v[0] for v in self.oprate_sql(self.__get_project_list_sql,{},callback)][1:]
         project_sql_gen=AppStorage.dynamic_sql_yield('select project,area,protocol,port,ip_expression from logininfo','where','project',project_list)
         lis=[]
         for _ in range(len(project_list)):
-            def callback(cur,con):
-                return cur.fetchall()
             project_sql=project_sql_gen.__next__()
             lis+=[self.oprate_sql(project_sql,{},callback)]
         dic={'project':'','area':'','protocol':'','port':'',"ip_expression":''}
@@ -362,6 +364,62 @@ class AppStorage():
         delete_sql=AppStorage.dynamic_sql_return('DELETE FROM FILEPATH','WHERE','AND',where_dict)
         return self.oprate_sql(delete_sql,where_dict,callback)
 
+    def update_parameter_database(self,dict):
+        before_list=dict['before']
+        after_list=dict['after']
+        print(before_list)
+        print(after_list)
+        merge_list=list(map(lambda x,y:(x,y),before_list,after_list))
+        update_result_list=[]
+        for e in merge_list:
+            if e[0]!=e[1]:
+                if e[0][0] not in [v[0] for v in after_list]:
+                    self.delete_filepath_parameter({'project':e[0][0],'area':'None'})
+                    self.delete_sendcommand_parameter({'project':e[0][0],'area':'None'})
+                if e[1][0] not in [v[0] for v in before_list ]:
+                    self.add_filepath_parameter({
+                        'project':e[1][0],
+                        'area':'None',
+                        'txt_export_path': 'default',
+                        'ftp_root_path':'default',  
+                        'ftp_upload_path':'default',
+                        'ftp_download_path':'default',
+                    })
+                    self.add_sendcommand_parameter({
+                        'project':e[1][0],
+                        'area':'None',
+                        'device_title_able':'False',
+                        'command_able':'False',
+                        'read_timeout':10  
+                    })
+                if tuple(e[1]) not in self.get_parameter_project_area_data():
+                    result_file=self.change_filepath_parameter({
+                        'where':{
+                            'project':e[0][0],
+                            'area':e[0][1]
+                            },
+                        'update':{
+                            'project':e[1][0],
+                            'area':e[1][1]
+                        }
+                        })
+                    result_send=self.change_sendcommand_parameter({
+                        'where':{
+                            'project':e[0][0],
+                            'area':e[0][1]
+                            },
+                        'update':{
+                            'project':e[1][0],
+                            'area':e[1][1]
+                        }
+                        })                  
+                    update_result_list.append((result_file,result_send))
+                else:
+                    self.delete_filepath_parameter({'project':e[0][0],'area':e[0][1]})
+                    self.delete_sendcommand_parameter({'project':e[0][0],'area':e[0][1]})
+        return update_result_list
+
+            
 if __name__ == '__main__':
     ap=AppStorage()
     # s1.add_login_info()

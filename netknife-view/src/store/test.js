@@ -1,49 +1,201 @@
-const oldList = [
-  [
-      "9670f5337a524d17b5a9354d7df6558a",
-      "9670f5337a524d17b5a9354d7df6558a"
-  ],
-  [
-      "Myproject",
-      "a"
-  ],
-  [
-      "Myproject",
-      "b"
-  ],
-  [
-      "Youproject",
-      "c"
-  ],
-  [
-      "ooo",
-      "d"
-  ],
-  [
-      "默认项目",
-      "e"
-  ]
-]
-
-const newList = [
-[
-    "Myproject",
-    "a"
-],
-[
-    "ooo",
-    "d"
-],
-[
-    "默认项目",
-    "e"
-]
-]
-
-diff_item_list=[]
-oldList.forEach(element => {
-  if(! newList.some(item => JSON.stringify(item) === JSON.stringify(element))){
-      diff_item_list.push(element)
-  }
-});
-console.log(diff_item_list)
+if(before_len===after_len){
+    console.log('相等')
+    state.update_item_list=combineFromStartAndEnd(findNonexistentItems(_before_lis,_after_lis))
+    console.log(state.update_item_list)
+    state.update_item_list.forEach(e=>{
+            //根据原始项目名称和区域名称以及更新后的项目名称和区域名称，更新filepath数据库
+            send_post('/change_filepath_parameter',{
+                'where':{
+                    'project':e[0][0],
+                    'area':e[0][1]
+                },
+                'update':{
+                    'project':e[1][0],
+                    'area':e[1][1]
+                }
+            },response=>{
+                // 判断更新后的原项目是否只剩余None区域，如果是则将原来的None区域的项目名称改为新的项目名称
+                send_post('/get_filepath_parameter',{'project':e[0][0]},response=>{
+                    console.log('---------------file是否只剩原来的区域的response-----------')
+                    console.log(response.data)
+                    if(response.data.length==1 && !areListsEqual(e[1],e[0])){
+                        send_post('/change_filepath_parameter',{
+                            where:{
+                                'project':e[0][0]
+                            },
+                            update:{
+                                'project':e[1][0]
+                            }
+                        })
+                    }  
+                })
+                //判断更新None区域项目是否存在冲突的None，如果存在则删除原有的None区域
+                send_post('/get_filepath_parameter',{'project':e[1][0],'area':'None'},response=>{
+                    console.log('-------------file是否删除原有NOne区域-------------------')
+                    console.log(response.data)
+                    if(response.data.length===1 && !areListsEqual(e[1],e[0])){
+                        console.log('删除原有None区域file')
+                        send_post('/delete_filepath_parameter',{'project':e[0][0],'area':'None'})
+                    }
+                })
+                // 判断更新后新增的表项的项目名是否唯一，如果唯一则说明是新项目要追加None区域
+                send_post('/get_filepath_parameter',{'project':e[1][0]},response=>{
+                    console.log('-------------file新增的项目是否是唯一的response-----------')
+                    console.log(response.data)
+                    if(response.data.length==1 && !areListsEqual(e[1],e[0])){
+                        send_post('/add_filepath_parameter',{
+                            'project':e[1][0],
+                            'area':'None',
+                            'txt_export_path': 'default',
+                            'ftp_root_path':'default',  
+                            'ftp_upload_path':'default',
+                            'ftp_download_path':'default',
+                        })
+                    }
+                })
+            
+            })
+            //根据原始项目名称和区域名称以及更新后的项目名称和区域名称，更新sendcommand数据库
+            send_post('/change_sendcommand_parameter',{
+                'where':{
+                    'project':e[0][0],
+                    'area':e[0][1]
+                },
+                'update':{
+                    'project':e[1][0],
+                    'area':e[1][1]
+                }
+            },response=>{
+            // 判断更新后的原项目是否只剩余None区域，如果是则将原来的None区域的项目名称改为新的项目名称
+                send_post('/get_sendcommand_parameter',{'project':e[0][0]},response=>{
+                    console.log('---------------send是否只剩原来的区域的response-----------')
+                    console.log(response.data)
+                    if(response.data.length==1 && !areListsEqual(e[1],e[0])){
+                        send_post('/change_sendcommand_parameter',{
+                            where:{
+                                'project':e[0][0]
+                            },
+                            update:{
+                                'project':e[1][0]
+                            }
+                        })
+                    }
+                })
+            //判断更新None区域项目是否存在冲突的None，如果存在则删除原有的None区域
+                send_post('/get_sendcommand_parameter',{'project':e[1][0],'area':'None'},response=>{
+                    console.log('--------------send是否删除原有None区域-------------------')
+                    console.log(response.data)
+                    if(response.data.length===1 && !areListsEqual(e[1],e[0])){
+                        console.log('删除原有None区域send')
+                        send_post('/delete_sendcommand_parameter',{'project':e[0][0],'area':'None'})
+                    }
+                })
+            // 判断更新后新增的表项的项目名是否唯一，如果唯一则说明是新项目要追加None区域
+                send_post('/get_sendcommand_parameter',{'project':e[1][0]},response=>{
+                    console.log('-------------send新增的项目是否是唯一的response-----------')
+                    console.log(response.data)
+                    if(response.data.length==1 && !areListsEqual(e[1],e[0])){
+                        send_post('/add_sendcommand_parameter',{
+                            'project':e[1][0],
+                            'area':'None',
+                            'device_title_able':'False',
+                            'command_able':'False',
+                            'read_timeout':10  
+                        })
+                    }
+                })   
+            })  
+        })
+}
+if(before_len>after_len){
+    console.log('减少')
+    _before_lis.forEach(element => {
+        if(! _after_lis.some(item => JSON.stringify(item) === JSON.stringify(element))){
+            state.diff_item_list.push(element)
+        }
+    });
+    console.log(state.diff_item_list)
+    console.log('------------------------difflist--------------')
+    state.diff_item_list.forEach(e=>{
+        send_post('/delete_filepath_parameter',{'project':e[0],'area':e[1]},response=>{
+            send_post('/get_filepath_parameter',{'project':e[0]},response=>{
+                    if(response.data.length==1){
+                        send_post('/delete_filepath_parameter',{'project':e[0]})
+                    }
+            })
+        })
+        send_post('/delete_sendcommand_parameter',{'project':e[0],'area':e[1]},response=>{
+            send_post('/get_sendcommand_parameter',{'project':e[0]},response=>{
+                if(response.data.length==1){
+                    send_post('/delete_sendcommand_parameter',{'project':e[0]})
+                }  
+            })
+        })
+    })  
+}   
+if(before_len<after_len){
+    console.log('增加')
+    _after_lis.forEach(element => {
+        if(! _before_lis.some(item => JSON.stringify(item) === JSON.stringify(element))){
+            console.log(element)
+            state.diff_item_list.push(element)
+        }
+    });
+    console.log(state.diff_item_list)
+    console.log('------------------------difflist--------------')
+    state.diff_item_list.forEach(e=>{
+        send_post('/get_filepath_parameter',
+        {
+            'project':e[0]
+        },response=>{
+            if(response.data==='None'){
+                send_post('/add_filepath_parameter',{
+                    'project':e[0],
+                    'area':'None',
+                    'txt_export_path': 'default',
+                    'ftp_root_path':'default',  
+                    'ftp_upload_path':'default',
+                    'ftp_download_path':'default',
+                })
+                send_post('/add_filepath_parameter',{
+                    'project':e[0],
+                    'area':e[1],
+                    'txt_export_path': 'default',
+                    'ftp_root_path':'default',  
+                    'ftp_upload_path':'default',
+                    'ftp_download_path':'default',
+                })
+                send_post('/add_sendcommand_parameter',{
+                    'project':e[0],
+                    'area':'None',
+                    'device_title_able':'False',
+                    'command_able':'False',
+                    'read_timeout':10  
+                })
+                send_post('/add_sendcommand_parameter',{
+                    'project':e[0],
+                    'area':e[1],
+                    'device_title_able':'False',
+                    'command_able':'False',
+                    'read_timeout':10  
+                })        
+            }else{
+                send_post('/add_filepath_parameter',{
+                    'project':e[0],
+                    'area':e[1],
+                    'txt_export_path': 'default',
+                    'ftp_root_path':'default',  
+                    'ftp_upload_path':'default',
+                    'ftp_download_path':'default',
+                })
+                send_post('/add_sendcommand_parameter',{
+                    'project':e[0],
+                    'area':e[1],
+                    'device_title_able':'False',
+                    'command_able':'False',
+                    'read_timeout':10  
+                })        
+            }
+        })
+    })
+}

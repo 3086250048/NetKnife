@@ -190,7 +190,6 @@ def get_sendcommand_parameter():
         print(result)
         return result
 
-    
 @netknife.route('/delete_sendcommand_parameter',methods=['POST'])
 def delete_sendcommand_parameter():
     result=storage.delete_sendcommand_parameter(json.loads(request.get_data(as_text=True)))
@@ -208,6 +207,10 @@ def stop_ftp_serve():
    result= _as.stop_ftp_serve()
    return result
 
+@netknife.route('/update_parameter_database',methods=['POST'])
+def update_parameter_database():
+    result= storage.update_parameter_database(json.loads(request.get_data(as_text=True)))
+    return result
 
 
 

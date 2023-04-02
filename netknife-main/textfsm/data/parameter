@@ -1,0 +1,74 @@
+>screen-length disable
+                     ^
+Error: Wrong parameter found at '^' position.
+<sw102>dir
+Directory of flash:/
+
+  Idx  Attr     Size(Byte)  Date        Time       FileName 
+    0  drw-              -  Aug 06 2015 21:26:42   src
+    1  drw-              -  Mar 22 2023 13:50:41   compatible
+    2  -rw-              0  Apr 02 2023 20:25:44   a.text
+    3  -rw-            736  Mar 23 2023 15:38:42   vrpcfg.zip
+    4  -rw-              0  Apr 02 2023 20:28:17   m.text
+    5  -rw-         83,234  Apr 02 2023 20:50:27   aaa.text
+    6  drw-              -  Apr 03 2023 00:00:51   resetinfo
+
+32,004 KB total (31,856 KB free)
+
+<sw102>
+
+
+>screen-length disable
+                      ^
+Error: Wrong parameter found at '^' position.
+<Huawei>dir
+Directory of flash:/
+
+  Idx  Attr     Size(Byte)  Date        Time       FileName 
+    0  drw-              -  Aug 06 2015 21:26:42   src
+    1  drw-              -  Mar 22 2023 13:50:43   compatible
+    2  -rw-         83,234  Apr 02 2023 20:50:28   aaa.text
+    3  -rw-            722  Mar 23 2023 15:36:17   vrpcfg.zip
+    4  drw-              -  Apr 03 2023 00:00:19   resetinfo
+
+32,004 KB total (31,864 KB free)
+
+<Huawei>
+
+
+>screen-length disable
+                      ^
+Error: Wrong parameter found at '^' position.
+<Huawei>dir
+Directory of flash:/
+
+  Idx  Attr     Size(Byte)  Date        Time       FileName 
+    0  drw-              -  Aug 06 2015 21:26:42   src
+    1  drw-              -  Mar 22 2023 13:50:48   compatible
+    2  -rw-         83,234  Apr 02 2023 20:50:28   aaa.text
+    3  -rw-            718  Mar 23 2023 15:36:17   vrpcfg.zip
+    4  drw-              -  Apr 03 2023 00:00:28   resetinfo
+
+32,004 KB total (31,864 KB free)
+
+<Huawei>
+
+
+>screen-length disable
+                      ^
+Error: Wrong parameter found at '^' position.
+<Huawei>dir
+Directory of flash:/
+
+  Idx  Attr     Size(Byte)  Date        Time       FileName 
+    0  drw-              -  Aug 06 2015 21:26:42   src
+    1  drw-              -  Mar 22 2023 13:50:52   compatible
+    2  -rw-         83,234  Apr 02 2023 20:50:28   aaa.text
+    3  -rw-            718  Mar 23 2023 15:36:17   vrpcfg.zip
+    4  drw-              -  Apr 03 2023 00:00:33   resetinfo
+
+32,004 KB total (31,864 KB free)
+
+<Huawei>
+
+

@@ -137,20 +137,27 @@ class AppProcessing():
     def processing_command_data(self,command_data):
 
         input_data = command_data['command']
-        select_pattern = r"(?<=select\s)(.*?)(?=\swhere|\sset|\saction|\supload|\sdownload|$)"
-        config_pattern = r"(?<=set\s)(.*?)(?=\swhere|\sselect|\saction|\supload|\sdownload|$)"
-        action_pattern = r"(?<=action\s)(.*?)(?=\swhere|\sselect|\sset|\supload|\sdownload|$)"
-        upload_pattern = r"(?<=upload\s)(.*?)(?=\swhere|\sselect|\sset|\saction|\sdownload|$)"
-        download_pattern = r"(?<=download\s)(.*?)(?=\swhere|\sselect|\sset|\saction|\supload|$)"
+        select_pattern = r"(?<=select\s)(.*?)(?=\swhere|\sset|\saction|\supload|\sdownload|delete|$)"
+        config_pattern = r"(?<=set\s)(.*?)(?=\swhere|\sselect|\saction|\supload|\sdownload|delete|$)"
+        action_pattern = r"(?<=action\s)(.*?)(?=\swhere|\sselect|\sset|\supload|\sdownload|delete|$)"
+        upload_pattern = r"(?<=upload\s)(.*?)(?=\swhere|\sselect|\sset|\saction|\sdownload|delete|$)"
+        download_pattern = r"(?<=download\s)(.*?)(?=\swhere|\sselect|\sset|\saction|\supload|delete|$)"
+        delete_pattern = r"(?<=delete\s)(.*?)(?=\swhere|\sselect|\sset|\saction|\supload|download|$)"
 
         select_match = re.search(select_pattern, input_data)
         config_match = re.search(config_pattern, input_data)
         action_match = re.search(action_pattern, input_data)
         upload_match = re.search(upload_pattern,input_data)
         download_match = re.search(download_pattern,input_data)
+        delete_match= re.search(delete_pattern,input_data)
 
         command_dict={}
         
+        if delete_match:
+            command_dict['delete']=delete_match.group(1)
+        else:
+            command_dict['delete']=None
+
         if select_match:
             command_dict['select']=select_match.group(1)
         else:
@@ -197,8 +204,6 @@ class AppProcessing():
         
         if command_data['path_parameter']:
             command_dict['path_parameter']=command_data['path_parameter']
-
-
         return command_dict
 
 class NetProcessing():
