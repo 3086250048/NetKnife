@@ -216,7 +216,10 @@ def update_parameter_database():
     result= storage.update_parameter_database(json.loads(request.get_data(as_text=True)))
     return result
 
-
+@netknife.route('/get_mixunit_data',methods=['POST'])
+def get_mixunit_data():
+    result= storage.get_mixunit_data(json.loads(request.get_data(as_text=True)))
+    return result
 
 
 if __name__ == '__main__':

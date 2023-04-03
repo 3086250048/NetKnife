@@ -171,29 +171,28 @@ class AppStorage():
                 return True
             return False
         return self.oprate_sql(AppStorage.dynamic_sql_return('SELECT * FROM LOGININFO','WHERE','AND',where_dict),where_dict,callback)
-    
+#给更新 参数数据库用 
     def get_project_area_data(self):
         def callback(cur,con):
             return cur.fetchall()
         return self.oprate_sql('SELECT ID,PROJECT,AREA FROM LOGININFO;',{},callback)
-
+#给delete 参数数据库用
     def get_project_area(self):
         def callback(cur,con):
             return cur.fetchall()
         return self.oprate_sql('SELECT PROJECT,AREA FROM LOGININFO;',{},callback)
-    
+#给更新 参数数据库用 
     def get_parameter_project_area_data(self):
         def callback(cur,con):
             return cur.fetchall()
         return self.oprate_sql('SELECT PROJECT,AREA FROM FILEPATH;',{},callback)
-    
+#给更新 参数数据库用 
     def get_filepath_parameter_value(self,where_dict):
         def callback(cur,con):
             return cur.fetchall()
-        print(888888888888888888888888888888888888888888888888888)
-        print(where_dict)
         sql=AppStorage.dynamic_sql_return('SELECT TXT_EXPORT_PATH,FTP_ROOT_PATH,FTP_UPLOAD_PATH,FTP_DOWNLOAD_PATH FROM FILEPATH','WHERE','AND',where_dict)
         return self.oprate_sql(sql,{},callback)
+#给更新 参数数据库用 
     def get_sendcommand_parameter_value(self,where_dict):
         def callback(cur,con):
             return cur.fetchall()
@@ -382,6 +381,7 @@ class AppStorage():
         return self.oprate_sql(delete_sql,where_dict,callback)
 
     def update_parameter_database(self,dict):
+        try:
             before_list=dict['before']
             after_list=dict['after']
             project_after_list = [ v[1] for v in after_list]
@@ -476,7 +476,13 @@ class AppStorage():
                 })
             
             return 'True'
-   
+        except Exception as e:
+            return str(e)
+    def get_mixunit_data(self,project_dict):
+        def callback(cur,con):
+            return cur.fetchall()
+        sql=AppStorage.dynamic_sql_return('SELECT * FROM LOGININFO','WHERE','AND',project_dict)
+        return self.oprate_sql(sql,{},callback)
 
             
 if __name__ == '__main__':

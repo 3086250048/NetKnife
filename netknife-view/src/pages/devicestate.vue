@@ -12,11 +12,11 @@
         </el-header>
         <el-main v-if="project_view_able">
             <ul>
-                <li  v-for="(project,i) in select_project_unit_list " > 
+                <li  v-for="(project,i) in select_project_unit_list " :key="i" > 
                     <el-card class="box-card  head_card " >
                         <div style="margin-top: -10px;">
-                            {{ project[0].slice(0,39) }}
-                                <el-button type="primary" class="head_button" @click="show_mix_unit_page(),set_choose_project(project)">显示最小操作单元</el-button>
+                            {{  project[0].length>39 ? project[0].slice(0,39):project[0] }}
+                                <el-button type="primary" class="head_button" @click="show_mix_unit_page(project[0]),set_choose_project(project)">显示最小操作单元</el-button>
                                 <el-button type="primary" class="head_button" @click="show_oprate_page(),set_choose_project(project)">操作</el-button>
                         </div>
                     </el-card>   
@@ -50,18 +50,21 @@ export default{
                                             ROLLBACK_SELECT_PROJECT_UNIT_LIST:'ROLLBACK_SELECT_PROJECT_UNIT_LIST',
                                             SET_PROJECT_VIEW_ABLE:'SET_PROJECT_VIEW_ABLE'}),
         ...mapMutations('projectoprateAbout',{SET_CHOOSE_PROJECT:'SET_CHOOSE_PROJECT'}),
-
-        show_mix_unit_page(){
+      
+        show_mix_unit_page(project){
             this.SET_PROJECT_VIEW_ABLE(false)
             this.$router.push({
-                name:'mixunit'
+                name:'mixunit',
+                params:{
+                    'project':project
+                }
             })
         },
 
         show_oprate_page(){
             this.SET_PROJECT_VIEW_ABLE(false)
             this.$router.push({
-                name:'projectoprate'
+                name:'projectoprate',
             })
           
         },
