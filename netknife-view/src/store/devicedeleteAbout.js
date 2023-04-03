@@ -30,7 +30,7 @@ export const devicedeleteAbout={
     },
     mutations:{
         DELETE(state){
-            send_get('/get_project_area_data',response=>{
+            send_get('/get_project_area',response=>{
                 state.delete_before_proeject_area_list=response.data
             },reason=>{})
             send_post('/delete_data',{
@@ -48,7 +48,7 @@ export const devicedeleteAbout={
                 if(response.data=='DELETE_SUCCESS'){
                     pop_info(state,'数据删除成功','success')
                     devicestateAbout.mutations.GET_PROJECT_UNIT_LIST(devicestateAbout.state)    
-                    send_get('/get_project_area_data',response=>{
+                    send_get('/get_project_area',response=>{
                         state.delete_after_project_area_list=response.data
                         state.diff_list=[]
                         state.delete_before_proeject_area_list.forEach(element => {

@@ -249,7 +249,7 @@ class StorageProcessing():
         _add_parameter_list=[]
         for v in add_parameter_list:
             if v=='default':
-                _add_parameter_list.append(os.path.join(os.path.expanduser("~"), "Desktop"))
+                _add_parameter_list.append(os.path.join(os.path.expanduser("~"), "Desktop")+'\\')
             else:
                 _add_parameter_list.append(v)
         return _add_parameter_list

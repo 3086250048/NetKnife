@@ -175,13 +175,30 @@ class AppStorage():
     def get_project_area_data(self):
         def callback(cur,con):
             return cur.fetchall()
+        return self.oprate_sql('SELECT ID,PROJECT,AREA FROM LOGININFO;',{},callback)
+
+    def get_project_area(self):
+        def callback(cur,con):
+            return cur.fetchall()
         return self.oprate_sql('SELECT PROJECT,AREA FROM LOGININFO;',{},callback)
     
     def get_parameter_project_area_data(self):
         def callback(cur,con):
             return cur.fetchall()
         return self.oprate_sql('SELECT PROJECT,AREA FROM FILEPATH;',{},callback)
- 
+    
+    def get_filepath_parameter_value(self,where_dict):
+        def callback(cur,con):
+            return cur.fetchall()
+        print(888888888888888888888888888888888888888888888888888)
+        print(where_dict)
+        sql=AppStorage.dynamic_sql_return('SELECT TXT_EXPORT_PATH,FTP_ROOT_PATH,FTP_UPLOAD_PATH,FTP_DOWNLOAD_PATH FROM FILEPATH','WHERE','AND',where_dict)
+        return self.oprate_sql(sql,{},callback)
+    def get_sendcommand_parameter_value(self,where_dict):
+        def callback(cur,con):
+            return cur.fetchall()
+        sql=AppStorage.dynamic_sql_return('SELECT DEVICE_TITLE_ABLE,COMMAND_ABLE,READ_TIMEOUT FROM SENDCOMMAND_PARAMETER','WHERE','AND',where_dict)
+        return self.oprate_sql(sql,{},callback)
     #更新数据库中某条记录
     #返回:布尔值
     #传入:
@@ -365,59 +382,101 @@ class AppStorage():
         return self.oprate_sql(delete_sql,where_dict,callback)
 
     def update_parameter_database(self,dict):
-        before_list=dict['before']
-        after_list=dict['after']
-        print(before_list)
-        print(after_list)
-        merge_list=list(map(lambda x,y:(x,y),before_list,after_list))
-        update_result_list=[]
-        for e in merge_list:
-            if e[0]!=e[1]:
-                if e[0][0] not in [v[0] for v in after_list]:
-                    self.delete_filepath_parameter({'project':e[0][0],'area':'None'})
-                    self.delete_sendcommand_parameter({'project':e[0][0],'area':'None'})
-                if e[1][0] not in [v[0] for v in before_list ]:
-                    self.add_filepath_parameter({
-                        'project':e[1][0],
-                        'area':'None',
-                        'txt_export_path': 'default',
-                        'ftp_root_path':'default',  
-                        'ftp_upload_path':'default',
-                        'ftp_download_path':'default',
-                    })
-                    self.add_sendcommand_parameter({
-                        'project':e[1][0],
-                        'area':'None',
-                        'device_title_able':'False',
-                        'command_able':'False',
-                        'read_timeout':10  
-                    })
-                if tuple(e[1]) not in self.get_parameter_project_area_data():
-                    result_file=self.change_filepath_parameter({
+            before_list=dict['before']
+            after_list=dict['after']
+            project_after_list = [ v[1] for v in after_list]
+            project_area_after_list = [v[1:] for v in after_list]
+            project_before_list=[ v[1] for v in before_list]
+            update_base_area_list=[]
+            add_base_area_list=[]
+            add_base_area_file_parameter_list=[]
+            add_base_area_send_parameter_list=[]
+            for i in before_list:
+                for j in after_list:
+                    if i[0]==j[0] and i[1:]!=j[1:]:
+                        if i[1:] not in project_area_after_list:
+                            update_base_area_list.append([i[1:],j[1:]])
+                        else:
+                            add_base_area_list.append(j[1:])
+                            add_base_area_file_parameter_list.append(self.get_filepath_parameter_value({
+                                'project':i[1],
+                                'area':i[2]
+                                }))
+                            add_base_area_send_parameter_list.append(self.get_sendcommand_parameter_value
+                            ({
+                                'project':i[1],
+                                'area':i[2]
+                                }))
+            delete_base_area_list=[ v[1:]  for v in before_list if v[1:] not in project_area_after_list]
+            delete_none_area_list=[ [v[1],'None'] for v in before_list if v[1] not in project_after_list ]
+            # 待增加add是原有项目的数据
+            add_none_area_list=[ [v[1],'None'] for v in after_list if v[1] not in project_before_list ]
+            for e in update_base_area_list:
+                self.change_filepath_parameter(
+                    {
                         'where':{
                             'project':e[0][0],
                             'area':e[0][1]
-                            },
+                        },
                         'update':{
                             'project':e[1][0],
                             'area':e[1][1]
                         }
-                        })
-                    result_send=self.change_sendcommand_parameter({
+                    }
+                )
+                self.change_sendcommand_parameter(
+                     {
                         'where':{
                             'project':e[0][0],
                             'area':e[0][1]
-                            },
+                        },
                         'update':{
                             'project':e[1][0],
                             'area':e[1][1]
                         }
-                        })                  
-                    update_result_list.append((result_file,result_send))
-                else:
-                    self.delete_filepath_parameter({'project':e[0][0],'area':e[0][1]})
-                    self.delete_sendcommand_parameter({'project':e[0][0],'area':e[0][1]})
-        return update_result_list
+                    }
+                )
+            for e in delete_base_area_list:
+                self.delete_filepath_parameter({'project':e[0],'area':e[1]})
+                self.delete_sendcommand_parameter({'project':e[0],'area':e[1]})
+            for e in delete_none_area_list:
+                self.delete_filepath_parameter({'project':e[0],'area':'None'})
+                self.delete_sendcommand_parameter({'project':e[0],'area':'None'})
+            for i,e in enumerate(add_base_area_list):
+                self.add_filepath_parameter({
+                    'project':e[0],
+                    'area':e[1],
+                    'txt_export_path':add_base_area_file_parameter_list[i][0][0],
+                    'ftp_root_path':add_base_area_file_parameter_list[i][0][1],
+                    'ftp_upload_path':add_base_area_file_parameter_list[i][0][2],
+                    'ftp_download_path:':add_base_area_file_parameter_list[i][0][3],
+                })
+                self.add_sendcommand_parameter({
+                    'project':e[0],
+                    'area':e[1],
+                    'device_title_able':add_base_area_send_parameter_list[i][0][0],
+                    'command_able': add_base_area_send_parameter_list[i][0][1],
+                    'read_timeout': add_base_area_send_parameter_list[i][0][2],
+                })
+            for e in add_none_area_list:
+                self.add_filepath_parameter({
+                    'project':e[0],
+                    'area':e[1],
+                    'txt_export_path':'default',
+                    'ftp_root_path':'default',
+                    'ftp_upload_path':'default',
+                    'ftp_download_path:':'default',
+                })
+                self.add_sendcommand_parameter({
+                    'project':e[0],
+                    'area':e[1],
+                    'device_title_able':'False',
+                    'command_able':'False',
+                    'read_timeout':10  
+                })
+            
+            return 'True'
+   
 
             
 if __name__ == '__main__':
@@ -429,5 +488,4 @@ if __name__ == '__main__':
     # print(update_sql+where_sql)
     # project_list=ap.get_project_unit_tuple()
     # list1=[ v[0] for v in list]
-    print(ap.get_project_unit_list())
-    # AppStorage.dynamic_sql_yield('select * from logininfo','where',)
+    print(ap.get_parameter_project_area_data())

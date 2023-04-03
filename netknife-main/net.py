@@ -170,8 +170,9 @@ class AppNet():
                     results.append(result)
 
         if command_data['action'] and results:
-             aa.action_class_map(command_data['action'][0],command_data['path_parameter']['txt_export_path']+command_data['action'][1],np.get_export_data(results))
-        
+            print('action了')
+            aa.action_class_map(command_data['action'][0],command_data['path_parameter']['txt_export_path']+command_data['action'][1],np.get_export_data(results))
+            
         return results
 
 if __name__ == '__main__':

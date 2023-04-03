@@ -82,6 +82,10 @@ def get_project_area_data():
     return storage.get_project_area_data()
 
 
+@netknife.route('/get_project_area')
+def get_project_area():
+    return storage.get_project_area()
+
 #更新数据库中的记录
 #使用时先向/check_where发送更新条件,再向这个接口发送更新请求,需要附带数据,结构如下
 #{'project':,'class':,'area':,'protocol':,'port':,'username':,'password':,

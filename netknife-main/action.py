@@ -6,6 +6,7 @@ class AppAction():
     def export(self,parameter,content):
         with open(parameter, "w") as file:
             file.write(content)
+            print('写入了')
     def action_class_map(self,action_class,parameter,content):
         action_map={
             'export':self.export  
