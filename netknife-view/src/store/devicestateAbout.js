@@ -10,8 +10,8 @@ export const  devicestateAbout={
                 state.select_project_unit_list=state.project_unit_list
                 send_post('/get_all_project_data',{},response=>{
                     state.all_project_list=response.data
-                },reason=>{})
-            },reason=>{})
+                })
+            })
         },
         CHOOSE_CHANGE(state,project){
             state.project_unit_list.forEach(element => {

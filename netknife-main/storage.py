@@ -357,7 +357,6 @@ class AppStorage():
         suid=''.join(uid.split('-'))
         add_parameter_list=list(add_parameter_dict.values())
         add_parameter_list.insert(0,suid)
-        ['e528bc3720e74c859ff84338bf56f5d9', '默认项目11', '默认区域', 'default', 'default', 'default', 'default']
         _add_parameter_list=sp.get_add_parameter_list(add_parameter_list)
         def callback(cur,con):
             con.commit()
@@ -478,13 +477,42 @@ class AppStorage():
             return 'True'
         except Exception as e:
             return str(e)
-    def get_mixunit_data(self,project_dict):
+    
+    def get_mixunit_data(self,where_dict):
         def callback(cur,con):
             return cur.fetchall()
-        sql=AppStorage.dynamic_sql_return('SELECT * FROM LOGININFO','WHERE','AND',project_dict)
+        _where_dict={}
+        if 'search' in  where_dict.keys():
+            search_str=where_dict['search']
+            search_lis=search_str.split(':')
+            _where_dict['project']=where_dict['project']
+            SEARCH_MAP={}
+            SEARCH_MAP['设备类型']='CLASS'
+            SEARCH_MAP['区域']='AREA'
+            SEARCH_MAP['协议']='PROTOCOL'
+            SEARCH_MAP['端口号']='PORT'
+            SEARCH_MAP['用户名']='USERNAME'
+            SEARCH_MAP['密码']='PASSWORD'
+            SEARCH_MAP['特权密码']='SECRET'
+            SEARCH_MAP['IP表达式']='IP_EXPRESSION'
+            _where_dict[SEARCH_MAP[search_lis[0]]]=search_lis[1]
+        else:
+            _where_dict=where_dict
+        sql=AppStorage.dynamic_sql_return('SELECT * FROM LOGININFO','WHERE','AND',_where_dict)
         return self.oprate_sql(sql,{},callback)
 
-            
+    def get_search_data(self):
+        def callback(cur,con):
+            return cur.fetchall()
+        result=self.oprate_sql('SELECT * FROM LOGININFO',{},callback)
+        search_data_list=[]
+        value_class=['设备类型:','区域:','协议:','端口号:','用户名:','密码:','特权密码:','IP表达式:']
+        for item in result:
+           search_data_list+=(list(map(lambda x,y:x+y,value_class,item[2:])))
+        search_item_list=[{'value':v} for v in list(set(search_data_list[8:])) if v !='特权密码:']
+        return search_item_list
+    
+    
 if __name__ == '__main__':
     ap=AppStorage()
     # s1.add_login_info()

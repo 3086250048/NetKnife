@@ -14,6 +14,7 @@
 
 <script>
 import { send_get } from '@/store/tools'
+import { mapMutations } from 'vuex'
 export default{
     name:'DeviceInfo',
     data(){
@@ -22,6 +23,7 @@ export default{
         }
     },
     methods:{
+        ...mapMutations('devicestateAbout',{SET_PROJECT_VIEW_ABLE:'SET_PROJECT_VIEW_ABLE'}),
         handleClick(tab,event){
             if(this.activeName==='second'){
                 this.$router.push({
@@ -38,6 +40,7 @@ export default{
                     })
                 }else{          
                     if(this.activeName==='first'){
+                        this.SET_PROJECT_VIEW_ABLE(true)
                         this.$router.push({
                             name:'state'
                         })

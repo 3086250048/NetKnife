@@ -5,7 +5,8 @@
                 <el-button class="el_header-div-el_button" @click="goBack">返回</el-button>
                 <div class="el_header-div-div" >
                     <h1  class="el_header-div-div-h1">
-                        当前所在项目:{{ choose_project[0].slice(0,22) }}
+                        <!-- 当前所在项目:{{ choose_project[0].slice(0,22) }} -->
+                        {{ pre_title }}{{ base_title }}
                     </h1>
                 </div>
             </div>
@@ -132,11 +133,29 @@ export default {
     methods:{
         ...mapMutations('devicestateAbout',{SET_PROJECT_VIEW_ABLE:'SET_PROJECT_VIEW_ABLE'}),
         ...mapMutations('projectoprateAbout',{COMMIT_COMMAND:'COMMIT_COMMAND',
-        SET_EFFECT:'SET_EFFECT',SET_TEXT_AREA:'SET_TEXT_AREA',SET_GO_BACK_STATE:'SET_GO_BACK_STATE'}),
+                                                SET_EFFECT:'SET_EFFECT',
+                                                SET_TEXT_AREA:'SET_TEXT_AREA',
+                                                SET_GO_BACK_STATE:'SET_GO_BACK_STATE',
+                                                SET_CHOOSE_MIXUNIT:'SET_CHOOSE_MIXUNIT',
+                                                set_CHOOSE_PROJECT:'SET_CHOOSE_PROJECT'}),
+        ...mapMutations('mixunitpageAbout',{SET_MIXUNIT_VIEW_ABLE:'SET_MIXUNIT_VIEW_ABLE'}),
         goBack(){
-            this.$router.push({
+            if(this.choose_mixunit.length>0){
+                this.SET_PROJECT_VIEW_ABLE(false)
+                this.SET_MIXUNIT_VIEW_ABLE(true)
+                this.$router.push({
+                name:'mixunit',
+                params:{
+                    'project':this.choose_project[0]
+                }
+                })
+            }else{
+                this.SET_PROJECT_VIEW_ABLE(true)
+                this.$router.push({
                 name:'state',
-            })
+                })
+            }
+
         },
         commit_command(){
             this.check_list=[]
@@ -209,19 +228,35 @@ export default {
         choose_project(){
             return this.$store.state.projectoprateAbout.choose_project
         },
+        choose_mixunit(){
+            return this.$store.state.projectoprateAbout.choose_mixunit
+        },
         response_data_list(){
             return this.$store.state.projectoprateAbout.response_data_list
         },
         loading_able(){
             return this.$store.state.projectoprateAbout.loading_able
+        },
+        pre_title(){
+            if(this.choose_project.length>0 && this.choose_mixunit.length===0 ){
+                return "当前所在项目:"
+            }else{
+                return "当前所在最小单元:"
+            }
+        },
+        base_title(){
+            if(this.choose_project.length>0 && this.choose_mixunit.length===0 ){
+                return this.choose_project[0].slice(0,22)
+            }else{
+                return `${this.choose_mixunit[3]}>${this.choose_mixunit[4]}>${this.choose_mixunit[5]}>${this.choose_mixunit[9]}`
+            }
         }
     },
     beforeDestroy(){
         send_get('/stop_ftp_serve')
-        this.SET_GO_BACK_STATE()
-        // 销毁前将PROJECT_VIEW_ABLE设置为true
-        this.SET_PROJECT_VIEW_ABLE(true)
-        
+        this.SET_CHOOSE_MIXUNIT([])
+        this.set_CHOOSE_PROJECT([])
+        this.SET_GO_BACK_STATE()        
     },
     watch:{
         check_list(new_value){
@@ -259,7 +294,8 @@ export default {
                     this.path_parameter.ftp_download_path=response.data[0][3]
                 },reason=>{})
             }
-        }
+        },
+     
     },
     mounted(){
         this.set_effect()

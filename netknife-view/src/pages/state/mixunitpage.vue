@@ -60,7 +60,10 @@ export default{
     methods: {
         ...mapMutations('devicestateAbout',{SET_PROJECT_VIEW_ABLE:'SET_PROJECT_VIEW_ABLE'}),
         ...mapMutations('mixunitpageAbout',{GET_MIXUNIT_DATA:'GET_MIXUNIT_DATA',
-                                        SET_MIXUNIT_VIEW_ABLE:'SET_MIXUNIT_VIEW_ABLE'}),
+                                        SET_MIXUNIT_VIEW_ABLE:'SET_MIXUNIT_VIEW_ABLE',
+                                        GET_SEARCH_DATA:'GET_SEARCH_DATA',
+                                        CHOOSE_CHANGE:'CHOOSE_CHANGE',
+                                        ROLLBACK_MIXUNIT_LIST:'ROLLBACK_MIXUNIT_LIST'}),
         ...mapMutations('projectoprateAbout',{SET_CHOOSE_MIXUNIT:'SET_CHOOSE_MIXUNIT'}),
         goback(){
             console.log("触发了")
@@ -87,23 +90,19 @@ export default{
            this.SET_CHOOSE_MIXUNIT(mixunit)
         },
         querySearchAsync(queryString, cb) {
-        let results=this.all_project_list
-        results = queryString ? results.filter(this.createStateFilter(queryString)) : results;
-        cb(results);
+            let results=this.mixunit_search_list
+            results = queryString ? results.filter(this.createStateFilter(queryString)) : results;
+            cb(results);
         },
         createStateFilter(queryString) {
         return (item) => {
           return item.value.toLowerCase().match(queryString.toLowerCase());
         };
-
         },
         handleSelect(item) {
-            this.CHOOSE_CHANGE(item.value)
+            this.CHOOSE_CHANGE({'project':this.$route.params.project,
+                                'search':item.value})
         },
-    },
-    beforeDestroy(){
-        
-        
     },
     computed:{
         mixunit_list(){
@@ -111,10 +110,21 @@ export default{
         },
         mixunit_view_able(){
             return this.$store.state.mixunitpageAbout.mixunit_view_able
+        },
+        mixunit_search_list(){
+            return this.$store.state.mixunitpageAbout.mixunit_search_list
+        }
+    },
+    watch:{
+        input(new_value,old_value){
+            if(old_value!=='' && new_value===''){
+                this.ROLLBACK_MIXUNIT_LIST()
+            }
         }
     },
     mounted(){
         this.GET_MIXUNIT_DATA({'project':this.$route.params.project})
+        this.GET_SEARCH_DATA()
     }
 }
 </script>
@@ -143,18 +153,18 @@ li:not(:first-child){
 }
 .success{
     float: left;
-    margin-top: -10px;
-    margin-left: -20px;
+    margin-top: -5px;
+    margin-left: -10px;
 }
 .error{
     float: left;
-    margin-top: -10px;
+    margin-top: -5px;
     margin-left: 28px;
 }
 
 .warning{
     float: left;
-    margin-top: -10px;
+    margin-top: -5px;
     margin-left: 28px;
 }
 </style>

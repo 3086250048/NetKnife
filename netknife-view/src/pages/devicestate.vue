@@ -50,9 +50,11 @@ export default{
                                             ROLLBACK_SELECT_PROJECT_UNIT_LIST:'ROLLBACK_SELECT_PROJECT_UNIT_LIST',
                                             SET_PROJECT_VIEW_ABLE:'SET_PROJECT_VIEW_ABLE'}),
         ...mapMutations('projectoprateAbout',{SET_CHOOSE_PROJECT:'SET_CHOOSE_PROJECT'}),
+        ...mapMutations('mixunitpageAbout',{SET_MIXUNIT_VIEW_ABLE:'SET_MIXUNIT_VIEW_ABLE'}),
       
         show_mix_unit_page(project){
             this.SET_PROJECT_VIEW_ABLE(false)
+            this.SET_MIXUNIT_VIEW_ABLE(true)
             this.$router.push({
                 name:'mixunit',
                 params:{
@@ -74,6 +76,7 @@ export default{
         },
 
         querySearchAsync(queryString, cb) {
+        console.log(this.all_project_list)
         let results=this.all_project_list
         results = queryString ? results.filter(this.createStateFilter(queryString)) : results;
         cb(results);
