@@ -42,6 +42,9 @@ export const  projectoprateAbout={
         SET_CHOOSE_PROJECT(state,project){
             state.choose_project=project
         },
+        SET_CHOOSE_MIXUNIT(state,mixunit){
+            state.choose_mixunit=mixunit
+        },
         SET_EFFECT(state,command){
            if (this.time!==undefined){clearTimeout(this.time)}
            this.time=setTimeout(() => {
@@ -79,6 +82,7 @@ export const  projectoprateAbout={
     state:{
         textarea:'',
         choose_project:[],
+        choose_mixunit:[],
         effect_connect_percent:0,
         response_data_list:[],
         response_date_time:'',

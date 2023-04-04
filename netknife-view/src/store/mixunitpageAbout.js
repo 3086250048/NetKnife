@@ -9,10 +9,14 @@ export const  mixunitpageAbout={
                 state.mixunit_list=response.data
                 console.log(state.mixunit_list)
             })
+        },
+        SET_MIXUNIT_VIEW_ABLE(state,able){
+            state.mixunit_view_able=able
         }
     },
     state:{
        project:'',
-       mixunit_list:[]
+       mixunit_list:[],
+       mixunit_view_able:true
     }
 }
