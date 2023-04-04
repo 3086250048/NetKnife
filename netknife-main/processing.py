@@ -96,6 +96,7 @@ class AppProcessing():
            
             where_dict['project']=command_data['base_effect_range']
         else:
+            # 第99行报错
             where_dict['project']=command_data['base_effect_range']
                     
         result={}
