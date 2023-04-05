@@ -10,8 +10,8 @@ export const  mixunitpageAbout={
                 state.full_mixunit_list=response.data
             })
         },
-        GET_SEARCH_DATA(state){
-            send_get('/get_search_data',response=>{
+        GET_SEARCH_DATA(state,project){
+            send_post('/get_search_data',{project:project},response=>{
                 state.mixunit_search_list=response.data
             })
         },
@@ -25,6 +25,9 @@ export const  mixunitpageAbout={
         },
         ROLLBACK_MIXUNIT_LIST(state){
             state.mixunit_list=state.full_mixunit_list
+        },
+        SET_MIXUNIT_LIST(state,list){
+            state.mixunit_list=list
         }
 
     },

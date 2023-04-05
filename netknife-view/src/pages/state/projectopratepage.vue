@@ -6,7 +6,7 @@
                 <div class="el_header-div-div" >
                     <h1  class="el_header-div-div-h1">
                         <!-- 当前所在项目:{{ choose_project[0].slice(0,22) }} -->
-                        {{ pre_title }}{{ base_title }}
+                        {{ base_title }}
                     </h1>
                 </div>
             </div>
@@ -157,6 +157,7 @@ export default {
             }
 
         },
+        //提交命令
         commit_command(){
             this.check_list=[]
             this.COMMIT_COMMAND({
@@ -179,7 +180,9 @@ export default {
             send_post('/change_sendcommand_parameter',{
                 'where':{
                     'project':this.choose_project[0],
-                    'area':'None',
+                    // 'area':'None',
+                    'mode':this.oprate_mode,
+                    'area':this.choose_mixunit[3]
                 },
                 'update':{
                     device_title_able:this.send_parameter.device_title_able,
@@ -198,7 +201,9 @@ export default {
             send_post('/change_filepath_parameter',{
                 'where':{
                     'project':this.choose_project[0],
-                    'area':'None',
+                    // 'area':'None',
+                    'mode':this.oprate_mode,
+                    'area':this.choose_mixunit[3]
                 },
                 'update':{
                     'txt_export_path': this.path_parameter.txt_export_path,
@@ -237,25 +242,27 @@ export default {
         loading_able(){
             return this.$store.state.projectoprateAbout.loading_able
         },
-        pre_title(){
-            if(this.choose_project.length>0 && this.choose_mixunit.length===0 ){
-                return "当前所在项目:"
-            }else{
-                return "当前所在最小单元:"
-            }
-        },
+        // pre_title(){
+        //     if( this.choose_mixunit.length===0 ){
+        //         return "当前所在项目:"
+        //     }else{
+        //         return "当前所在最小单元:"
+        //     }
+        // },
         base_title(){
-            if(this.choose_project.length>0 && this.choose_mixunit.length===0 ){
+            if(this.choose_mixunit.length===0 ){
                 return this.choose_project[0].slice(0,22)
             }else{
-                return `${this.choose_mixunit[3]}>${this.choose_mixunit[4]}>${this.choose_mixunit[5]}>${this.choose_mixunit[9]}`
+                return `${this.choose_project[0].slice(0,22)}>${this.choose_mixunit[3]}>${this.choose_mixunit[4]}>${this.choose_mixunit[5]}>${this.choose_mixunit[9]}`
             }
+        },
+        oprate_mode(){
+            return this.$store.state.projectoprateAbout.oprate_mode
         }
     },
     beforeDestroy(){
         send_get('/stop_ftp_serve')
         this.SET_CHOOSE_MIXUNIT([])
-        this.set_CHOOSE_PROJECT([])
         this.SET_GO_BACK_STATE()        
     },
     watch:{
@@ -266,7 +273,9 @@ export default {
             if(new_value){
                 send_post('/get_sendcommand_parameter',{
                     'project':this.choose_project[0],
-                    'area':'None'
+                    // 'area':'None'
+                    'mode':this.oprate_mode,
+                    'area':this.choose_mixunit[3],
                 },response=>{
                     if(response.data[0][0]=='False'){
                         this.send_parameter.device_title_able=false
@@ -286,7 +295,9 @@ export default {
             if(new_value){
                 send_post('/get_filepath_parameter',{
                     'project':this.choose_project[0],
-                    'area':'None'
+                    // 'area':'None'
+                    'mode':this.oprate_mode,
+                    'area':this.choose_mixunit[3],
                 },response=>{
                     this.path_parameter.txt_export_path=response.data[0][0]
                     this.path_parameter.ftp_root_path=response.data[0][1]
@@ -301,7 +312,9 @@ export default {
         this.set_effect()
         send_post('/get_filepath_parameter',{
             'project':this.choose_project[0],
-            'area':'None'
+            // 'area':'None'
+            'mode':this.oprate_mode,
+            'area':this.choose_mixunit[3],
         },response=>{
             console.log(response.data)
             this.path_parameter.txt_export_path=response.data[0][0]
@@ -312,7 +325,9 @@ export default {
         },reason=>{})
         send_post('/get_sendcommand_parameter',{
             'project':this.choose_project[0],
-            'area':'None'
+            // 'area':'None'
+            'mode':this.oprate_mode,
+            'area':this.choose_mixunit[3],
         },response=>{
             if(response.data[0][0]=='False'){
                 this.send_parameter.device_title_able=false
@@ -350,8 +365,8 @@ export default {
         margin-top: -40px;
     }
     .el_header-div-div-h1{
-        font-size:30px;
-       
+        font-size:22px;
+        margin-top: 4px;
     }
     .el_main{
         margin-top: 25px;  

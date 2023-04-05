@@ -17,6 +17,8 @@ export const  projectoprateAbout={
             state.textarea=''
             send_post('/commit_command',{
                 'base_effect_range':state.choose_project[0],
+                'mixunit':state.choose_mixunit,
+                'mode':state.oprate_mode,
                 'command':payload.command,
                 'send_parameter':{
                     strip_prompt:payload.send_parameter.device_title_able,
@@ -46,17 +48,19 @@ export const  projectoprateAbout={
             state.choose_mixunit=mixunit
         },
         SET_EFFECT(state,command){
+            console.log(state.oprate_mode)
            if (this.time!==undefined){clearTimeout(this.time)}
            this.time=setTimeout(() => {
                 send_post('/get_effect_data',{
                     'base_effect_range':state.choose_project[0],
+                    'extra_effect_range':state.choose_mixunit,
                     'command':command,
-                    
+                    'mode':state.oprate_mode
                 },response=>{
                     state.effect_connect_percent=response.data['effect_connect_percent']
                 },reason=>{  
                 })
-            }, 300);
+            }, 100);
         },
         SET_TEXT_AREA(state,check_list){
             state.textarea=''
@@ -77,6 +81,9 @@ export const  projectoprateAbout={
         },
         GET_SEND_COMMAND_PARAMETER(){
             send_post('/')
+        },
+        SET_OPRATE_MODE(state,mode){
+            state.oprate_mode=mode
         }
     },
     state:{
@@ -86,6 +93,7 @@ export const  projectoprateAbout={
         effect_connect_percent:0,
         response_data_list:[],
         response_date_time:'',
-        loading_able:false
+        loading_able:false,
+        oprate_mode:'project'
     }
 }

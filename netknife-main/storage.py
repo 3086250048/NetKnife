@@ -309,7 +309,14 @@ class AppStorage():
                return 'None'
             else:
                 return result
-        sql=AppStorage.dynamic_sql_return('select device_title_able,command_able,read_timeout from sendcommand_parameter','where','and',select_parameter_dict)
+        _where_dict={}
+        if select_parameter_dict['mode']=='project':
+            _where_dict['area']='None'
+            _where_dict['project']=select_parameter_dict['project']
+        else:
+            _where_dict['area']=select_parameter_dict['area']
+            _where_dict['project']=select_parameter_dict['project']
+        sql=AppStorage.dynamic_sql_return('select device_title_able,command_able,read_timeout from sendcommand_parameter','where','and',_where_dict)
         return self.oprate_sql(sql,{},callback)
          
     def add_sendcommand_parameter(self,add_parameter_dict):
@@ -327,7 +334,14 @@ class AppStorage():
         def callback(cur,con):
             con.commit()
             return True
-        where_sql=AppStorage.dynamic_sql_return('','where','and',data_dict['where'])
+        _where_dict={}
+        if data_dict['where']['mode']=='project':
+            _where_dict['area']='None'
+            _where_dict['project']=data_dict['where']['project']
+        else:
+            _where_dict['area']=data_dict['where']['area']
+            _where_dict['project']=data_dict['where']['project']
+        where_sql=AppStorage.dynamic_sql_return('','where','and',_where_dict)
         update_sql=AppStorage.dynamic_sql_return('update sendcommand_parameter','set',',',data_dict['update'])
         sql=update_sql+where_sql
         print(sql)
@@ -349,7 +363,14 @@ class AppStorage():
                 return 'None'
             else:
                 return result
-        sql=AppStorage.dynamic_sql_return('select TXT_EXPORT_PATH,FTP_ROOT_PATH ,FTP_UPLOAD_PATH ,FTP_DOWNLOAD_PATH from filepath','where','and',select_parameter_dict)
+        _where_dict={}
+        if select_parameter_dict['mode']=='project':
+            _where_dict['area']='None'
+            _where_dict['project']=select_parameter_dict['project']
+        else:
+            _where_dict['area']=select_parameter_dict['area']
+            _where_dict['project']=select_parameter_dict['project']
+        sql=AppStorage.dynamic_sql_return('select TXT_EXPORT_PATH,FTP_ROOT_PATH ,FTP_UPLOAD_PATH ,FTP_DOWNLOAD_PATH from filepath','where','and',_where_dict)
         return self.oprate_sql(sql,{},callback)
          
     def add_filepath_parameter(self,add_parameter_dict):
@@ -367,7 +388,14 @@ class AppStorage():
         def callback(cur,con):
             con.commit()
             return True
-        where_sql=AppStorage.dynamic_sql_return('','where','and',data_dict['where'])
+        _where_dict={}
+        if data_dict['where']['mode']=='project':
+            _where_dict['area']='None'
+            _where_dict['project']=data_dict['where']['project']
+        else:
+            _where_dict['area']=data_dict['where']['area']
+            _where_dict['project']=data_dict['where']['project']
+        where_sql=AppStorage.dynamic_sql_return('','where','and',_where_dict)
         update_sql=AppStorage.dynamic_sql_return('update filepath','set',',',data_dict['update'])
         sql=update_sql+where_sql
         return self.oprate_sql(sql,{},callback)
@@ -501,15 +529,16 @@ class AppStorage():
         sql=AppStorage.dynamic_sql_return('SELECT * FROM LOGININFO','WHERE','AND',_where_dict)
         return self.oprate_sql(sql,{},callback)
 
-    def get_search_data(self):
+    def get_search_data(self,where_dict):
         def callback(cur,con):
             return cur.fetchall()
-        result=self.oprate_sql('SELECT * FROM LOGININFO',{},callback)
+        sql=AppStorage.dynamic_sql_return('SELECT * FROM LOGININFO','WHERE','AND',where_dict)
+        result=self.oprate_sql(sql,{},callback)
         search_data_list=[]
         value_class=['设备类型:','区域:','协议:','端口号:','用户名:','密码:','特权密码:','IP表达式:']
         for item in result:
            search_data_list+=(list(map(lambda x,y:x+y,value_class,item[2:])))
-        search_item_list=[{'value':v} for v in list(set(search_data_list[8:])) if v !='特权密码:']
+        search_item_list=[{'value':v} for v in list(set(search_data_list)) if v !='特权密码:']
         return search_item_list
     
     

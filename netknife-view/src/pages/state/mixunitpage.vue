@@ -63,10 +63,13 @@ export default{
                                         SET_MIXUNIT_VIEW_ABLE:'SET_MIXUNIT_VIEW_ABLE',
                                         GET_SEARCH_DATA:'GET_SEARCH_DATA',
                                         CHOOSE_CHANGE:'CHOOSE_CHANGE',
-                                        ROLLBACK_MIXUNIT_LIST:'ROLLBACK_MIXUNIT_LIST'}),
-        ...mapMutations('projectoprateAbout',{SET_CHOOSE_MIXUNIT:'SET_CHOOSE_MIXUNIT'}),
+                                        ROLLBACK_MIXUNIT_LIST:'ROLLBACK_MIXUNIT_LIST',
+                                        SET_MIXUNIT_LIST:'SET_MIXUNIT_LIST'}),
+        ...mapMutations('projectoprateAbout',{SET_CHOOSE_MIXUNIT:'SET_CHOOSE_MIXUNIT',
+                                            SET_OPRATE_MODE:'SET_OPRATE_MODE'}),
         goback(){
             console.log("触发了")
+            this.SET_OPRATE_MODE('project')
             this.$router.push({
                 name:'state',
             })
@@ -122,9 +125,14 @@ export default{
             }
         }
     },
+    beforeDestroy(){
+        this.SET_MIXUNIT_LIST([])
+        
+    },
     mounted(){
         this.GET_MIXUNIT_DATA({'project':this.$route.params.project})
-        this.GET_SEARCH_DATA()
+        this.GET_SEARCH_DATA(this.$route.params.project)
+        this.SET_OPRATE_MODE('mixunit')
     }
 }
 </script>

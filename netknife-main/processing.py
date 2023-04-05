@@ -80,25 +80,31 @@ class AppProcessing():
     def processing_effect_command(self,command_data):
         input_data = command_data['command']
         where_dict={}
-        where_pattern = r"(?<=where\s)(.*?)(?=\sset|\sselect|\saction|\supload|\sdownload|$)"
-        where_match = re.search(where_pattern,input_data)
-        if where_match:
-            where_key_value_list=where_match.group(1).split(',')
-            for item in where_key_value_list:
-                if item !='':
-                    _kv=item.split('=')
-                    if _kv[0]=='project':continue
-                    if len(_kv)<=1:continue
-                    if _kv[0]=='ip':
-                        where_dict['ip_expression']=_kv[1]
-                    else:
-                        where_dict[_kv[0]]=_kv[1]
-           
-            where_dict['project']=command_data['base_effect_range']
+        if command_data['mode'] =='project':
+            where_pattern = r"(?<=where\s)(.*?)(?=\sset|\sselect|\saction|\supload|\sdownload|$)"
+            where_match = re.search(where_pattern,input_data)
+            if where_match:
+                where_key_value_list=where_match.group(1).split(',')
+                for item in where_key_value_list:
+                    if item !='':
+                        _kv=item.split('=')
+                        if _kv[0]=='project':continue
+                        if len(_kv)<=1:continue
+                        if _kv[0]=='ip':
+                            where_dict['ip_expression']=_kv[1]
+                        else:
+                            where_dict[_kv[0]]=_kv[1]
+            
+                where_dict['project']=command_data['base_effect_range']
+            else:
+                where_dict['project']=command_data['base_effect_range']  
         else:
-            # 第99行报错
-            where_dict['project']=command_data['base_effect_range']
-                    
+            where_dict['project']=command_data['base_effect_range']    
+            where_dict['area']=command_data['extra_effect_range'][3]
+            where_dict['protocol']=command_data['extra_effect_range'][4]
+            where_dict['port']=command_data['extra_effect_range'][5]
+            where_dict['ip_expression']=command_data['extra_effect_range'][9]     
+
         result={}
         _full_connect_lis=[]
         _effect_connect_lis=[]
@@ -113,28 +119,36 @@ class AppProcessing():
     def processing_effect_login_data(self,command_data):
         input_data = command_data['command']
         where_dict={}
-        where_pattern = r"(?<=where\s)(.*?)(?=\sset|\sselect|\saction|\supload|\sdownload|$)"
-        where_match = re.search(where_pattern,input_data)
-        if where_match:
-            where_key_value_list=where_match.group(1).split(',')
-            for item in where_key_value_list:
-                if item !='':
-                    _kv=item.split('=')
-                    if _kv[0]=='project':continue
-                    if len(_kv)<=1:continue
-                    if _kv[0]=='ip':
-                        where_dict['ip_expression']=_kv[1]
-                    else:
-                        where_dict[_kv[0]]=_kv[1]
-           
-            where_dict['project']=command_data['base_effect_range']
-            # print(where_dict)
-            return self.__storage.get_full_login_list(where_dict)
+        if command_data['mode']=='project':
+            where_pattern = r"(?<=where\s)(.*?)(?=\sset|\sselect|\saction|\supload|\sdownload|$)"
+            where_match = re.search(where_pattern,input_data)
+            if where_match:
+                where_key_value_list=where_match.group(1).split(',')
+                for item in where_key_value_list:
+                    if item !='':
+                        _kv=item.split('=')
+                        if _kv[0]=='project':continue
+                        if len(_kv)<=1:continue
+                        if _kv[0]=='ip':
+                            where_dict['ip_expression']=_kv[1]
+                        else:
+                            where_dict[_kv[0]]=_kv[1]
+            
+                where_dict['project']=command_data['base_effect_range']
+                # print(where_dict)
+                return self.__storage.get_full_login_list(where_dict)
+            else:
+                where_dict['project']=command_data['base_effect_range']
+                # print(where_dict)
+                return self.__storage.get_full_login_list(where_dict)
         else:
             where_dict['project']=command_data['base_effect_range']
-            # print(where_dict)
+            where_dict['area']=command_data['mixunit'][3]
+            where_dict['protocol']=command_data['mixunit'][4]
+            where_dict['port']=command_data['mixunit'][5]
+            where_dict['ip_expression']=command_data['mixunit'][9]
             return self.__storage.get_full_login_list(where_dict)
-                     
+        
     def processing_command_data(self,command_data):
 
         input_data = command_data['command']

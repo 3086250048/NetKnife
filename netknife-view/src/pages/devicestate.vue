@@ -49,12 +49,14 @@ export default{
                                             CHOOSE_CHANGE:'CHOOSE_CHANGE',
                                             ROLLBACK_SELECT_PROJECT_UNIT_LIST:'ROLLBACK_SELECT_PROJECT_UNIT_LIST',
                                             SET_PROJECT_VIEW_ABLE:'SET_PROJECT_VIEW_ABLE'}),
-        ...mapMutations('projectoprateAbout',{SET_CHOOSE_PROJECT:'SET_CHOOSE_PROJECT'}),
+        ...mapMutations('projectoprateAbout',{SET_CHOOSE_PROJECT:'SET_CHOOSE_PROJECT',
+                                                SET_OPRATE_MODE:'SET_OPRATE_MODE'}),
         ...mapMutations('mixunitpageAbout',{SET_MIXUNIT_VIEW_ABLE:'SET_MIXUNIT_VIEW_ABLE'}),
       
         show_mix_unit_page(project){
             this.SET_PROJECT_VIEW_ABLE(false)
             this.SET_MIXUNIT_VIEW_ABLE(true)
+            this.SET_OPRATE_MODE('mixunit')
             this.$router.push({
                 name:'mixunit',
                 params:{
@@ -118,6 +120,7 @@ export default{
     },
     mounted(){        
         this.GET_PROJECT_UNIT_LIST()
+        
     }
 }
 

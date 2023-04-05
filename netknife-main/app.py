@@ -220,9 +220,9 @@ def update_parameter_database():
 def get_mixunit_data():
     result= storage.get_mixunit_data(json.loads(request.get_data(as_text=True)))
     return result
-@netknife.route('/get_search_data')
+@netknife.route('/get_search_data',methods=['POST'])
 def get_search_data():
-    result=storage.get_search_data()
+    result=storage.get_search_data(json.loads(request.get_data(as_text=True)))
     return result
 
 
