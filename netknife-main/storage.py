@@ -16,7 +16,7 @@ class AppStorage():
         self.__add_sendcommand_parameter_info_sql='''INSERT INTO SENDCOMMAND_PARAMETER (ID,PROJECT,AREA,DEVICE_TITLE_ABLE,COMMAND_ABLE,READ_TIMEOUT)
                             VALUES (?,?,?,?,?,?);'''
         self.__get_project_list_sql='''SELECT PROJECT FROM LOGININFO GROUP BY PROJECT ;'''
-      
+        self.__add_suid_sql='''INSERT INTO SUID (FIRST_SUID) VALUES (?);'''
         #初始化创建数据库和表
         if not os.path.exists(self.__path):
             try:
@@ -63,6 +63,10 @@ class AppStorage():
                 );'''
                 )
                 print('SENDCOMMAND_PARAMETER')
+                cur.execute(
+                    '''CREATE TABLE SUID (FIRST_SUID   TEXT    PRIMARY KEY NOT NULL);'''
+                )
+               
                 uid =str(uuid.uuid4())
                 suid=''.join(uid.split('-'))
                 cur.execute(self.__add_login_info_sql,[suid]*10)
@@ -71,6 +75,7 @@ class AppStorage():
                 print('INSERT-2')
                 cur.execute(self.__add_sendcommand_parameter_info_sql,[suid]*6)
                 print('INSERT-3')
+                cur.execute(self.__add_suid_sql,[suid])
                 con.commit()
             except sqlite3.Error as e:
                 print(e)
@@ -227,7 +232,10 @@ class AppStorage():
     def get_project_unit_list(self) -> list:
         def callback(cur,con):
             return cur.fetchall()
-        project_list=[ v[0] for v in self.oprate_sql(self.__get_project_list_sql,{},callback)][1:]
+        ['ensp', 'fb5377e75c6e48f0aef672a8c9c9a008']
+        project_list=[ v[0] for v in self.oprate_sql(self.__get_project_list_sql,{},callback)]
+        first_suid=self.oprate_sql('SELECT * FROM SUID',{},callback)[0][0]
+        project_list.remove(first_suid)
         project_sql_gen=AppStorage.dynamic_sql_yield('select project,area,protocol,port,ip_expression from logininfo','where','project',project_list)
         lis=[]
         for _ in range(len(project_list)):

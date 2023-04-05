@@ -13,11 +13,20 @@
         <el-main v-if="project_view_able">
             <ul>
                 <li  v-for="(project,i) in select_project_unit_list " :key="i" > 
-                    <el-card class="box-card  head_card " >
+                    <el-card class="box-card  head_card ">
                         <div style="margin-top: -10px;">
                             {{  project[0].length>39 ? project[0].slice(0,39):project[0] }}
-                                <el-button type="primary" class="head_button" @click="show_mix_unit_page(project[0]),set_choose_project(project)">显示最小操作单元</el-button>
-                                <el-button type="primary" class="head_button" @click="show_oprate_page(),set_choose_project(project)">操作</el-button>
+                            <el-button type="primary" class="head_button" @click="show_mix_unit_page(project[0]),set_choose_project(project)">显示最小操作单元</el-button>
+                            <el-button type="primary" class="head_button" @click="show_oprate_page(),set_choose_project(project)">操作</el-button>
+                            <el-badge :value="1" :max="999" class="warning" type="warning">
+                                <el-button size="small">检测失败</el-button>
+                            </el-badge>
+                            <el-badge :value="10" :max="999" class="error" >
+                                <el-button size="small">检测异常</el-button>
+                            </el-badge>
+                            <el-badge :value="100" :max="999" class="success" type="primary">
+                                <el-button size="small">检测正常</el-button>
+                            </el-badge>
                         </div>
                     </el-card>   
                     <el-card class="box-card" >
@@ -144,5 +153,22 @@ li:not(:first-child){
 }
 .el_container{
     height:"490px"
+}
+
+.success{
+    float: right;
+    margin-top: 5px;
+    margin-right: 34px;
+}
+.error{
+    float: right;
+    margin-top: 5px;
+    margin-right: 34px;
+}
+
+.warning{
+    float: right;
+    margin-top: 5px;
+    margin-right: 28px;
 }
 </style>

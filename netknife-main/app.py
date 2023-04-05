@@ -116,7 +116,7 @@ def get_project_unit_data():
 # [ {'value':默认项目},{'value':默认项目2}]
 #不需要传入数据
 @netknife.route('/get_all_project_data',methods=['POST'])
-def get_all_project_data():
+def get_all_project_data(): 
     return storage.get_all_project_list()
 
 
