@@ -58,16 +58,22 @@ export const devicedeleteAbout={
                         });
                         state.diff_list.forEach(e=>{
                             send_post('/delete_filepath_parameter',{'project':e[0],'area':e[1]},response=>{
-                                send_post('/get_filepath_parameter',{'project':e[0]},response=>{
+                                send_post('/get_filepath_parameter',{'project':e[0],'mode':'project'},response=>{
+                                    console.log(response.data)
                                         if(response.data.length==1){
-                                            send_post('/delete_filepath_parameter',{'project':e[0]})
+                                            console.log('删除None项目')
+                                            send_post('/delete_filepath_parameter',{
+                                                'project':e[0],
+                                            })
                                         }
                                 })
                             })
                             send_post('/delete_sendcommand_parameter',{'project':e[0],'area':e[1]},response=>{
-                                send_post('/get_sendcommand_parameter',{'project':e[0]},response=>{
+                                send_post('/get_sendcommand_parameter',{'project':e[0],'mode':'project'},response=>{
                                     if(response.data.length==1){
-                                        send_post('/delete_sendcommand_parameter',{'project':e[0]})
+                                        send_post('/delete_sendcommand_parameter',{
+                                            'project':e[0],
+                                        })
                                     }  
                                 })
                             })

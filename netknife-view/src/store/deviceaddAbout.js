@@ -34,7 +34,8 @@ export const deviceaddAbout={
             console.log('FILEPATH被触发')
             send_post('/get_filepath_parameter',
             {
-                'project':state.device_info.project
+                'project':state.device_info.project,
+                'mode':'project'
             },response=>{
                 console.log(response)
                 if(response.data==='None'){
@@ -71,7 +72,8 @@ export const deviceaddAbout={
         ADD_SEND_COMMAND_PARAMETER(state){
             console.log('SENDCOMMAND被触发')
             send_post('/get_sendcommand_parameter',{
-                'project':state.device_info.project
+                'project':state.device_info.project,
+                'mode':'project'
             },response=>{
                 console.log(response)
                 if(response.data==='None'){
