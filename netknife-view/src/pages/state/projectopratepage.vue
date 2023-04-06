@@ -6,7 +6,7 @@
                 <div class="el_header-div-div" >
                     <h1  class="el_header-div-div-h1">
                         <!-- 当前所在项目:{{ choose_project[0].slice(0,22) }} -->
-                        {{ base_title }}
+                        {{ base_title }} {{ command_index }}
                     </h1>
                 </div>
             </div>
@@ -16,6 +16,8 @@
              @keyup.enter.native="commit_command"  @input="set_effect" >
             <template slot="prepend">CLI</template>
             </el-input><br>
+            
+            <!-- 影响链接百分比的进度条 -->
             <div class="el_main-div">
                 <span>影响连接百分比</span>
                 <el-progress class="el_main-div-el_progress" :percentage="effect_connect_percent"></el-progress>
@@ -24,7 +26,7 @@
                 <span>设备执行进度</span>
                 <el-progress class="el_main--div-el_progress" :percentage="response_percent"></el-progress>
             </div> -->
-            
+            <!-- 文字按钮 -->
             <el-button style="position:absolute;top:144px" type="text" @click="send_dialog_able = true">设置发送命令参数</el-button>
             <el-dialog title="设置发送命令参数" :visible.sync="send_dialog_able" width="700px" >
                 <el-form :model="send_parameter">
@@ -48,8 +50,8 @@
                     <el-button @click="sendcommand_handler_cancel">取 消</el-button>
                     <el-button type="primary" @click="sendcommand_handler_commit">确 定</el-button>
                 </div>
-            </el-dialog>    
-
+            </el-dialog> 
+            <!--文字按钮  -->
             <el-button style="position:absolute;top:144px;left: 250px;" type="text" @click="path_dialog_able= true">设置文件路径参数</el-button>
             <el-dialog title="设置文件路径参数" :visible.sync="path_dialog_able" width="700px" >
                 <el-form :model="path_parameter">
@@ -78,8 +80,8 @@
                     <el-button @click="filepath_handler_cancel">取 消</el-button>
                     <el-button type="primary" @click="filepath_handler_commit">确 定</el-button>
                 </div>
-            </el-dialog>    
-
+            </el-dialog>
+            <!--输出框  -->
             <el-input
             type="textarea"
             :rows="15"
@@ -88,11 +90,20 @@
             class="el_main--el_input"
             >
             </el-input>
+            <!-- 加载动画 -->
             <div class="el_main-loading_div" element-loading-text="等待响应中...." v-loading="loading_able"></div>
+            <!-- 历史命令按钮 -->
+            <el-button-group class="el_main-el_button_group">
+            <el-button type="primary" icon="el-icon-arrow-left" size="mini" @click="rollback_command" >上一条命令</el-button>
+            <el-button type="primary" size="mini" @click="next_command">下一条命令<i class="el-icon-arrow-right el-icon--right"></i></el-button>
+            <el-button type="primary" icon="el-icon-delete" size="mini"></el-button>
+            <el-button type="primary" icon="el-icon-search" size="mini"></el-button>
+            </el-button-group>
+            <!-- 输出选择列表框 -->
             <ul class="el_main-ul">
                 <el-checkbox-group v-model="check_list" >
                     <li  v-for="item,index in response_data_list" :key="index" class="el_main-ul-li">
-                        <el-checkbox :label="item.type+item.ip+':'+item.port" class="el_main-ul-li-el_checkbox" :border="true">
+                        <el-checkbox :checked="true" :label="item.type+item.ip+':'+item.port" class="el_main-ul-li-el_checkbox" :border="true">
                         {{ item.type }} {{item.ip}} {{ item.port }}
                         </el-checkbox>
                     </li>
@@ -125,8 +136,8 @@ export default {
                 ftp_root_path:'',
                 ftp_upload_path:'',
                 ftp_download_path:''
-            }
-            ,
+            },
+
      
         }
     },
@@ -137,7 +148,11 @@ export default {
                                                 SET_TEXT_AREA:'SET_TEXT_AREA',
                                                 SET_GO_BACK_STATE:'SET_GO_BACK_STATE',
                                                 SET_CHOOSE_MIXUNIT:'SET_CHOOSE_MIXUNIT',
-                                                set_CHOOSE_PROJECT:'SET_CHOOSE_PROJECT'}),
+                                                SET_CHOOSE_PROJECT:'SET_CHOOSE_PROJECT',
+                                                ROLLBACK_COMMAND:'ROLLBACK_COMMAND',
+                                                NEXT_COMMAND:'NEXT_COMMAND',
+                                                SET_COMMAND_INDEX:'SET_COMMAND_INDEX',
+                                                SET_HISTORY_COMMAND_COUNT:'SET_HISTORY_COMMAND_COUNT'}),
         ...mapMutations('mixunitpageAbout',{SET_MIXUNIT_VIEW_ABLE:'SET_MIXUNIT_VIEW_ABLE'}),
         goBack(){
             if(this.choose_mixunit.length>0){
@@ -214,8 +229,18 @@ export default {
             },response=>{
                 console.log(response.data)
             },reason=>{})
+        },
+        rollback_command(){
+            if(this.command_index>=this.history_command_count-1)return
+            this.check_list=[]
+            this.ROLLBACK_COMMAND()
+            console.log(this.command_index)
+        },
+        next_command(){
+            this.check_list=[]
+            this.NEXT_COMMAND()
+            console.log(this.command_index)
         }
-       
     },
     computed:{
         able(){
@@ -258,12 +283,24 @@ export default {
         },
         oprate_mode(){
             return this.$store.state.projectoprateAbout.oprate_mode
+        },
+        command_index(){
+            return this.$store.state.projectoprateAbout.command_index
+        },
+        history_command(){
+            return this.$store.state.projectoprateAbout.history_command
+        },
+        history_command_count(){
+            return this.$store.state.projectoprateAbout.history_command_count
         }
+   
+
     },
     beforeDestroy(){
         send_get('/stop_ftp_serve')
         this.SET_CHOOSE_MIXUNIT([])
-        this.SET_GO_BACK_STATE()        
+        this.SET_GO_BACK_STATE()
+        this.SET_COMMAND_INDEX(-1)        
     },
     watch:{
         check_list(new_value){
@@ -306,7 +343,10 @@ export default {
                 },reason=>{})
             }
         },
-     
+        history_command(new_value){
+            this.command=new_value
+          
+        }
     },
     mounted(){
         this.set_effect()
@@ -341,6 +381,7 @@ export default {
             }
             this.send_parameter.read_timeout=response.data[0][2]
         },reason=>{})
+        this.SET_HISTORY_COMMAND_COUNT()
     },
 
 }
@@ -379,6 +420,7 @@ export default {
     }
 
     .el_main-div{
+        position: absolute;
         margin-top: -5px;
         margin-left: 320px;
     }
@@ -392,14 +434,15 @@ export default {
         margin-left: 330px;
         margin-top: -20px;
     }
-    .el_main--div-el_progress{
+    /* .el_main--div-el_progress{
         width: 200px;
         margin-left: 110px;
         margin-top: -20px; 
        
-    }
+    } */
     .el_main--el_input{
-        margin-top: 10px;
+        position: absolute;
+        margin-top: 22px;
         font-size: larger;
         width: 650px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
@@ -422,8 +465,15 @@ export default {
         width: 300px;
     }
     .el_main-loading_div{
-        position: relative;
-        left: 330px;
-        top:-220px
+        position: absolute;
+        left: 840px;
+        top:320px;
+        width:200px
     }
+    .el_main-el_button_group{
+        position: absolute;
+        top: 150px;
+        left: 789px;
+    }
+   
 </style>

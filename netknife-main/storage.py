@@ -1,5 +1,6 @@
 import sqlite3,os,uuid
 from processing import StorageProcessing
+import json
 sp=StorageProcessing()
 
 class AppStorage():
@@ -17,6 +18,7 @@ class AppStorage():
                             VALUES (?,?,?,?,?,?);'''
         self.__get_project_list_sql='''SELECT PROJECT FROM LOGININFO GROUP BY PROJECT ;'''
         self.__add_suid_sql='''INSERT INTO SUID (FIRST_SUID) VALUES (?);'''
+        self.__add_command_history_sql='''INSERT INTO COMMAND_HISTORY (ID,PROJECT,AREA,COMMAND,COMMAND_RESPONSE,DATE_TIME) VALUES (?,?,?,?,?,?);'''
         #初始化创建数据库和表
         if not os.path.exists(self.__path):
             try:
@@ -64,9 +66,19 @@ class AppStorage():
                 )
                 print('SENDCOMMAND_PARAMETER')
                 cur.execute(
+                    '''CREATE TABLE COMMAND_HISTORY (
+                ID             TEXT     PRIMARY KEY NOT NULL,
+                PROJECT        TEXT     NOT NULL,
+                AREA           TEXT     NOT NULL,
+                COMMAND        TEXT     NOT NULL,
+                COMMAND_RESPONSE TEXT   NOT NULL,
+                DATE_TIME   TEXT    NOT NULL);'''
+                )
+                print('COMMAND_HISTORY')
+                cur.execute(
                     '''CREATE TABLE SUID (FIRST_SUID   TEXT    PRIMARY KEY NOT NULL);'''
                 )
-               
+                print('SUID')
                 uid =str(uuid.uuid4())
                 suid=''.join(uid.split('-'))
                 cur.execute(self.__add_login_info_sql,[suid]*10)
@@ -75,7 +87,10 @@ class AppStorage():
                 print('INSERT-2')
                 cur.execute(self.__add_sendcommand_parameter_info_sql,[suid]*6)
                 print('INSERT-3')
+                cur.execute(self.__add_command_history_sql,[suid]*6)
+                print('INSERT-4')
                 cur.execute(self.__add_suid_sql,[suid])
+                print('INSERT-5')
                 con.commit()
             except sqlite3.Error as e:
                 print(e)
@@ -415,6 +430,7 @@ class AppStorage():
         delete_sql=AppStorage.dynamic_sql_return('DELETE FROM FILEPATH','WHERE','AND',where_dict)
         return self.oprate_sql(delete_sql,where_dict,callback)
 
+    # 参数数据库
     def update_parameter_database(self,dict):
         try:
             before_list=dict['before']
@@ -513,7 +529,7 @@ class AppStorage():
             return 'True'
         except Exception as e:
             return str(e)
-    
+    #mixunitpage的搜索数据
     def get_mixunit_data(self,where_dict):
         def callback(cur,con):
             return cur.fetchall()
@@ -549,7 +565,186 @@ class AppStorage():
         search_item_list=[{'value':v} for v in list(set(search_data_list)) if v !='特权密码:']
         return search_item_list
     
+    #历史命令数据库相关
+    def get_command_history(self,where_dict):
+        def callback(cur,con):
+            return cur.fetchall()
+        _where_dict={}
+        if where_dict['mode']=='project':   
+            _where_dict['area']='None'
+        else:
+            _where_dict['area']=where_dict['area']
+        _where_dict['project']=where_dict['project']
+        select_sql=AppStorage.dynamic_sql_return('SELECT * FROM COMMAND_HISTORY','WHERE','AND',_where_dict)
+        limit_sql=f" ORDER BY DATE_TIME DESC limit {where_dict['index']},1" 
+        full_sql=select_sql+limit_sql
+        result=self.oprate_sql(full_sql,{},callback)
+        print(result)
+        command_history_dict={}
+        command_history_dict['command']=result[0][3]
+        command_history_dict['response']=json.loads(result[0][4])
+        command_history_dict['date_time']=result[0][5]
+        print(command_history_dict['date_time'])
+        return command_history_dict
+    def add_command_history(self,command_history_dict):
+        print(command_history_dict)
+       
+        _command_history_dict={}
+        _command_history_dict['project']=command_history_dict['project']
+        if command_history_dict['mode']=='project':   
+            _command_history_dict['area']='None'
+        else:
+            _command_history_dict['area']=command_history_dict['area']
+        _command_history_dict['command']=command_history_dict['command']
+        _command_history_dict['command_response']=json.dumps(command_history_dict['response'], ensure_ascii=False, indent=2)
+        _command_history_dict['date_time']=command_history_dict['date_time']
+        
+           
+        uid =str(uuid.uuid4())
+        suid=''.join(uid.split('-'))
+        add_parameter_list=list(_command_history_dict.values())
+        add_parameter_list.insert(0,suid)
+        print(add_parameter_list)
+        def callback(cur,con):
+            con.commit()
+            return True
+        return self.oprate_sql(self.__add_command_history_sql,add_parameter_list,callback)
     
+    def del_command_history(self,where_dict):
+        def callback(cur,con):
+            con.commit()
+            return True
+        delete_sql=AppStorage.dynamic_sql_return('DELETE FROM COMMAND_HISTORY','WHERE','AND',where_dict)
+        return self.oprate_sql(delete_sql,where_dict,callback)
+
+    def update_command_history(self,data_dict):
+        def callback(cur,con):
+            con.commit()
+            return True
+        _where_dict={}
+        if data_dict['where']['mode']=='project':
+            _where_dict['area']='None'
+            _where_dict['project']=data_dict['where']['project']
+        else:
+            _where_dict['area']=data_dict['where']['area']
+            _where_dict['project']=data_dict['where']['project']
+        where_sql=AppStorage.dynamic_sql_return('','where','and',_where_dict)
+        update_sql=AppStorage.dynamic_sql_return('update filepath','set',',',data_dict['update'])
+        sql=update_sql+where_sql
+        return self.oprate_sql(sql,{},callback)
+    
+    def update_command_history_database(self,dict):
+        try:
+            before_list=dict['before']
+            after_list=dict['after']
+            project_after_list = [ v[1] for v in after_list]
+            project_area_after_list = [v[1:] for v in after_list]
+            project_before_list=[ v[1] for v in before_list]
+            update_base_area_list=[]
+            add_base_area_list=[]
+            add_base_area_file_parameter_list=[]
+            add_base_area_send_parameter_list=[]
+            for i in before_list:
+                for j in after_list:
+                    if i[0]==j[0] and i[1:]!=j[1:]:
+                        if i[1:] not in project_area_after_list:
+                            update_base_area_list.append([i[1:],j[1:]])
+                        else:
+                            add_base_area_list.append(j[1:])
+                            add_base_area_file_parameter_list.append(self.get_filepath_parameter_value({
+                                'project':i[1],
+                                'area':i[2]
+                                }))
+                            add_base_area_send_parameter_list.append(self.get_sendcommand_parameter_value
+                            ({
+                                'project':i[1],
+                                'area':i[2]
+                                }))
+            delete_base_area_list=[ v[1:]  for v in before_list if v[1:] not in project_area_after_list]
+            delete_none_area_list=[ [v[1],'None'] for v in before_list if v[1] not in project_after_list ]
+            # 待增加add是原有项目的数据
+            add_none_area_list=[ [v[1],'None'] for v in after_list if v[1] not in project_before_list ]
+            for e in update_base_area_list:
+                self.change_filepath_parameter(
+                    {
+                        'where':{
+                            'project':e[0][0],
+                            'area':e[0][1]
+                        },
+                        'update':{
+                            'project':e[1][0],
+                            'area':e[1][1]
+                        }
+                    }
+                )
+                self.change_sendcommand_parameter(
+                        {
+                        'where':{
+                            'project':e[0][0],
+                            'area':e[0][1]
+                        },
+                        'update':{
+                            'project':e[1][0],
+                            'area':e[1][1]
+                        }
+                    }
+                )
+            for e in delete_base_area_list:
+                self.delete_filepath_parameter({'project':e[0],'area':e[1]})
+                self.delete_sendcommand_parameter({'project':e[0],'area':e[1]})
+            for e in delete_none_area_list:
+                self.delete_filepath_parameter({'project':e[0],'area':'None'})
+                self.delete_sendcommand_parameter({'project':e[0],'area':'None'})
+            for i,e in enumerate(add_base_area_list):
+                self.add_filepath_parameter({
+                    'project':e[0],
+                    'area':e[1],
+                    'txt_export_path':add_base_area_file_parameter_list[i][0][0],
+                    'ftp_root_path':add_base_area_file_parameter_list[i][0][1],
+                    'ftp_upload_path':add_base_area_file_parameter_list[i][0][2],
+                    'ftp_download_path:':add_base_area_file_parameter_list[i][0][3],
+                })
+                self.add_sendcommand_parameter({
+                    'project':e[0],
+                    'area':e[1],
+                    'device_title_able':add_base_area_send_parameter_list[i][0][0],
+                    'command_able': add_base_area_send_parameter_list[i][0][1],
+                    'read_timeout': add_base_area_send_parameter_list[i][0][2],
+                })
+            for e in add_none_area_list:
+                self.add_filepath_parameter({
+                    'project':e[0],
+                    'area':e[1],
+                    'txt_export_path':'default',
+                    'ftp_root_path':'default',
+                    'ftp_upload_path':'default',
+                    'ftp_download_path:':'default',
+                })
+                self.add_sendcommand_parameter({
+                    'project':e[0],
+                    'area':e[1],
+                    'device_title_able':'False',
+                    'command_able':'False',
+                    'read_timeout':10  
+                })
+            
+            return 'True'
+        except Exception as e:
+            return str(e)
+    #获取历史命令总条数
+    def get_command_history_count(self,where_dict):
+        def callback(cur,con):
+            return cur.fetchall()
+        _where_dict={}
+        if where_dict['mode']=='project':   
+            _where_dict['area']='None'
+        else:
+            _where_dict['area']=where_dict['area']
+        _where_dict['project']=where_dict['project']
+        sql=AppStorage.dynamic_sql_return('SELECT COUNT(*) FROM COMMAND_HISTORY','WHERE','AND',_where_dict)
+        result=self.oprate_sql(sql,{},callback)
+        return str(result[0][0])
+
 if __name__ == '__main__':
     ap=AppStorage()
     # s1.add_login_info()

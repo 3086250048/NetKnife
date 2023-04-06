@@ -36,6 +36,27 @@ export const  projectoprateAbout={
                 state.response_data_list=[]
                 state.response_data_list=response.data
                 state.response_date_time=get_time()
+                console.log('发送add_command_history')
+                send_post('/add_command_history',{
+                    'project':state.choose_project[0],
+                    'area':state.choose_mixunit[3],
+                    'mode':state.oprate_mode,
+                    'command':payload.command,
+                    'response':state.response_data_list,
+                    'date_time':state.response_date_time
+                },response=>{
+                    console.log(response)
+                    send_post('/get_command_history_count',{
+                        'project':state.choose_project[0],
+                        'area':state.choose_mixunit[3],
+                        'mode':state.oprate_mode,
+                    },response=>{
+                        state.history_command_count=response.data
+                    })
+                },reason=>{
+                    console.log(reason)
+                })
+                console.log("已经发送")
             },reason=>{
                 state=false
             
@@ -84,6 +105,60 @@ export const  projectoprateAbout={
         },
         SET_OPRATE_MODE(state,mode){
             state.oprate_mode=mode
+        },
+        ROLLBACK_COMMAND(state){
+            console.log(state.command_index.history_command_count)
+            console.log('发送了')
+            state.command_index+=1
+            state.response_data_list=[]
+            state.textarea=''
+            state.history_command=''
+            send_post('/get_command_history',{
+                'mode':state.oprate_mode,
+                'project':state.choose_project[0],
+                'area':state.choose_mixunit[3],
+                'index':state.command_index
+            },response=>{
+                state.loading_able=false
+                state.response_data_list=response.data['response']
+                state.response_date_time=response.data['date_time']
+                state.history_command=response.data['command']
+            })
+            
+        },
+        NEXT_COMMAND(state){
+            if(state.command_index>=1){
+                state.command_index-=1
+            }
+            if(state.command_index<0)return
+            state.response_data_list=[]
+            state.textarea=''
+            state.history_command=''
+            send_post('/get_command_history',{
+                'mode':state.oprate_mode,
+                'project':state.choose_project[0],
+                'area':state.choose_mixunit[3],
+                'index':state.command_index
+            },response=>{
+                state.loading_able=false
+                state.response_data_list=response.data['response']
+                state.response_date_time=response.data['date_time']
+                state.history_command=response.data['command']
+            })
+         
+        },
+        SET_COMMAND_INDEX(state,index){
+            state.command_index=index
+        },
+        SET_HISTORY_COMMAND_COUNT(state){
+            send_post('/get_command_history_count',{
+                'project':state.choose_project[0],
+                'area':state.choose_mixunit[3],
+                'mode':state.oprate_mode,
+            },response=>{
+                console.log(response.data)
+                state.history_command_count=response.data
+            })
         }
     },
     state:{
@@ -94,6 +169,9 @@ export const  projectoprateAbout={
         response_data_list:[],
         response_date_time:'',
         loading_able:false,
-        oprate_mode:'project'
+        oprate_mode:'project',
+        command_index:-1,
+        history_command:'',
+        history_command_count:0
     }
 }

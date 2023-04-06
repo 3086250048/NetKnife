@@ -112,8 +112,7 @@ class AppProcessing():
             _full_connect_lis+=list(self.processing_check_ip(i))
         for i in self.__storage.get_effect_ip_expression_list(where_dict):
             _effect_connect_lis+=list(self.processing_check_ip(i))
-  
-        result['effect_connect_percent']=int(len(_effect_connect_lis)/len(_full_connect_lis)*100)
+        result['effect_connect_percent']=round(len(_effect_connect_lis)/len(_full_connect_lis)*100,1)
         return result
 
     def processing_effect_login_data(self,command_data):

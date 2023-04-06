@@ -224,7 +224,20 @@ def get_mixunit_data():
 def get_search_data():
     result=storage.get_search_data(json.loads(request.get_data(as_text=True)))
     return result
-
-
+@netknife.route('/add_command_history',methods=['POST'])
+def add_command_history():
+    result=storage.add_command_history(json.loads(request.get_data(as_text=True)))
+    if result:
+        return 'ADD_SUCCESS'
+    else:
+        return 'ADD_FAULT'
+@netknife.route('/get_command_history',methods=['POST'])
+def get_command_history():
+    result=storage.get_command_history(json.loads(request.get_data(as_text=True)))
+    return result
+@netknife.route('/get_command_history_count',methods=['POST'])
+def get_command_history_count():
+    result=storage.get_command_history_count(json.loads(request.get_data(as_text=True)))
+    return result
 if __name__ == '__main__':
     netknife.run('0.0.0.0',port=3000,debug=True)
