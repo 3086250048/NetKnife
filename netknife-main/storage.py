@@ -456,9 +456,13 @@ class AppStorage():
             project_area_after_list = [v[1:] for v in after_list]
             project_before_list=[ v[1] for v in before_list]
             update_base_area_list=[]
+
             add_base_area_list=[]
             add_base_area_file_parameter_list=[]
             add_base_area_send_parameter_list=[]
+
+            add_none_area_list=[]
+
             for i in before_list:
                 for j in after_list:
                     if i[0]==j[0] and i[1:]!=j[1:]:
@@ -468,23 +472,36 @@ class AppStorage():
                             add_base_area_list.append(j[1:])
                             add_base_area_file_parameter_list.append(self.get_filepath_parameter_value({
                                 'project':i[1],
-                                'area':i[2]
+                                'area':i[2],
                                 }))
                             add_base_area_send_parameter_list.append(self.get_sendcommand_parameter_value
                             ({
                                 'project':i[1],
-                                'area':i[2]
+                                'area':i[2],
                                 }))
+                        if j[1] not in project_before_list:
+                            add_none_area_list.append([j[1],'None'])
+                            add_none_area_file_parameter_list=self.get_filepath_parameter({
+                                'project':i[1],
+                                'area':i[2],
+                                'mode':'project'
+                            })
+                            add_none_area_send_parameter_list=self.get_sendcommand_parameter({
+                                'project':i[1],
+                                'area':i[2],
+                                'mode':'project'
+                            })
             delete_base_area_list=[ v[1:]  for v in before_list if v[1:] not in project_area_after_list]
             delete_none_area_list=[ [v[1],'None'] for v in before_list if v[1] not in project_after_list ]
             # 待增加add是原有项目的数据
-            add_none_area_list=[ [v[1],'None'] for v in after_list if v[1] not in project_before_list ]
+            # add_none_area_list=[ [v[1],'None'] for v in after_list if v[1] not in project_before_list ]
             for e in update_base_area_list:
                 self.change_filepath_parameter(
                     {
                         'where':{
                             'project':e[0][0],
-                            'area':e[0][1]
+                            'area':e[0][1],
+                            'mode':'area'
                         },
                         'update':{
                             'project':e[1][0],
@@ -496,7 +513,8 @@ class AppStorage():
                      {
                         'where':{
                             'project':e[0][0],
-                            'area':e[0][1]
+                            'area':e[0][1],
+                            'mode':'area'
                         },
                         'update':{
                             'project':e[1][0],
@@ -527,20 +545,25 @@ class AppStorage():
                     'read_timeout': add_base_area_send_parameter_list[i][0][2],
                 })
             for e in add_none_area_list:
+                [('C:\\Users\\30862\\Desktop\\', 'C:\\Users\\30862\\Desktop\\', 'C:\\Users\\30862\\Desktop\\', 'C:\\Users\\30862\\Desktop\\')]
+                [('False', 'False', '10')]
+                print('**********************************************************')
+                print(add_none_area_file_parameter_list)
+                print(add_none_area_send_parameter_list)
                 self.add_filepath_parameter({
                     'project':e[0],
                     'area':e[1],
-                    'txt_export_path':'default',
-                    'ftp_root_path':'default',
-                    'ftp_upload_path':'default',
-                    'ftp_download_path:':'default',
+                    'txt_export_path':add_none_area_file_parameter_list[0][0],
+                    'ftp_root_path':add_none_area_file_parameter_list[0][1],
+                    'ftp_upload_path':add_none_area_file_parameter_list[0][2],
+                    'ftp_download_path:':add_none_area_file_parameter_list[0][3],
                 })
                 self.add_sendcommand_parameter({
                     'project':e[0],
                     'area':e[1],
-                    'device_title_able':'False',
-                    'command_able':'False',
-                    'read_timeout':10  
+                    'device_title_able':add_none_area_send_parameter_list[0][0],
+                    'command_able':add_none_area_send_parameter_list[0][1],
+                    'read_timeout':add_none_area_send_parameter_list[0][2] 
                 })
             
             return 'True'
