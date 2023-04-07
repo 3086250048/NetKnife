@@ -18,7 +18,7 @@ class AppStorage():
                             VALUES (?,?,?,?,?,?);'''
         self.__get_project_list_sql='''SELECT PROJECT FROM LOGININFO GROUP BY PROJECT ;'''
         self.__add_suid_sql='''INSERT INTO SUID (FIRST_SUID) VALUES (?);'''
-        self.__add_command_history_sql='''INSERT INTO COMMAND_HISTORY (ID,PROJECT,AREA,COMMAND,COMMAND_RESPONSE,DATE_TIME) VALUES (?,?,?,?,?,?);'''
+        self.__add_command_history_sql='''INSERT INTO COMMAND_HISTORY (ID,PROJECT,AREA,PROTOCOL,PORT,IP_EXPRESSION,COMMAND,COMMAND_RESPONSE,DATE_TIME) VALUES (?,?,?,?,?,?,?,?,?);'''
         #初始化创建数据库和表
         if not os.path.exists(self.__path):
             try:
@@ -70,6 +70,9 @@ class AppStorage():
                 ID             TEXT     PRIMARY KEY NOT NULL,
                 PROJECT        TEXT     NOT NULL,
                 AREA           TEXT     NOT NULL,
+                PROTOCOL       TEXT     NOT NULL,
+                PORT           TEXT     NOT NULL,
+                IP_EXPRESSION  TEXT     NOT NULL,
                 COMMAND        TEXT     NOT NULL,
                 COMMAND_RESPONSE TEXT   NOT NULL,
                 DATE_TIME   TEXT    NOT NULL);'''
@@ -87,7 +90,7 @@ class AppStorage():
                 print('INSERT-2')
                 cur.execute(self.__add_sendcommand_parameter_info_sql,[suid]*6)
                 print('INSERT-3')
-                cur.execute(self.__add_command_history_sql,[suid]*6)
+                cur.execute(self.__add_command_history_sql,[suid]*9)
                 print('INSERT-4')
                 cur.execute(self.__add_suid_sql,[suid])
                 print('INSERT-5')
@@ -572,18 +575,22 @@ class AppStorage():
         _where_dict={}
         if where_dict['mode']=='project':   
             _where_dict['area']='None'
+            _where_dict['project']=where_dict['project']
         else:
             _where_dict['area']=where_dict['area']
-        _where_dict['project']=where_dict['project']
+            _where_dict['project']=where_dict['project']
+            _where_dict['protocol']=where_dict['protocol']
+            _where_dict['port']=where_dict['port']
+            _where_dict['ip_expression']=where_dict['ip_expression']
         select_sql=AppStorage.dynamic_sql_return('SELECT * FROM COMMAND_HISTORY','WHERE','AND',_where_dict)
         limit_sql=f" ORDER BY DATE_TIME DESC limit {where_dict['index']},1" 
         full_sql=select_sql+limit_sql
         result=self.oprate_sql(full_sql,{},callback)
         print(result)
         command_history_dict={}
-        command_history_dict['command']=result[0][3]
-        command_history_dict['response']=json.loads(result[0][4])
-        command_history_dict['date_time']=result[0][5]
+        command_history_dict['command']=result[0][6]
+        command_history_dict['response']=json.loads(result[0][7])
+        command_history_dict['date_time']=result[0][8]
         print(command_history_dict['date_time'])
         return command_history_dict
     def add_command_history(self,command_history_dict):
@@ -593,11 +600,20 @@ class AppStorage():
         _command_history_dict['project']=command_history_dict['project']
         if command_history_dict['mode']=='project':   
             _command_history_dict['area']='None'
+            _command_history_dict['protocol']='None'
+            _command_history_dict['port']='None'
+            _command_history_dict['ip_expression']='None'
+            _command_history_dict['command']=command_history_dict['command']
+            _command_history_dict['command_response']=json.dumps(command_history_dict['response'], ensure_ascii=False, indent=2)
+            _command_history_dict['date_time']=command_history_dict['date_time']
         else:
             _command_history_dict['area']=command_history_dict['area']
-        _command_history_dict['command']=command_history_dict['command']
-        _command_history_dict['command_response']=json.dumps(command_history_dict['response'], ensure_ascii=False, indent=2)
-        _command_history_dict['date_time']=command_history_dict['date_time']
+            _command_history_dict['protocol']=command_history_dict['protocol']
+            _command_history_dict['port']=command_history_dict['port']
+            _command_history_dict['ip_expression']=command_history_dict['ip_expression']
+            _command_history_dict['command']=command_history_dict['command']
+            _command_history_dict['command_response']=json.dumps(command_history_dict['response'], ensure_ascii=False, indent=2)
+            _command_history_dict['date_time']=command_history_dict['date_time']
         
            
         uid =str(uuid.uuid4())
@@ -737,10 +753,14 @@ class AppStorage():
             return cur.fetchall()
         _where_dict={}
         if where_dict['mode']=='project':   
+            _where_dict['project']=where_dict['project']
             _where_dict['area']='None'
         else:
             _where_dict['area']=where_dict['area']
-        _where_dict['project']=where_dict['project']
+            _where_dict['project']=where_dict['project']
+            _where_dict['protocol']=where_dict['protocol']
+            _where_dict['port']=where_dict['port']
+            _where_dict['ip_expression']=where_dict['ip_expression']
         sql=AppStorage.dynamic_sql_return('SELECT COUNT(*) FROM COMMAND_HISTORY','WHERE','AND',_where_dict)
         result=self.oprate_sql(sql,{},callback)
         return str(result[0][0])

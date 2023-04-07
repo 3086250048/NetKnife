@@ -40,6 +40,9 @@ export const  projectoprateAbout={
                 send_post('/add_command_history',{
                     'project':state.choose_project[0],
                     'area':state.choose_mixunit[3],
+                    'protocol':state.choose_mixunit[4],
+                    'port':state.choose_mixunit[5],
+                    'ip_expression':state.choose_mixunit[9],
                     'mode':state.oprate_mode,
                     'command':payload.command,
                     'response':state.response_data_list,
@@ -49,6 +52,9 @@ export const  projectoprateAbout={
                     send_post('/get_command_history_count',{
                         'project':state.choose_project[0],
                         'area':state.choose_mixunit[3],
+                        'protocol':state.choose_mixunit[4],
+                        'port':state.choose_mixunit[5],
+                        'ip_expression':state.choose_mixunit[9],
                         'mode':state.oprate_mode,
                     },response=>{
                         state.history_command_count=response.data
@@ -117,7 +123,10 @@ export const  projectoprateAbout={
                 'mode':state.oprate_mode,
                 'project':state.choose_project[0],
                 'area':state.choose_mixunit[3],
-                'index':state.command_index
+                'protocol':state.choose_mixunit[4],
+                'port':state.choose_mixunit[5],
+                'ip_expression':state.choose_mixunit[9],
+                'index':state.command_index,
             },response=>{
                 state.loading_able=false
                 state.response_data_list=response.data['response']
@@ -138,6 +147,9 @@ export const  projectoprateAbout={
                 'mode':state.oprate_mode,
                 'project':state.choose_project[0],
                 'area':state.choose_mixunit[3],
+                'protocol':state.choose_mixunit[4],
+                'port':state.choose_mixunit[5],
+                'ip_expression':state.choose_mixunit[9],
                 'index':state.command_index
             },response=>{
                 state.loading_able=false
@@ -154,6 +166,9 @@ export const  projectoprateAbout={
             send_post('/get_command_history_count',{
                 'project':state.choose_project[0],
                 'area':state.choose_mixunit[3],
+                'protocol':state.choose_mixunit[4],
+                'port':state.choose_mixunit[5],
+                'ip_expression':state.choose_mixunit[9],
                 'mode':state.oprate_mode,
             },response=>{
                 console.log(response.data)

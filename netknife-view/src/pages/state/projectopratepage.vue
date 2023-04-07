@@ -143,16 +143,17 @@ export default {
     },
     methods:{
         ...mapMutations('devicestateAbout',{SET_PROJECT_VIEW_ABLE:'SET_PROJECT_VIEW_ABLE'}),
-        ...mapMutations('projectoprateAbout',{COMMIT_COMMAND:'COMMIT_COMMAND',
-                                                SET_EFFECT:'SET_EFFECT',
-                                                SET_TEXT_AREA:'SET_TEXT_AREA',
-                                                SET_GO_BACK_STATE:'SET_GO_BACK_STATE',
-                                                SET_CHOOSE_MIXUNIT:'SET_CHOOSE_MIXUNIT',
-                                                SET_CHOOSE_PROJECT:'SET_CHOOSE_PROJECT',
-                                                ROLLBACK_COMMAND:'ROLLBACK_COMMAND',
-                                                NEXT_COMMAND:'NEXT_COMMAND',
-                                                SET_COMMAND_INDEX:'SET_COMMAND_INDEX',
-                                                SET_HISTORY_COMMAND_COUNT:'SET_HISTORY_COMMAND_COUNT'}),
+        ...mapMutations('projectoprateAbout',{
+            COMMIT_COMMAND:'COMMIT_COMMAND',
+            SET_EFFECT:'SET_EFFECT',
+            SET_TEXT_AREA:'SET_TEXT_AREA',
+            SET_GO_BACK_STATE:'SET_GO_BACK_STATE',
+            SET_CHOOSE_MIXUNIT:'SET_CHOOSE_MIXUNIT',
+            SET_CHOOSE_PROJECT:'SET_CHOOSE_PROJECT',
+            ROLLBACK_COMMAND:'ROLLBACK_COMMAND',
+            NEXT_COMMAND:'NEXT_COMMAND',
+            SET_COMMAND_INDEX:'SET_COMMAND_INDEX',
+            SET_HISTORY_COMMAND_COUNT:'SET_HISTORY_COMMAND_COUNT'}),
         ...mapMutations('mixunitpageAbout',{SET_MIXUNIT_VIEW_ABLE:'SET_MIXUNIT_VIEW_ABLE'}),
         goBack(){
             if(this.choose_mixunit.length>0){
