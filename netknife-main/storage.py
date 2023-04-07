@@ -158,6 +158,18 @@ class AppStorage():
             if con:
                 con.close()
 
+    #取任意数据库任意字段
+    def get_database_data(self,database_name,field_list,where_dict=[]):
+        def callback(cur,con):
+            return cur.fetchall()
+        field_str=','.join(field_list)
+        if where_dict:
+            where_sql=AppStorage.dynamic_sql_return('','WHERE','AND',where_dict)
+        else:
+            where_sql=''
+        full_sql=f"SELECT {field_str} FROM {database_name} {where_sql}"
+        return self.oprate_sql(full_sql,{},callback)
+
     #向数据库中插入数据
     #返回:布尔值
     #传入:{'projet':'',area:'',protocol:'',port:'',ip_expression:'',username:'',password:'',secret:''} 
@@ -194,11 +206,13 @@ class AppStorage():
                 return True
             return False
         return self.oprate_sql(AppStorage.dynamic_sql_return('SELECT * FROM LOGININFO','WHERE','AND',where_dict),where_dict,callback)
-#给更新 参数数据库用 
+#给更新参数数据库用 
     def get_project_area_data(self):
         def callback(cur,con):
             return cur.fetchall()
         return self.oprate_sql('SELECT ID,PROJECT,AREA FROM LOGININFO;',{},callback)
+
+
 #给delete 参数数据库用
     def get_project_area(self):
         def callback(cur,con):
@@ -633,120 +647,75 @@ class AppStorage():
         delete_sql=AppStorage.dynamic_sql_return('DELETE FROM COMMAND_HISTORY','WHERE','AND',where_dict)
         return self.oprate_sql(delete_sql,where_dict,callback)
 
-    def update_command_history(self,data_dict):
+    def update_command_history_database(self,dict):
         def callback(cur,con):
             con.commit()
             return True
-        _where_dict={}
-        if data_dict['where']['mode']=='project':
-            _where_dict['area']='None'
-            _where_dict['project']=data_dict['where']['project']
-        else:
-            _where_dict['area']=data_dict['where']['area']
-            _where_dict['project']=data_dict['where']['project']
-        where_sql=AppStorage.dynamic_sql_return('','where','and',_where_dict)
-        update_sql=AppStorage.dynamic_sql_return('update filepath','set',',',data_dict['update'])
-        sql=update_sql+where_sql
-        return self.oprate_sql(sql,{},callback)
-    
-    def update_command_history_database(self,dict):
-        try:
-            before_list=dict['before']
-            after_list=dict['after']
-            project_after_list = [ v[1] for v in after_list]
-            project_area_after_list = [v[1:] for v in after_list]
-            project_before_list=[ v[1] for v in before_list]
-            update_base_area_list=[]
-            add_base_area_list=[]
-            add_base_area_file_parameter_list=[]
-            add_base_area_send_parameter_list=[]
-            for i in before_list:
-                for j in after_list:
-                    if i[0]==j[0] and i[1:]!=j[1:]:
-                        if i[1:] not in project_area_after_list:
-                            update_base_area_list.append([i[1:],j[1:]])
-                        else:
-                            add_base_area_list.append(j[1:])
-                            add_base_area_file_parameter_list.append(self.get_filepath_parameter_value({
-                                'project':i[1],
-                                'area':i[2]
-                                }))
-                            add_base_area_send_parameter_list.append(self.get_sendcommand_parameter_value
-                            ({
-                                'project':i[1],
-                                'area':i[2]
-                                }))
-            delete_base_area_list=[ v[1:]  for v in before_list if v[1:] not in project_area_after_list]
-            delete_none_area_list=[ [v[1],'None'] for v in before_list if v[1] not in project_after_list ]
-            # 待增加add是原有项目的数据
-            add_none_area_list=[ [v[1],'None'] for v in after_list if v[1] not in project_before_list ]
-            for e in update_base_area_list:
-                self.change_filepath_parameter(
-                    {
-                        'where':{
-                            'project':e[0][0],
-                            'area':e[0][1]
-                        },
-                        'update':{
-                            'project':e[1][0],
-                            'area':e[1][1]
-                        }
-                    }
-                )
-                self.change_sendcommand_parameter(
-                        {
-                        'where':{
-                            'project':e[0][0],
-                            'area':e[0][1]
-                        },
-                        'update':{
-                            'project':e[1][0],
-                            'area':e[1][1]
-                        }
-                    }
-                )
-            for e in delete_base_area_list:
-                self.delete_filepath_parameter({'project':e[0],'area':e[1]})
-                self.delete_sendcommand_parameter({'project':e[0],'area':e[1]})
-            for e in delete_none_area_list:
-                self.delete_filepath_parameter({'project':e[0],'area':'None'})
-                self.delete_sendcommand_parameter({'project':e[0],'area':'None'})
-            for i,e in enumerate(add_base_area_list):
-                self.add_filepath_parameter({
-                    'project':e[0],
-                    'area':e[1],
-                    'txt_export_path':add_base_area_file_parameter_list[i][0][0],
-                    'ftp_root_path':add_base_area_file_parameter_list[i][0][1],
-                    'ftp_upload_path':add_base_area_file_parameter_list[i][0][2],
-                    'ftp_download_path:':add_base_area_file_parameter_list[i][0][3],
-                })
-                self.add_sendcommand_parameter({
-                    'project':e[0],
-                    'area':e[1],
-                    'device_title_able':add_base_area_send_parameter_list[i][0][0],
-                    'command_able': add_base_area_send_parameter_list[i][0][1],
-                    'read_timeout': add_base_area_send_parameter_list[i][0][2],
-                })
-            for e in add_none_area_list:
-                self.add_filepath_parameter({
-                    'project':e[0],
-                    'area':e[1],
-                    'txt_export_path':'default',
-                    'ftp_root_path':'default',
-                    'ftp_upload_path':'default',
-                    'ftp_download_path:':'default',
-                })
-                self.add_sendcommand_parameter({
-                    'project':e[0],
-                    'area':e[1],
-                    'device_title_able':'False',
-                    'command_able':'False',
-                    'read_timeout':10  
-                })
-            
-            return 'True'
-        except Exception as e:
-            return str(e)
+        before_list=dict['before']
+        after_list=dict['after']
+        project_after_list = [v[1] for v in after_list]
+        project_before_list = [v[1] for v in before_list]
+        print('===========================before_list===============================')
+        print(before_list)
+        print('===========================after_list================================')
+        print(after_list)
+        for i in before_list:
+            for j in after_list:
+                if i[0]==j[0] and i[1:]!=j[1:]:
+                    print('UPDATE-1')
+                    if i[1] not in project_after_list :
+                            print('UPDATE-2')
+                            where_dict={}
+                            update_dict={}
+                            where_dict['project']=i[1]
+                            where_dict['area']=i[2]
+                            where_dict['protocol']=i[3]
+                            where_dict['port']=i[4]
+                            where_dict['ip_expression']=i[5]
+                            update_dict['project']=j[1]
+                            update_dict['area']=j[2]
+                            update_dict['protocol']=j[3]
+                            update_dict['port']=j[4]
+                            update_dict['ip_expression']=j[5]
+                            where_sql=AppStorage.dynamic_sql_return('','WHERE','AND',where_dict)
+                            update_sql=AppStorage.dynamic_sql_return('UPDATE COMMAND_HISTORY','SET',',',update_dict)
+                            full_sql=update_sql+where_sql
+                            self.oprate_sql(full_sql,{},callback)
+                            where_dict['project']=i[1]
+                            where_dict['area']='None'
+                            where_dict['protocol']='None'
+                            where_dict['port']='None'
+                            where_dict['ip_expression']='None'
+                            update_dict['project']=j[1]
+                            update_dict['area']='None'
+                            update_dict['protocol']='None'
+                            update_dict['port']='None'
+                            update_dict['ip_expression']='None'
+                            where_sql=AppStorage.dynamic_sql_return('','WHERE','AND',where_dict)
+                            update_sql=AppStorage.dynamic_sql_return('UPDATE COMMAND_HISTORY','SET',',',update_dict)
+                            full_sql=update_sql+where_sql
+                            self.oprate_sql(full_sql,{},callback)
+                    else:
+                            print('UPDATE-3')
+                            where_dict={}
+                            update_dict={}
+                            where_dict['project']=i[1]
+                            where_dict['area']=i[2]
+                            where_dict['protocol']=i[3]
+                            where_dict['port']=i[4]
+                            where_dict['ip_expression']=i[5]
+                            update_dict['project']=j[1]
+                            update_dict['area']=j[2]
+                            update_dict['protocol']=j[3]
+                            update_dict['port']=j[4]
+                            update_dict['ip_expression']=j[5]
+                            where_sql=AppStorage.dynamic_sql_return('','WHERE','AND',where_dict)
+                            update_sql=AppStorage.dynamic_sql_return('UPDATE COMMAND_HISTORY','SET',',',update_dict)
+                            full_sql=update_sql+where_sql
+                            self.oprate_sql(full_sql,{},callback)
+                       
+                    
+                        
     #获取历史命令总条数
     def get_command_history_count(self,where_dict):
         def callback(cur,con):

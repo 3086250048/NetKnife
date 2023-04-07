@@ -239,5 +239,23 @@ def get_command_history():
 def get_command_history_count():
     result=storage.get_command_history_count(json.loads(request.get_data(as_text=True)))
     return result
+
+@netknife.route('/get_id_mixunit_data')
+def get_id_mixunit_data():
+    result=storage.get_database_data('LOGININFO',['ID','PROJECT','AREA','PROTOCOL','PORT','IP_EXPRESSION'])
+    return result
+
+@netknife.route('/update_command_history_database',methods=['POST'])
+def update_command_history_database():
+    result=storage.update_command_history_database(json.loads(request.get_data(as_text=True)))
+    if result:
+        return 'UPDATE_SUCCESS'
+    else:
+        return 'UPDATE_FAULT'
+
+
+
+
+
 if __name__ == '__main__':
     netknife.run('0.0.0.0',port=3000,debug=True)

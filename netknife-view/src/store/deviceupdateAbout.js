@@ -39,9 +39,13 @@ export const deviceupdateAbout={
                 pop_info(state,'端口范围应在:0~65535之内','warning')
                 return
             }
-
+            // 给更新参数数据库用
             send_get('/get_project_area_data',response=>{
                 state.update_before_project_area_list=response.data
+            })
+            //给更新历史命令数据库用
+            send_get('/get_id_mixunit_data',response=>{
+                state.update_before_id_mixunit_list=response.data
             })
 
             send_post('/update_data',{ 
@@ -57,6 +61,8 @@ export const deviceupdateAbout={
                     if(response.data==='UPDATE_SUCCESS'){
                         pop_info(state,'数据更新成功','success')
                         devicestateAbout.mutations.GET_PROJECT_UNIT_LIST(devicestateAbout.state)
+                        
+                        // 给更新参数数据库用的
                         send_get('/get_project_area_data',response=>{
                             state.update_after_project_area_list=response.data
                             send_post('/update_parameter_database',{
@@ -64,6 +70,16 @@ export const deviceupdateAbout={
                                 'after':state.update_after_project_area_list
                             })
                         }) 
+
+                        // 给更新历史命令数据库用的
+                        send_get('/get_id_mixunit_data',response=>{
+                            state.update_after_id_mixunit_list=response.data
+                            send_post('/update_command_history_database',{
+                                'before':state.update_before_id_mixunit_list,
+                                'after':state.update_after_id_mixunit_list
+                            })
+                        })
+                        
                     }else{
                         pop_info(state,'更新后最小数据单元存在重复','error')
                     }},reason=>{
@@ -128,7 +144,9 @@ export const deviceupdateAbout={
         update_before_project_area_list:[],
         update_after_project_area_list:[],
         update_item_list:[],
-        diff_item_list:[]
+        diff_item_list:[],
+        update_before_id_mixunit_list:[],
+        update_after_id_mixunit_list:[]
     }
 
 }
