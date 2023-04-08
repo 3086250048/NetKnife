@@ -6,7 +6,7 @@
                 <div class="el_header-div-div" >
                     <h1  class="el_header-div-div-h1">
                         <!-- 当前所在项目:{{ choose_project[0].slice(0,22) }} -->
-                        {{ base_title }} {{ command_index }}
+                        {{ base_title }}
                     </h1>
                 </div>
             </div>
@@ -22,12 +22,12 @@
                 <span>影响连接百分比</span>
                 <el-progress class="el_main-div-el_progress" :percentage="effect_connect_percent"></el-progress>
             </div>
-            <!-- <div class="el_main--div">
-                <span>设备执行进度</span>
-                <el-progress class="el_main--div-el_progress" :percentage="response_percent"></el-progress>
-            </div> -->
             <!-- 文字按钮 -->
-            <el-button style="position:absolute;top:144px" type="text" @click="send_dialog_able = true">设置发送命令参数</el-button>
+            <el-dialog title="设置参数" :visible.sync="setting_dialog_able" width="700px">
+                <el-button  type="text" @click="send_dialog_able = true">设置命令参数</el-button>
+                <el-button  type="text" @click="path_dialog_able= true">设置文件路径参数</el-button>
+            </el-dialog>
+            <!-- 弹出框 -->
             <el-dialog title="设置发送命令参数" :visible.sync="send_dialog_able" width="700px" >
                 <el-form :model="send_parameter">
                     <el-form-item label="是否关闭显示命令" :label-width="'130px'" style="margin-left: -20px;">
@@ -51,8 +51,6 @@
                     <el-button type="primary" @click="sendcommand_handler_commit">确 定</el-button>
                 </div>
             </el-dialog> 
-            <!--文字按钮  -->
-            <el-button style="position:absolute;top:144px;left: 250px;" type="text" @click="path_dialog_able= true">设置文件路径参数</el-button>
             <el-dialog title="设置文件路径参数" :visible.sync="path_dialog_able" width="700px" >
                 <el-form :model="path_parameter">
                     <el-form-item label="TXT导出路径"  :label-width="'130px'">
@@ -81,6 +79,31 @@
                     <el-button type="primary" @click="filepath_handler_commit">确 定</el-button>
                 </div>
             </el-dialog>
+            <!-- 搜索历史命令 -->
+            <el-dialog title="搜索历史命令" :visible.sync="search_command_history_able" width="800px" >
+                <el-autocomplete
+                prefix-icon="el-icon-search"
+                class="search"
+                v-model="input"
+                :fetch-suggestions="querySearchAsync"
+                placeholder="输入命令或执行时间进行检索"
+                @select="handleSelect"
+                ></el-autocomplete>
+                <div style="height: 350px;overflow: scroll;">
+                    <ul>
+                        <li v-for="(item,i) in all_command_time_list " :key="i" > 
+                            <el-card class="box-card" >
+                                <el-button-group style="float: right;margin-top: -20px;margin-right:-20px;" >
+                                    <el-button type="primary" size="mini" @click="show_history_command(item[0],item[1])" >查看</el-button>
+                                    <el-button type="primary" size="mini" @click="delete_history_command(item[0],item[1])">删除</el-button>
+                                </el-button-group>
+                                命令:{{ item[0] }}<br>
+                                执行时间:{{ item[1] }} 
+                            </el-card>
+                        </li>
+                    </ul>
+                </div>
+            </el-dialog>
             <!--输出框  -->
             <el-input
             type="textarea"
@@ -92,12 +115,16 @@
             </el-input>
             <!-- 加载动画 -->
             <div class="el_main-loading_div" element-loading-text="等待响应中...." v-loading="loading_able"></div>
-            <!-- 历史命令按钮 -->
+            <!-- 历史命令按钮组 -->
             <el-button-group class="el_main-el_button_group">
             <el-button type="primary" icon="el-icon-arrow-left" size="mini" @click="rollback_command" >上一条命令</el-button>
             <el-button type="primary" size="mini" @click="next_command">下一条命令<i class="el-icon-arrow-right el-icon--right"></i></el-button>
-            <el-button type="primary" icon="el-icon-delete" size="mini"></el-button>
-            <el-button type="primary" icon="el-icon-search" size="mini"></el-button>
+            <el-button type="primary" icon="el-icon-document" size="mini" @click="export_textarea"></el-button>
+            <el-button type="primary" icon="el-icon-search" size="mini" @click="search_command_handler" ></el-button>
+            </el-button-group>
+            <!-- 设置按钮组 -->
+            <el-button-group class="el_main--el_button_group">
+                <el-button type="primary" icon="el-icon-setting" size="mini" @click="setting_dialog_able=true"></el-button>
             </el-button-group>
             <!-- 输出选择列表框 -->
             <ul class="el_main-ul">
@@ -137,8 +164,9 @@ export default {
                 ftp_upload_path:'',
                 ftp_download_path:''
             },
-
-     
+            setting_dialog_able:false,
+            search_command_history_able:false,
+            input:''
         }
     },
     methods:{
@@ -153,7 +181,14 @@ export default {
             ROLLBACK_COMMAND:'ROLLBACK_COMMAND',
             NEXT_COMMAND:'NEXT_COMMAND',
             SET_COMMAND_INDEX:'SET_COMMAND_INDEX',
-            SET_HISTORY_COMMAND_COUNT:'SET_HISTORY_COMMAND_COUNT'}),
+            SET_HISTORY_COMMAND_COUNT:'SET_HISTORY_COMMAND_COUNT',
+            EXPORT_TEXTAREA:'EXPORT_TEXTAREA',
+            GET_ALL_COMMAND_TIME:'GET_ALL_COMMAND_TIME',
+            ROLLBACK_MIXUNIT_LIST:'ROLLBACK_MIXUNIT_LIST',
+            CHOOSE_CHANGE:'CHOOSE_CHANGE',
+            SHOW_HISTORY_COMMAND:'SHOW_HISTORY_COMMAND',
+            DELETE_HISTORY_COMMAND:'DELETE_HISTORY_COMMAND'
+        }),
         ...mapMutations('mixunitpageAbout',{SET_MIXUNIT_VIEW_ABLE:'SET_MIXUNIT_VIEW_ABLE'}),
         goBack(){
             if(this.choose_mixunit.length>0){
@@ -185,9 +220,6 @@ export default {
         set_effect(){
             this.SET_EFFECT(this.command)
         },
-
-
-
         sendcommand_handler_cancel(){
             this.send_dialog_able=false
         },
@@ -241,7 +273,48 @@ export default {
             this.check_list=[]
             this.NEXT_COMMAND()
             console.log(this.command_index)
+        },
+        export_textarea(){
+            this.EXPORT_TEXTAREA({
+                'command':this.command,
+                'vm':this,
+                'txt_export_path':this.path_parameter.txt_export_path
+            })
+        },
+        search_command_handler(){
+            this.search_command_history_able=true
+            this.input=''
+            this.GET_ALL_COMMAND_TIME()
+        },
+        querySearchAsync(queryString, cb) {
+            let results=this.all_command_time_search_list
+            results = queryString ? results.filter(this.createStateFilter(queryString)) : results;
+            cb(results);
+        },
+        createStateFilter(queryString) {
+        return (item) => {
+          return item.value.toLowerCase().match(queryString.toLowerCase());
+        };
+        },
+        handleSelect(item) {
+            this.CHOOSE_CHANGE(item)
+        },
+        show_history_command(command,date_time){
+            this.check_list=[]
+            this.search_command_history_able=false
+            this.SHOW_HISTORY_COMMAND({
+                'command':command,
+                'date_time':date_time
+            })
+
+        },
+        delete_history_command(command,date_time){
+            this.DELETE_HISTORY_COMMAND({
+                'command':command,
+                'date_time':date_time
+            })
         }
+
     },
     computed:{
         able(){
@@ -268,13 +341,6 @@ export default {
         loading_able(){
             return this.$store.state.projectoprateAbout.loading_able
         },
-        // pre_title(){
-        //     if( this.choose_mixunit.length===0 ){
-        //         return "当前所在项目:"
-        //     }else{
-        //         return "当前所在最小单元:"
-        //     }
-        // },
         base_title(){
             if(this.choose_mixunit.length===0 ){
                 return this.choose_project[0].slice(0,22)
@@ -293,7 +359,14 @@ export default {
         },
         history_command_count(){
             return this.$store.state.projectoprateAbout.history_command_count
-        }
+        },
+        all_command_time_search_list(){
+            return this.$store.state.projectoprateAbout.all_command_time_search_list
+        },
+        all_command_time_list(){
+            return this.$store.state.projectoprateAbout.all_command_time_list
+        },
+        
    
 
     },
@@ -347,7 +420,12 @@ export default {
         history_command(new_value){
             this.command=new_value
           
-        }
+        },
+        input(new_value,old_value){
+            if(old_value!=='' && new_value===''){
+                this.ROLLBACK_MIXUNIT_LIST()
+            }
+        },
     },
     mounted(){
         this.set_effect()
@@ -476,5 +554,25 @@ export default {
         top: 150px;
         left: 789px;
     }
-   
+    .el_main--el_button_group{
+        position: absolute;
+        top: 150px;
+        left: 132px;
+    }
+    .search{
+        width: 760px;
+        position: absolute;
+        top: 45px;
+    }
+    li{
+    list-style-type: none;
+    margin-top: 2px;
+    }
+    li:first-child{
+        margin-top: 10px;
+    }
+
+    
+    
+    
 </style>

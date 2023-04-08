@@ -47,7 +47,28 @@ export const devicedeleteAbout={
             },response=>{
                 if(response.data=='DELETE_SUCCESS'){
                     pop_info(state,'数据删除成功','success')
-                    devicestateAbout.mutations.GET_PROJECT_UNIT_LIST(devicestateAbout.state)    
+                    devicestateAbout.mutations.GET_PROJECT_UNIT_LIST(devicestateAbout.state)  
+                    //删除历史命令数据库删
+                    send_post('/delete_history_command',{
+                        'mode':'mixunit',
+                        'project':state.delete_info.project,
+                        'area':state.delete_info.area,
+                        'protocol':state.delete_info.protocol,
+                        'port':state.delete_info.port,
+                        'ip_expression':state.delete_info.ip_expression,
+                    },response=>{
+                        send_get('/get_history_command_count',{
+                            'project':state.delete_info.project
+                        },response=>{
+                            if(response.data<=0){
+                                send_post('/delete_history_command',{
+                                    'mode':'project',
+                                    'project':state.delete_info.project,
+                                })
+                            }
+                        })
+                    })
+                    // 删除参数数据库相关
                     send_get('/get_project_area',response=>{
                         state.delete_after_project_area_list=response.data
                         state.diff_list=[]

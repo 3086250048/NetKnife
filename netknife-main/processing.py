@@ -220,6 +220,35 @@ class AppProcessing():
             command_dict['path_parameter']=command_data['path_parameter']
         return command_dict
 
+    def processing_command_history_where_dict(self,where_dict):
+        _where_dict={}
+        if where_dict['mode']=='project':   
+            _where_dict['area']='None'
+            _where_dict['project']=where_dict['project']
+        else:
+            _where_dict['area']=where_dict['area']
+            _where_dict['project']=where_dict['project']
+            _where_dict['protocol']=where_dict['protocol']
+            _where_dict['port']=where_dict['port']
+            _where_dict['ip_expression']=where_dict['ip_expression']
+        if 'search' in where_dict:
+            _lis=where_dict['search'].split('|')
+            __lis=[ v.strip(' ')  for v in _lis]
+            _where_dict['command']=__lis[0]
+            _where_dict['date_time']=__lis[1]
+        if 'command' in where_dict :
+            _where_dict['command']=where_dict['command']
+        if 'date_time' in where_dict:
+            _where_dict['date_time']=where_dict['date_time']
+        return _where_dict
+
+    def processing_command_history_result(self,result):
+        _result=[]
+        for v in result:
+            _result.append([v[0],v[1]])  
+        __result=[{'value':v} for v in _result ]
+        return __result
+
 class NetProcessing():
     def __new__(cls,*args, **kwds):
         if not hasattr(cls,'_instance'):

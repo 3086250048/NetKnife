@@ -11,13 +11,15 @@ from storage import AppStorage
 from net import AppNet
 from processing import AppProcessing
 from server import APPserver
+from action import ButtonAction
+
 
 data=AppInfo()
 storage=AppStorage()
 net=AppNet()
 ap=AppProcessing()
 _as=APPserver()
-
+ba=ButtonAction()
 
 netknife=Flask(__name__)
 CORS(netknife, resources={r"/*": {"origins": "*"}})
@@ -253,9 +255,33 @@ def update_command_history_database():
     else:
         return 'UPDATE_FAULT'
 
-
-
-
+@netknife.route('/export_textarea',methods=['POST'])
+def export_textarea():
+    result=ba.export_textarea(json.loads(request.get_data(as_text=True)))
+    if result:
+        return 'EXPORT_SUCCESS'
+    else:
+        return 'EXPORT_FAULT'
+@netknife.route('/get_all_command_time',methods=['POST'])
+def get_all_command_time():
+    where_dict=ap.processing_command_history_where_dict(json.loads(request.get_data(as_text=True)))
+    result=storage.get_database_data('COMMAND_HISTORY',['COMMAND','DATE_TIME'],where_dict,'ORDER BY DATE_TIME DESC')
+    _result=ap.processing_command_history_result(result)
+    return _result
+@netknife.route('/delete_history_command',methods=['POST'])
+def delete_history_command():
+    where_dict=ap.processing_command_history_where_dict(json.loads(request.get_data(as_text=True)))
+    result=storage.del_database_data('COMMAND_HISTORY',where_dict)
+    if result:
+        return 'DELETE_SUCCESS'
+    else:
+        return 'DELETE_FAULT'
+@netknife.route('/get_history_command_count',methods=['POST'])
+def get_history_command_count():
+    where_dict=json.loads(request.get_data(as_text=True))
+    result=storage.get_database_data_count('COMMAND_HISTORY',where_dict)
+    print(result)
+    return result
 
 if __name__ == '__main__':
     netknife.run('0.0.0.0',port=3000,debug=True)

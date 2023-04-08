@@ -1,4 +1,4 @@
-import { send_post,get_time, send_get } from "./tools";
+import { send_post,get_time, send_get, pop_info } from "./tools";
 
 
 export const  projectoprateAbout={
@@ -96,18 +96,15 @@ export const  projectoprateAbout={
                 check_list.forEach(e=>{
                     if(item.type+item.ip+':'+item.port===e ){
                         if(flag){
-                            state.textarea+=`===============================================================================\n设备类型:${item.type}  设备登录IP:${item.ip}  设备登录端口:${item.port}\n时间:${state.response_date_time}\n===============================================================================`+item.response
+                            state.textarea+=`===============================================================================\n设备类型:${item.type}  设备登录IP:${item.ip}  设备登录端口:${item.port}\n时间:${state.response_date_time}\n===============================================================================`+'\n'+item.response
                             flag=false
                         }else{
-                            state.textarea+=`\n===============================================================================\n设备类型:${item.type}  设备登录IP:${item.ip}  设备登录端口:${item.port}\n时间:${state.response_date_time}\n===============================================================================`+item.response
+                            state.textarea+=`\n===============================================================================\n设备类型:${item.type}  设备登录IP:${item.ip}  设备登录端口:${item.port}\n时间:${state.response_date_time}\n===============================================================================`+'\n'+item.response
                         }
                        
                     }
                 }) 
             });
-        },
-        GET_SEND_COMMAND_PARAMETER(){
-            send_post('/')
         },
         SET_OPRATE_MODE(state,mode){
             state.oprate_mode=mode
@@ -174,6 +171,115 @@ export const  projectoprateAbout={
                 console.log(response.data)
                 state.history_command_count=response.data
             })
+        },
+        EXPORT_TEXTAREA(state,payload){
+            send_post('/export_textarea',{
+                'textarea':state.textarea,
+                'command':payload.command,
+                'txt_export_path':payload.txt_export_path
+            },response=>{
+                if(response.data==='EXPORT_SUCCESS'){
+                    payload.vm.$message({
+                        showClose: true,
+                        message: '导出成功',
+                        type: 'success'
+                      });
+                }else{
+                    payload.vm.$message({
+                        showClose: true,
+                        message: '导出失败',
+                        type: 'error'
+                      });
+                }
+            })
+        },
+        GET_ALL_COMMAND_TIME(state){
+            state.all_command_time_list=[]
+            state.all_command_time_search_list=[]
+            send_post('/get_all_command_time',{
+                'project':state.choose_project[0],
+                'area':state.choose_mixunit[3],
+                'protocol':state.choose_mixunit[4],
+                'port':state.choose_mixunit[5],
+                'ip_expression':state.choose_mixunit[9],
+                'mode':state.oprate_mode,
+            },response=>{
+                response.data.forEach(e=>{
+                    state.all_command_time_search_list.push({'value':`${e.value[0]} | ${e.value[1]}`})
+                    state.all_command_time_list.push([e.value[0],e.value[1]])
+                })
+                state.full_all_command_time_list=state.all_command_time_list
+            })
+        },
+        CHOOSE_CHANGE(state,item){
+            send_post('/get_all_command_time',{
+            'project':state.choose_project[0],
+            'area':state.choose_mixunit[3],
+            'protocol':state.choose_mixunit[4],
+            'port':state.choose_mixunit[5],
+            'ip_expression':state.choose_mixunit[9],
+            'mode':state.oprate_mode,
+            'search':item.value
+        },response=>{
+            state.all_command_time_list=[]
+            response.data.forEach(e=>{
+                state.all_command_time_list.push([e.value[0],e.value[1]])
+            })
+            })
+        },
+        ROLLBACK_MIXUNIT_LIST(state){
+            state.all_command_time_list=state.full_all_command_time_list
+        },
+        SHOW_HISTORY_COMMAND(state,payload){
+            state.response_data_list=[]
+            state.textarea=''
+            state.history_command=''
+            send_post('/get_command_history',{
+                'mode':state.oprate_mode,
+                'project':state.choose_project[0],
+                'area':state.choose_mixunit[3],
+                'protocol':state.choose_mixunit[4],
+                'port':state.choose_mixunit[5],
+                'ip_expression':state.choose_mixunit[9],
+                'command':payload.command,
+                'date_time':payload.date_time
+            },response=>{
+                state.loading_able=false
+                state.response_data_list=response.data['response']
+                state.response_date_time=response.data['date_time']
+                state.history_command=response.data['command']
+            })
+        },
+        DELETE_HISTORY_COMMAND(state,payload){
+            send_post('/delete_history_command',{
+                'mode':state.oprate_mode,
+                'project':state.choose_project[0],
+                'area':state.choose_mixunit[3],
+                'protocol':state.choose_mixunit[4],
+                'port':state.choose_mixunit[5],
+                'ip_expression':state.choose_mixunit[9],
+                'command':payload.command,
+                'date_time':payload.date_time
+            },response=>{
+                if(response.data==='DELETE_SUCCESS'){
+                    state.all_command_time_list=[]
+                    state.all_command_time_search_list=[]
+                    send_post('/get_all_command_time',{
+                        'project':state.choose_project[0],
+                        'area':state.choose_mixunit[3],
+                        'protocol':state.choose_mixunit[4],
+                        'port':state.choose_mixunit[5],
+                        'ip_expression':state.choose_mixunit[9],
+                        'mode':state.oprate_mode,
+                    },response=>{
+                        response.data.forEach(e=>{
+                            state.all_command_time_search_list.push({'value':`${e.value[0]} | ${e.value[1]}`})
+                            state.all_command_time_list.push([e.value[0],e.value[1]])
+                        })
+                        state.full_all_command_time_list=state.all_command_time_list
+                    })
+                }
+            })
         }
     },
     state:{
@@ -187,6 +293,9 @@ export const  projectoprateAbout={
         oprate_mode:'project',
         command_index:-1,
         history_command:'',
-        history_command_count:0
+        history_command_count:0,
+        all_command_time_list:[],
+        all_command_time_search_list:[],
+        full_all_command_time_list:[]
     }
 }

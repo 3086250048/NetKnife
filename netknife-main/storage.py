@@ -159,7 +159,7 @@ class AppStorage():
                 con.close()
 
     #取任意数据库任意字段
-    def get_database_data(self,database_name,field_list,where_dict=[]):
+    def get_database_data(self,database_name,field_list,where_dict={},other_command=''):
         def callback(cur,con):
             return cur.fetchall()
         field_str=','.join(field_list)
@@ -167,8 +167,30 @@ class AppStorage():
             where_sql=AppStorage.dynamic_sql_return('','WHERE','AND',where_dict)
         else:
             where_sql=''
-        full_sql=f"SELECT {field_str} FROM {database_name} {where_sql}"
+        full_sql=f"SELECT {field_str} FROM {database_name} {where_sql} {other_command}"
         return self.oprate_sql(full_sql,{},callback)
+    #删除任意数据库数据
+    def del_database_data(self,database_name,where_dict={}):
+        def callback(cur,con):
+            con.commit()
+            return True
+        if where_dict:
+            where_sql=AppStorage.dynamic_sql_return('','WHERE','AND',where_dict)
+        else:
+            where_sql=''
+        full_sql=f"DELETE FROM {database_name} {where_sql}"
+        return self.oprate_sql(full_sql,{},callback)
+    #获取任意数据库的条目数
+    def get_database_data_count(self,database_name,where_dict={}):
+        def callback(cur,con):
+            return len(cur.fetchall())
+        if where_dict:
+            where_sql=AppStorage.dynamic_sql_return('','WHERE','AND',where_dict)
+        else:
+            where_sql=''
+        full_sql=f"SELECT COUNT(*) FROM {database_name} {where_sql}"
+        return self.oprate_sql(full_sql,{},callback)
+
 
     #向数据库中插入数据
     #返回:布尔值
@@ -619,8 +641,15 @@ class AppStorage():
             _where_dict['protocol']=where_dict['protocol']
             _where_dict['port']=where_dict['port']
             _where_dict['ip_expression']=where_dict['ip_expression']
+        if 'command' in where_dict and 'date_time' in where_dict:
+            _where_dict['command']=where_dict['command']
+            _where_dict['date_time']=where_dict['date_time']
         select_sql=AppStorage.dynamic_sql_return('SELECT * FROM COMMAND_HISTORY','WHERE','AND',_where_dict)
-        limit_sql=f" ORDER BY DATE_TIME DESC limit {where_dict['index']},1" 
+        if 'index' in where_dict:
+            limit_sql=f" ORDER BY DATE_TIME DESC limit {where_dict['index']},1"
+        else:
+            limit_sql=""
+        
         full_sql=select_sql+limit_sql
         result=self.oprate_sql(full_sql,{},callback)
         print(result)
