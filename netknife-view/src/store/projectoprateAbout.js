@@ -110,8 +110,6 @@ export const  projectoprateAbout={
             state.oprate_mode=mode
         },
         ROLLBACK_COMMAND(state){
-            console.log(state.command_index.history_command_count)
-            console.log('发送了')
             state.command_index+=1
             state.response_data_list=[]
             state.textarea=''
@@ -133,10 +131,7 @@ export const  projectoprateAbout={
             
         },
         NEXT_COMMAND(state){
-            if(state.command_index>=1){
-                state.command_index-=1
-            }
-            if(state.command_index<0)return
+            state.command_index-=1
             state.response_data_list=[]
             state.textarea=''
             state.history_command=''
@@ -173,6 +168,14 @@ export const  projectoprateAbout={
             })
         },
         EXPORT_TEXTAREA(state,payload){
+            if(payload.command.length<=0){
+                payload.vm.$message({
+                    showClose: true,
+                    message: '导出失败。',
+                    type: 'error'
+                  });
+                return
+            }
             send_post('/export_textarea',{
                 'textarea':state.textarea,
                 'command':payload.command,

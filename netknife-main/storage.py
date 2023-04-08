@@ -168,6 +168,8 @@ class AppStorage():
         else:
             where_sql=''
         full_sql=f"SELECT {field_str} FROM {database_name} {where_sql} {other_command}"
+        print('================================90909090909090')
+        print(full_sql)
         return self.oprate_sql(full_sql,{},callback)
     #删除任意数据库数据
     def del_database_data(self,database_name,where_dict={}):
@@ -183,13 +185,21 @@ class AppStorage():
     #获取任意数据库的条目数
     def get_database_data_count(self,database_name,where_dict={}):
         def callback(cur,con):
-            return len(cur.fetchall())
+            return cur.fetchall()
         if where_dict:
             where_sql=AppStorage.dynamic_sql_return('','WHERE','AND',where_dict)
         else:
             where_sql=''
         full_sql=f"SELECT COUNT(*) FROM {database_name} {where_sql}"
-        return self.oprate_sql(full_sql,{},callback)
+        print('===================================full_sql')
+        print(full_sql)
+        result= self.oprate_sql(full_sql,{},callback)
+        print(type(result[0][0]))
+        if result[0][0]==0:
+            return True
+        else:
+            return False
+        
 
 
     #向数据库中插入数据

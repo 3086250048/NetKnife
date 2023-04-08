@@ -33,6 +33,17 @@ export const devicedeleteAbout={
             send_get('/get_project_area',response=>{
                 state.delete_before_proeject_area_list=response.data
             },reason=>{})
+            // 获取被删除的最小单元的项目名称列表
+            send_post('/get_delete_project_list',{
+                'project':state.delete_info.project,
+                'area':state.delete_info.area,
+                'protocol':state.delete_info.protocol,
+                'port':state.delete_info.port,
+                'ip_expression':state.delete_info.ip_expression,
+            },response=>{
+                state.delte_project_list=response.data
+            })
+            // 删除
             send_post('/delete_data',{
                 'project':state.delete_info.project,
                 'device_class':state.delete_info.device_class,
@@ -57,16 +68,20 @@ export const devicedeleteAbout={
                         'port':state.delete_info.port,
                         'ip_expression':state.delete_info.ip_expression,
                     },response=>{
-                        send_get('/get_history_command_count',{
-                            'project':state.delete_info.project
-                        },response=>{
-                            if(response.data<=0){
-                                send_post('/delete_history_command',{
-                                    'mode':'project',
-                                    'project':state.delete_info.project,
-                                })
-                            }
-                        })
+                        console.log(state.delte_project_list)
+                        state.delte_project_list.forEach(e=>{
+                            send_post('/get_logininfo_project_count',{
+                                'project':e[0],
+                            },response=>{
+                                console.log(response.data)
+                                if(response.data==='DELETE_NEXT'){
+                                    send_post('/delete_history_command',{
+                                        'mode':'project',
+                                        'project':state.delete_info.project,
+                                    })
+                                }
+                            })
+                        })                       
                     })
                     // 删除参数数据库相关
                     send_get('/get_project_area',response=>{
@@ -128,6 +143,7 @@ export const devicedeleteAbout={
         },
         delete_before_proeject_area_list:[],
         delete_after_project_area_list:[],
-        diff_list:[]
+        diff_list:[],
+        delte_project_list:[]
     }
 }

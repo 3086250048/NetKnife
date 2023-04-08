@@ -210,6 +210,14 @@ export default {
         },
         //提交命令
         commit_command(){
+            if(this.command.length<=0){
+                this.$message({
+                    showClose: true,
+                    message: '命令不能为空',
+                    type: 'warning'
+                });
+                return
+            }
             this.check_list=[]
             this.COMMIT_COMMAND({
                 command:this.command,
@@ -264,14 +272,37 @@ export default {
             },reason=>{})
         },
         rollback_command(){
-            if(this.command_index>=this.history_command_count-1)return
+            if(this.command_index>=this.history_command_count-1){
+                this.$message({
+                    showClose: true,
+                    message: '已经是最早的一条命令了',
+                    type: 'warning'
+                });
+                return
+            }
             this.check_list=[]
             this.ROLLBACK_COMMAND()
             console.log(this.command_index)
         },
         next_command(){
+            if(this,this.command_index<=-1){
+                this.$message({
+                    showClose: true,
+                    message: '没有更多命令了',
+                    type: 'warning'
+                });
+                return
+            }
+            if(this.command_index<=0){
+                this.$message({
+                    showClose: true,
+                    message: '已经是最后一条命令了',
+                    type: 'warning'
+                });
+                return
+            }
             this.check_list=[]
-            this.NEXT_COMMAND()
+            this.NEXT_COMMAND(this)
             console.log(this.command_index)
         },
         export_textarea(){

@@ -276,12 +276,27 @@ def delete_history_command():
         return 'DELETE_SUCCESS'
     else:
         return 'DELETE_FAULT'
-@netknife.route('/get_history_command_count',methods=['POST'])
-def get_history_command_count():
+
+@netknife.route('/get_delete_project_list',methods=['POST'])
+def get_delete_project_list():
     where_dict=json.loads(request.get_data(as_text=True))
-    result=storage.get_database_data_count('COMMAND_HISTORY',where_dict)
+    result=storage.get_database_data('LOGININFO',['PROJECT'],where_dict)
+    print('====================get_delete_project_list********************************************')
     print(result)
     return result
+
+@netknife.route('/get_logininfo_project_count',methods=['POST'])
+def get_history_command_count():
+    where_dict=json.loads(request.get_data(as_text=True))
+    print('=====================================where_dict')
+    print(where_dict)
+    result=storage.get_database_data_count('LOGININFO',where_dict)
+    print('==============================================================')
+    print(result)
+    if result:
+        return 'DELETE_NEXT'
+    else:
+        return 'DELETE_STOP'
 
 if __name__ == '__main__':
     netknife.run('0.0.0.0',port=3000,debug=True)
