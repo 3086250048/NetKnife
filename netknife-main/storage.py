@@ -795,6 +795,40 @@ class AppStorage():
         sql=AppStorage.dynamic_sql_return('SELECT COUNT(*) FROM COMMAND_HISTORY','WHERE','AND',_where_dict)
         result=self.oprate_sql(sql,{},callback)
         return str(result[0][0])
+    
+    def delete_parameter_database(self,data_dict):
+        try:
+            print('before and after=========================================')
+            print(data_dict['before'])
+            print(data_dict['after'])
+            tuple_before=(tuple(v) for v in data_dict['before'])
+            tuple_after=(tuple(v) for v in data_dict['after'])
+            delete_list=list(set(tuple_before)-set(tuple_after))
+            for e in delete_list:
+                self.delete_filepath_parameter({
+                    'project':e[0],
+                    'area':e[1]
+                                            })
+                self.delete_sendcommand_parameter({
+                    'project':e[0],
+                    'area':e[1]
+                                            })
+                if self.get_database_data_count('LOGININFO',{'PROJECT':e[0]}):
+                    self.delete_filepath_parameter({
+                    'project':e[0],
+                    'area':'None'
+                                            })
+                    self.delete_sendcommand_parameter({
+                    'project':e[0],
+                    'area':'None'
+                                            })
+            return True
+        except:
+            return False
+
+         
+        [['152e0b8d526147469141e9c0ca416958', '152e0b8d526147469141e9c0ca416958'], ['默认项目', '默认区域'], ['默认项目', '默认区域1'], ['默认项目', '默认区域12']]
+        [['152e0b8d526147469141e9c0ca416958', '152e0b8d526147469141e9c0ca416958'], ['默认项目', '默认区域1'], ['默认项目', '默认区域12']]
 
 if __name__ == '__main__':
     ap=AppStorage()

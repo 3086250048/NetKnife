@@ -298,5 +298,12 @@ def get_history_command_count():
     else:
         return 'DELETE_STOP'
 
+@netknife.route('/delete_parameter_database',methods=['POST'])
+def delete_parameter_database():
+    result= storage.delete_parameter_database(json.loads(request.get_data(as_text=True)))
+    if result:
+        return 'DELETE_SUCCESS'
+    else:
+        return 'DELETE_FAULT'
 if __name__ == '__main__':
     netknife.run('0.0.0.0',port=3000,debug=True)

@@ -86,36 +86,10 @@ export const devicedeleteAbout={
                     // 删除参数数据库相关
                     send_get('/get_project_area',response=>{
                         state.delete_after_project_area_list=response.data
-                        state.diff_list=[]
-                        state.delete_before_proeject_area_list.forEach(element => {
-                          if(! state.delete_after_project_area_list.some(item => JSON.stringify(item) === JSON.stringify(element))){
-                            state.diff_list.push(element)
-                          }
-                        });
-                        console.log('==================================================================')
-                        console.log(state.diff_list)
-                        state.diff_list.forEach(e=>{
-                            send_post('/delete_filepath_parameter',{'project':e[0],'area':e[1]},response=>{
-                                send_post('/get_filepath_parameter',{'project':e[0],'mode':'project'},response=>{
-                                    console.log(response.data)
-                                        if(response.data.length==1){
-                                            console.log('删除None项目')
-                                            send_post('/delete_filepath_parameter',{
-                                                'project':e[0],
-                                            })
-                                        }
-                                })
-                            })
-                            send_post('/delete_sendcommand_parameter',{'project':e[0],'area':e[1]},response=>{
-                                send_post('/get_sendcommand_parameter',{'project':e[0],'mode':'project'},response=>{
-                                    if(response.data.length==1){
-                                        send_post('/delete_sendcommand_parameter',{
-                                            'project':e[0],
-                                        })
-                                    }  
-                                })
-                            })
-                        })  
+                        send_post('/delete_parameter_database',{
+                            'before':state.delete_before_proeject_area_list,
+                            'after':state.delete_after_project_area_list
+                        }) 
                     })
                   
                 }else{
