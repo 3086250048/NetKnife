@@ -92,6 +92,8 @@ export const devicedeleteAbout={
                             state.diff_list.push(element)
                           }
                         });
+                        console.log('==================================================================')
+                        console.log(state.diff_list)
                         state.diff_list.forEach(e=>{
                             send_post('/delete_filepath_parameter',{'project':e[0],'area':e[1]},response=>{
                                 send_post('/get_filepath_parameter',{'project':e[0],'mode':'project'},response=>{

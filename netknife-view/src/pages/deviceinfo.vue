@@ -2,11 +2,14 @@
     <el-container>
         <el-menu  :style="{'margin-left':'-18px',
                             // height:screen_height,
-                            width:'106px',
+                            width:'109px',
                             display: 'flex',
                             'min-height':'100vh',
-                            'flex-direction':'column'
+                            'flex-direction':'column',
+                            'margin-left':'-20px',
+                            'margin-top':'-5px' 
                             }"
+                           
                             :default-active="activeIndex" class="el-menu-vertical-demo"  @select="handleSelect">
                 <el-menu-item index="first">设备状态</el-menu-item>
                 <el-menu-item index="second">管理设备</el-menu-item>
