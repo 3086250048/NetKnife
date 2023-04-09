@@ -1,15 +1,9 @@
 <template>
     <el-container class="el_container">
-        <el-header  height="15px"  >
-            <div class="el_header-div" >
-                <el-button class="el_header-div-el_button" @click="goBack">返回</el-button>
-                <div class="el_header-div-div" >
-                    <h1  class="el_header-div-div-h1">
-                        <!-- 当前所在项目:{{ choose_project[0].slice(0,22) }} -->
-                        {{ base_title }}
-                    </h1>
-                </div>
-            </div>
+        <el-header  height="0px"  >
+            <div class="title">
+                {{ base_title }}
+            </div>     
         </el-header>
         <el-main class="el_main">
             <el-input class="el_main-el_input" v-model="command" clearable placeholder="请输入命令"
@@ -19,8 +13,7 @@
             
             <!-- 影响链接百分比的进度条 -->
             <div class="el_main-div">
-                <span>影响连接百分比</span>
-                <el-progress class="el_main-div-el_progress" :percentage="effect_connect_percent"></el-progress>
+                <el-progress :text-inside="true" :stroke-width="5" :format="format" class="el_main-div-el_progress" :percentage="effect_connect_percent"></el-progress>
             </div>
             <!-- 文字按钮 -->
             <el-dialog title="设置参数" :visible.sync="setting_dialog_able" width="700px">
@@ -107,7 +100,8 @@
             <!--输出框  -->
             <el-input
             type="textarea"
-            :rows="15"
+            :rows="18"
+            
             v-model="textarea"
             resize="none"
             class="el_main--el_input"
@@ -124,6 +118,7 @@
             </el-button-group>
             <!-- 设置按钮组 -->
             <el-button-group class="el_main--el_button_group">
+                <el-button type="primary" icon="el-icon-back" size="mini" @click="goBack">返回</el-button>
                 <el-button type="primary" icon="el-icon-setting" size="mini" @click="setting_dialog_able=true"></el-button>
             </el-button-group>
             <!-- 输出选择列表框 -->
@@ -170,6 +165,9 @@ export default {
         }
     },
     methods:{
+        format(){
+            return ``
+        },
         ...mapMutations('devicestateAbout',{SET_PROJECT_VIEW_ABLE:'SET_PROJECT_VIEW_ABLE'}),
         ...mapMutations('projectoprateAbout',{
             COMMIT_COMMAND:'COMMIT_COMMAND',
@@ -374,9 +372,9 @@ export default {
         },
         base_title(){
             if(this.choose_mixunit.length===0 ){
-                return this.choose_project[0].slice(0,22)
+                return `${this.choose_project[0].slice(0,22)}>`
             }else{
-                return `${this.choose_project[0].slice(0,22)}>${this.choose_mixunit[3]}>${this.choose_mixunit[4]}>${this.choose_mixunit[5]}>${this.choose_mixunit[9]}`
+                return `${this.choose_project[0].slice(0,22)}>${this.choose_mixunit[3]}>${this.choose_mixunit[4]}>${this.choose_mixunit[5]}>${this.choose_mixunit[9]}>`
             }
         },
         oprate_mode(){
@@ -523,22 +521,20 @@ export default {
         margin-top: 25px;  
     }
     .el_main-el_input  {
-        
-        margin-top: -10px;
-        margin-bottom: 10px;
+        position: absolute;
+        width: 970px;
+        margin-top: -17px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04)
     }
 
     .el_main-div{
         position: absolute;
-        margin-top: -5px;
-        margin-left: 320px;
+       
     }
     .el_main-div-el_progress{
-        width: 200px;
-        margin-left: 130px;
-        margin-top: -20px;
-    
+        width:300px;
+        margin-top: 30px;
+        margin-left: 668px;
     }
     .el_main--div{
         margin-left: 330px;
@@ -552,18 +548,18 @@ export default {
     } */
     .el_main--el_input{
         position: absolute;
-        margin-top: 22px;
+        top: 168px;
         font-size: larger;
-        width: 650px;
+        width: 660px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
         
     }
     .el_main-ul{
         position: absolute;
         left: 789px;
-        top:180px;
+        top:170px;
         width: 300px;
-        height: 362px;
+        height: 430px;
         overflow-y:scroll;
         box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
     }
@@ -577,18 +573,18 @@ export default {
     .el_main-loading_div{
         position: absolute;
         left: 840px;
-        top:320px;
+        top:340px;
         width:200px
     }
     .el_main-el_button_group{
         position: absolute;
-        top: 150px;
+        top: 136px;
         left: 789px;
     }
     .el_main--el_button_group{
         position: absolute;
-        top: 150px;
-        left: 132px;
+        top: 136px;
+        left: 122px;
     }
     .search{
         width: 760px;
@@ -602,7 +598,9 @@ export default {
     li:first-child{
         margin-top: 10px;
     }
-
+    .title{
+        font-size: 20px; 
+    }
     
     
     

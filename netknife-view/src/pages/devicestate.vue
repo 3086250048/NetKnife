@@ -1,5 +1,5 @@
 <template>
-    <el-container class="el_container" >
+    <el-container class="el_container"  >
         <el-header v-if="project_view_able" style="margin-top: -20px;" height="30px">
             <el-autocomplete
             prefix-icon="el-icon-search"

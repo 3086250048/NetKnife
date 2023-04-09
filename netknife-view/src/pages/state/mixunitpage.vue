@@ -155,8 +155,8 @@ li:not(:first-child){
 .search{
     width: 500px;
     position: absolute;
-    left: 360px;
-    top: 55px;
+    left: 345px;
+    top: 65px;
 
 }
 .success{

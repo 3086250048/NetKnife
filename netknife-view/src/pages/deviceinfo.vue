@@ -1,11 +1,9 @@
 <template>
     <el-container>
-        <el-aside width="100px">
-            <el-tabs v-model="activeName" type="card" tab-position="left" @tab-click="handleClick">
-            <el-tab-pane label="设备状态" name="first"></el-tab-pane>
-            <el-tab-pane label="管理设备" name="second"></el-tab-pane>
-            </el-tabs>
-        </el-aside>
+        <el-menu   style="margin-left: -18px;height: 758px;width: 106px;" :default-active="activeIndex" class="el-menu-vertical-demo"  @select="handleSelect">
+                <el-menu-item index="first">设备状态</el-menu-item>
+                <el-menu-item index="second">管理设备</el-menu-item>
+        </el-menu>
         <el-main>
             <router-view></router-view>
         </el-main>
@@ -19,14 +17,18 @@ export default{
     name:'DeviceInfo',
     data(){
         return {
-            activeName:'first'
+            activeName:'first',
+            activeIndex:'first',
+            if_first_load:false,
+            
         }
     },
     methods:{
         ...mapMutations('devicestateAbout',{SET_PROJECT_VIEW_ABLE:'SET_PROJECT_VIEW_ABLE'}),
         ...mapMutations('projectoprateAbout',{SET_OPRATE_MODE:'SET_OPRATE_MODE'}),
-        handleClick(tab,event){
-            if(this.activeName==='second'){
+        handleSelect(key){
+            this.activeIndex='first'
+            if(key==='second' ){
                 this.$router.push({
                     name:'create'
                 })
@@ -40,7 +42,7 @@ export default{
                         }
                     })
                 }else{          
-                    if(this.activeName==='first'){
+                    if(key==='first' || this.activeIndex==='first' && !this.if_first_load){
                         this.SET_OPRATE_MODE('project')
                         this.SET_PROJECT_VIEW_ABLE(true)
                         this.$router.push({
@@ -48,14 +50,15 @@ export default{
                         })
                     }
                 }
-                },reason=>{
                 })
             }
           
         },
     },
     mounted(){
-        this.handleClick()
+        this.handleSelect()
+        
     }
+    
 }
 </script>
