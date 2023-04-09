@@ -1,7 +1,10 @@
 <template>
     <el-container >
         <el-header height="45px">
-            <el-menu style="margin-left: -20px;" :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
+            <el-menu :style="{width:screen_width,'margin-left':'-20px'}" 
+             background-color="#545c64"
+                text-color="#fff"
+                active-text-color="#ffd04b" :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
                 <el-menu-item index="first">CONNECT</el-menu-item>
                 <el-menu-item index="second">CONSOL</el-menu-item>
             </el-menu>
@@ -43,6 +46,12 @@ export default{
                 })
             }
       }
+    },
+    computed:{
+        screen_width(){
+            var w= window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth 
+            return w+'px'
+        }
     },
     mounted(){
         this.handleSelect()

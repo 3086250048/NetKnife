@@ -1,6 +1,13 @@
 <template>
     <el-container>
-        <el-menu   style="margin-left: -18px;height: 758px;width: 106px;" :default-active="activeIndex" class="el-menu-vertical-demo"  @select="handleSelect">
+        <el-menu  :style="{'margin-left':'-18px',
+                            // height:screen_height,
+                            width:'106px',
+                            display: 'flex',
+                            'min-height':'100vh',
+                            'flex-direction':'column'
+                            }"
+                            :default-active="activeIndex" class="el-menu-vertical-demo"  @select="handleSelect">
                 <el-menu-item index="first">设备状态</el-menu-item>
                 <el-menu-item index="second">管理设备</el-menu-item>
         </el-menu>
@@ -55,10 +62,16 @@ export default{
           
         },
     },
+    computed:{
+        // screen_height(){
+        //     var h=window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+        //     return h+'px'
+        // },
+        
+    },
     mounted(){
         this.handleSelect()
-        
+     
     }
-    
 }
 </script>
