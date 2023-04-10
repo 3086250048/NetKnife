@@ -14,8 +14,8 @@ class AppStorage():
                             VALUES (?,?,?,?,?,?,?,?,?,?);'''
         self.__add_filepath_info_sql='''INSERT INTO FILEPATH (ID,PROJECT,AREA,TXT_EXPORT_PATH,FTP_ROOT_PATH,FTP_UPLOAD_PATH,FTP_DOWNLOAD_PATH)
                             VALUES (?,?,?,?,?,?,?);'''
-        self.__add_sendcommand_parameter_info_sql='''INSERT INTO SENDCOMMAND_PARAMETER (ID,PROJECT,AREA,DEVICE_TITLE_ABLE,COMMAND_ABLE,READ_TIMEOUT)
-                            VALUES (?,?,?,?,?,?);'''
+        self.__add_sendcommand_parameter_info_sql='''INSERT INTO SENDCOMMAND_PARAMETER (ID,PROJECT,AREA,DEVICE_TITLE_ABLE,COMMAND_ABLE,READ_TIMEOUT,COMMAND_HISTORY_LIMIT)
+                            VALUES (?,?,?,?,?,?,?);'''
         self.__get_project_list_sql='''SELECT PROJECT FROM LOGININFO GROUP BY PROJECT ;'''
         self.__add_suid_sql='''INSERT INTO SUID (FIRST_SUID) VALUES (?);'''
         self.__add_command_history_sql='''INSERT INTO COMMAND_HISTORY (ID,PROJECT,AREA,PROTOCOL,PORT,IP_EXPRESSION,COMMAND,COMMAND_RESPONSE,DATE_TIME) VALUES (?,?,?,?,?,?,?,?,?);'''
@@ -61,6 +61,7 @@ class AppStorage():
                 DEVICE_TITLE_ABLE  TEXT    NOT NULL,
                 COMMAND_ABLE    TEXT    NOT NULL,
                 READ_TIMEOUT    TEXT    NOT NULL,
+                COMMAND_HISTORY_LIMIT TEXT NOT NULL,
                 UNIQUE(PROJECT,AREA)
                 );'''
                 )
@@ -88,7 +89,7 @@ class AppStorage():
                 print('INSERT-1')
                 cur.execute(self.__add_filepath_info_sql,[suid]*7)
                 print('INSERT-2')
-                cur.execute(self.__add_sendcommand_parameter_info_sql,[suid]*6)
+                cur.execute(self.__add_sendcommand_parameter_info_sql,[suid]*7)
                 print('INSERT-3')
                 cur.execute(self.__add_command_history_sql,[suid]*9)
                 print('INSERT-4')
@@ -172,7 +173,7 @@ class AppStorage():
         print(full_sql)
         return self.oprate_sql(full_sql,{},callback)
     #删除任意数据库数据
-    def del_database_data(self,database_name,where_dict={}):
+    def del_database_data(self,database_name,where_dict={},other_sql=''):
         def callback(cur,con):
             con.commit()
             return True
@@ -180,7 +181,7 @@ class AppStorage():
             where_sql=AppStorage.dynamic_sql_return('','WHERE','AND',where_dict)
         else:
             where_sql=''
-        full_sql=f"DELETE FROM {database_name} {where_sql}"
+        full_sql=f"DELETE FROM {database_name} {where_sql} {other_sql}"
         return self.oprate_sql(full_sql,{},callback)
     #获取任意数据库的条目数
     def get_database_data_count(self,database_name,where_dict={}):
@@ -265,7 +266,7 @@ class AppStorage():
     def get_sendcommand_parameter_value(self,where_dict):
         def callback(cur,con):
             return cur.fetchall()
-        sql=AppStorage.dynamic_sql_return('SELECT DEVICE_TITLE_ABLE,COMMAND_ABLE,READ_TIMEOUT FROM SENDCOMMAND_PARAMETER','WHERE','AND',where_dict)
+        sql=AppStorage.dynamic_sql_return('SELECT DEVICE_TITLE_ABLE,COMMAND_ABLE,READ_TIMEOUT,COMMAND_HISTORY_LIMIT FROM SENDCOMMAND_PARAMETER','WHERE','AND',where_dict)
         return self.oprate_sql(sql,{},callback)
     #更新数据库中某条记录
     #返回:布尔值
@@ -388,7 +389,7 @@ class AppStorage():
         else:
             _where_dict['area']=select_parameter_dict['area']
             _where_dict['project']=select_parameter_dict['project']
-        sql=AppStorage.dynamic_sql_return('select device_title_able,command_able,read_timeout from sendcommand_parameter','where','and',_where_dict)
+        sql=AppStorage.dynamic_sql_return('select device_title_able,command_able,read_timeout,COMMAND_HISTORY_LIMIT from sendcommand_parameter','where','and',_where_dict)
         return self.oprate_sql(sql,{},callback)
          
     def add_sendcommand_parameter(self,add_parameter_dict):
@@ -670,8 +671,32 @@ class AppStorage():
         print(command_history_dict['date_time'])
         return command_history_dict
     def add_command_history(self,command_history_dict):
-        print(command_history_dict)
-       
+        flag=False
+        where_dict={}
+        where_dict['project']=command_history_dict['project']
+        if command_history_dict['mode']=='project':   
+            where_dict['area']='None'
+            where_dict['protocol']='None'
+            where_dict['port']='None'
+            where_dict['ip_expression']='None'
+        else:
+            where_dict['area']=command_history_dict['area']
+            where_dict['protocol']=command_history_dict['protocol']
+            where_dict['port']=command_history_dict['port']
+            where_dict['ip_expression']=command_history_dict['ip_expression']
+        limit=self.get_database_data('SENDCOMMAND_PARAMETER',['COMMAND_HISTORY_LIMIT'],{'project':where_dict['project'],
+                                                                                         'area':where_dict['area']})[0][0]
+        count=self.get_database_data('COMMAND_HISTORY',['COUNT(*)'],where_dict)[0][0]
+        
+        if count>=int(limit):
+            # 任务删除第一条插入的，修复删除命令时，回滚命令报错的bug
+            where_sql=AppStorage.dynamic_sql_return('','WHERE','AND',where_dict)
+            other_sql=f"WHERE ID IN (select ID from command_history {where_sql} order by date_time limit 0,1)"
+            print('other_sql=======================================================================')
+            print(other_sql)
+            self.del_database_data('COMMAND_HISTORY',{},other_sql)
+            flag=True
+
         _command_history_dict={}
         _command_history_dict['project']=command_history_dict['project']
         if command_history_dict['mode']=='project':   
@@ -699,6 +724,8 @@ class AppStorage():
         print(add_parameter_list)
         def callback(cur,con):
             con.commit()
+            if flag:
+                return 'LIMIT'
             return True
         return self.oprate_sql(self.__add_command_history_sql,add_parameter_list,callback)
     

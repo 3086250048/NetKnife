@@ -2,7 +2,7 @@
     <el-container class="el_container">
         <el-header  height="0px"  >
             <div class="title">
-                {{ base_title }}
+                {{ base_title }}{{ this.command_index }}
             </div>     
         </el-header>
         <el-main class="el_main">
@@ -21,7 +21,7 @@
                 <el-button  type="text" @click="path_dialog_able= true">设置文件路径参数</el-button>
             </el-dialog>
             <!-- 弹出框 -->
-            <el-dialog title="设置发送命令参数" :visible.sync="send_dialog_able" width="700px" >
+            <el-dialog title="设置命令参数" :visible.sync="send_dialog_able" width="700px" >
                 <el-form :model="send_parameter">
                     <el-form-item label="是否关闭显示命令" :label-width="'130px'" style="margin-left: -20px;">
                         <el-switch
@@ -37,6 +37,9 @@
                     </el-form-item>
                     <el-form-item label="命令输出的超时时间" :label-width="'140px'" style="position: absolute;top: 84px;left: 356px;">
                         <el-input-number v-model="send_parameter.read_timeout" :min="0" :max="1000" label="读取回显的超时时间"></el-input-number>
+                    </el-form-item>
+                    <el-form-item label="历史命令上限" :label-width="'140px'" style="position: absolute;top: 134px;left: -38px;">
+                        <el-input-number v-model="send_parameter.COMMAND_HISTORY_LIMIT" :min="1" :max="9999" label="历史命令上限"></el-input-number>
                     </el-form-item>
                 </el-form>
                 <div slot="footer" class="dialog-footer">
@@ -87,11 +90,11 @@
                         <li v-for="(item,i) in all_command_time_list " :key="i" > 
                             <el-card class="box-card" >
                                 <el-button-group style="float: right;margin-top: -20px;margin-right:-20px;" >
-                                    <el-button type="primary" size="mini" @click="show_history_command(item[0],item[1])" >查看</el-button>
-                                    <el-button type="primary" size="mini" @click="delete_history_command(item[0],item[1])">删除</el-button>
+                                    <el-button type="primary" size="mini" @click="show_history_command(item[0],item[1],i)" >查看</el-button>
+                                    <el-button type="primary" size="mini" @click="delete_history_command(item[0],item[1],item[2],i)">删除</el-button>
                                 </el-button-group>
                                 命令:{{ item[0] }}<br>
-                                执行时间:{{ item[1] }} 
+                                执行时间:{{ item[1] }} <br>
                             </el-card>
                         </li>
                     </ul>
@@ -151,7 +154,8 @@ export default {
             send_parameter:{
                 device_title_able:false,
                 command_able:false,
-                read_timeout:10
+                read_timeout:10,
+                COMMAND_HISTORY_LIMIT:500
             },
             path_parameter:{
                 txt_export_path:'',
@@ -185,7 +189,8 @@ export default {
             ROLLBACK_MIXUNIT_LIST:'ROLLBACK_MIXUNIT_LIST',
             CHOOSE_CHANGE:'CHOOSE_CHANGE',
             SHOW_HISTORY_COMMAND:'SHOW_HISTORY_COMMAND',
-            DELETE_HISTORY_COMMAND:'DELETE_HISTORY_COMMAND'
+            DELETE_HISTORY_COMMAND:'DELETE_HISTORY_COMMAND',
+            SET_VM:'SET_VM'
         }),
         ...mapMutations('mixunitpageAbout',{SET_MIXUNIT_VIEW_ABLE:'SET_MIXUNIT_VIEW_ABLE'}),
         goBack(){
@@ -220,7 +225,8 @@ export default {
             this.COMMIT_COMMAND({
                 command:this.command,
                 send_parameter:this.send_parameter,
-                path_parameter:this.path_parameter
+                path_parameter:this.path_parameter,
+                choose_mixunit:this.choose_mixunit
             })
         },
         set_effect(){
@@ -230,7 +236,7 @@ export default {
             this.send_dialog_able=false
         },
         sendcommand_handler_commit(){
-            this.send_dialog_able=false
+           
             send_post('/change_sendcommand_parameter',{
                 'where':{
                     'project':this.choose_project[0],
@@ -241,17 +247,19 @@ export default {
                 'update':{
                     device_title_able:this.send_parameter.device_title_able,
                     command_able:this.send_parameter.command_able,
-                    read_timeout:this.send_parameter.read_timeout
+                    read_timeout:this.send_parameter.read_timeout,
+                    COMMAND_HISTORY_LIMIT:this.send_parameter.COMMAND_HISTORY_LIMIT
                 }
             },response=>{
                 console.log(response.data)
+                this.send_dialog_able=false
             },reason=>{})
         },
         filepath_handler_cancel(){
             this.path_dialog_able=false
         },
         filepath_handler_commit(){
-            this.path_dialog_able=false
+            
             send_post('/change_filepath_parameter',{
                 'where':{
                     'project':this.choose_project[0],
@@ -267,6 +275,7 @@ export default {
                 }
             },response=>{
                 console.log(response.data)
+                this.path_dialog_able=false
             },reason=>{})
         },
         rollback_command(){
@@ -328,19 +337,23 @@ export default {
         handleSelect(item) {
             this.CHOOSE_CHANGE(item)
         },
-        show_history_command(command,date_time){
+        show_history_command(command,date_time,i){
             this.check_list=[]
             this.search_command_history_able=false
             this.SHOW_HISTORY_COMMAND({
                 'command':command,
-                'date_time':date_time
+                'date_time':date_time,
+                'index':i
             })
 
         },
-        delete_history_command(command,date_time){
+        delete_history_command(command,date_time,id,i){
+            this.check_list=[]
             this.DELETE_HISTORY_COMMAND({
                 'command':command,
-                'date_time':date_time
+                'date_time':date_time,
+                'id':id,
+                'index':i
             })
         }
 
@@ -410,7 +423,7 @@ export default {
             this.SET_TEXT_AREA(new_value)
         },
         send_dialog_able(new_value){
-            if(new_value){
+            //  if(new_value){
                 send_post('/get_sendcommand_parameter',{
                     'project':this.choose_project[0],
                     // 'area':'None'
@@ -428,11 +441,13 @@ export default {
                         this.send_parameter.command_able=true
                     }
                     this.send_parameter.read_timeout=response.data[0][2]
+                    this.send_parameter.COMMAND_HISTORY_LIMIT=response.data[0][3]
                 },reason=>{})
-            }
+            // }
+            console.log(this.send_parameter)
         },
         path_dialog_able(new_value){
-            if(new_value){
+            // if(new_value){
                 send_post('/get_filepath_parameter',{
                     'project':this.choose_project[0],
                     // 'area':'None'
@@ -444,7 +459,7 @@ export default {
                     this.path_parameter.ftp_upload_path=response.data[0][2]
                     this.path_parameter.ftp_download_path=response.data[0][3]
                 },reason=>{})
-            }
+            // }
         },
         history_command(new_value){
             this.command=new_value
@@ -457,7 +472,9 @@ export default {
         },
     },
     mounted(){
+        this.SET_VM(this)
         this.set_effect()
+        // 加载初始化参数
         send_post('/get_filepath_parameter',{
             'project':this.choose_project[0],
             // 'area':'None'
@@ -488,6 +505,7 @@ export default {
                 this.send_parameter.command_able=true
             }
             this.send_parameter.read_timeout=response.data[0][2]
+            this.send_parameter.COMMAND_HISTORY_LIMIT=response.data[0][3]
         },reason=>{})
         this.SET_HISTORY_COMMAND_COUNT()
     },
@@ -497,7 +515,6 @@ export default {
 
 <style scoped>
     
-
     .el_container{
         margin-left: -28px;
         margin-top: -20px;

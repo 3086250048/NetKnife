@@ -229,6 +229,8 @@ def get_search_data():
 @netknife.route('/add_command_history',methods=['POST'])
 def add_command_history():
     result=storage.add_command_history(json.loads(request.get_data(as_text=True)))
+    if result=='LIMIT':
+        return result
     if result:
         return 'ADD_SUCCESS'
     else:
@@ -265,8 +267,9 @@ def export_textarea():
 @netknife.route('/get_all_command_time',methods=['POST'])
 def get_all_command_time():
     where_dict=ap.processing_command_history_where_dict(json.loads(request.get_data(as_text=True)))
-    result=storage.get_database_data('COMMAND_HISTORY',['COMMAND','DATE_TIME'],where_dict,'ORDER BY DATE_TIME DESC')
+    result=storage.get_database_data('COMMAND_HISTORY',['COMMAND','DATE_TIME','ID'],where_dict,'ORDER BY DATE_TIME DESC')
     _result=ap.processing_command_history_result(result)
+    print(_result)
     return _result
 @netknife.route('/delete_history_command',methods=['POST'])
 def delete_history_command():

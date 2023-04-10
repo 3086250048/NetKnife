@@ -225,12 +225,15 @@ class AppProcessing():
         if where_dict['mode']=='project':   
             _where_dict['area']='None'
             _where_dict['project']=where_dict['project']
+           
         else:
             _where_dict['area']=where_dict['area']
             _where_dict['project']=where_dict['project']
             _where_dict['protocol']=where_dict['protocol']
             _where_dict['port']=where_dict['port']
             _where_dict['ip_expression']=where_dict['ip_expression']
+        if 'id' in where_dict:
+             _where_dict['id']=where_dict['id']
         if 'search' in where_dict:
             _lis=where_dict['search'].split('|')
             __lis=[ v.strip(' ')  for v in _lis]
@@ -245,7 +248,7 @@ class AppProcessing():
     def processing_command_history_result(self,result):
         _result=[]
         for v in result:
-            _result.append([v[0],v[1]])  
+            _result.append([v[0],v[1],v[2]])  
         __result=[{'value':v} for v in _result ]
         return __result
 

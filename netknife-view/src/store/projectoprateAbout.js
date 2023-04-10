@@ -15,6 +15,7 @@ export const  projectoprateAbout={
             state.loading_able=true
             state.response_data_list=[]
             state.textarea=''
+            state.command_index=-1
             send_post('/commit_command',{
                 'base_effect_range':state.choose_project[0],
                 'mixunit':state.choose_mixunit,
@@ -39,22 +40,28 @@ export const  projectoprateAbout={
                 console.log('发送add_command_history')
                 send_post('/add_command_history',{
                     'project':state.choose_project[0],
-                    'area':state.choose_mixunit[3],
-                    'protocol':state.choose_mixunit[4],
-                    'port':state.choose_mixunit[5],
-                    'ip_expression':state.choose_mixunit[9],
+                    'area':payload.choose_mixunit[3],
+                    'protocol':payload.choose_mixunit[4],
+                    'port':payload.choose_mixunit[5],
+                    'ip_expression':payload.choose_mixunit[9],
                     'mode':state.oprate_mode,
                     'command':payload.command,
                     'response':state.response_data_list,
                     'date_time':state.response_date_time
                 },response=>{
-                    console.log(response)
+                    if (response.data==='LIMIT'){
+                        state.vm.$message({
+                            showClose: true,
+                            message: '记录的命令已经达到上限,将删除最早的一条命令后继续记录',
+                            type: 'warning'
+                          });
+                    }
                     send_post('/get_command_history_count',{
                         'project':state.choose_project[0],
-                        'area':state.choose_mixunit[3],
-                        'protocol':state.choose_mixunit[4],
-                        'port':state.choose_mixunit[5],
-                        'ip_expression':state.choose_mixunit[9],
+                        'area':payload.choose_mixunit[3],
+                        'protocol':payload.choose_mixunit[4],
+                        'port':payload.choose_mixunit[5],
+                        'ip_expression':payload.choose_mixunit[9],
                         'mode':state.oprate_mode,
                     },response=>{
                         state.history_command_count=response.data
@@ -165,6 +172,7 @@ export const  projectoprateAbout={
             },response=>{
                 console.log(response.data)
                 state.history_command_count=response.data
+               
             })
         },
         EXPORT_TEXTAREA(state,payload){
@@ -207,9 +215,10 @@ export const  projectoprateAbout={
                 'ip_expression':state.choose_mixunit[9],
                 'mode':state.oprate_mode,
             },response=>{
+                console.log(response.data)
                 response.data.forEach(e=>{
                     state.all_command_time_search_list.push({'value':`${e.value[0]} | ${e.value[1]}`})
-                    state.all_command_time_list.push([e.value[0],e.value[1]])
+                    state.all_command_time_list.push([e.value[0],e.value[1],e.value[2]])
                 })
                 state.full_all_command_time_list=state.all_command_time_list
             })
@@ -222,11 +231,11 @@ export const  projectoprateAbout={
             'port':state.choose_mixunit[5],
             'ip_expression':state.choose_mixunit[9],
             'mode':state.oprate_mode,
-            'search':item.value
+            'search':item.value,
         },response=>{
             state.all_command_time_list=[]
             response.data.forEach(e=>{
-                state.all_command_time_list.push([e.value[0],e.value[1]])
+                state.all_command_time_list.push([e.value[0],e.value[1],e.value[2]])
             })
             })
         },
@@ -237,6 +246,7 @@ export const  projectoprateAbout={
             state.response_data_list=[]
             state.textarea=''
             state.history_command=''
+            state.command_index=payload.index
             send_post('/get_command_history',{
                 'mode':state.oprate_mode,
                 'project':state.choose_project[0],
@@ -254,8 +264,13 @@ export const  projectoprateAbout={
             })
         },
         DELETE_HISTORY_COMMAND(state,payload){
+            state.response_data_list=[]
+            state.textarea=''
+            state.history_command=''
+            state.command_index=-1
             send_post('/delete_history_command',{
                 'mode':state.oprate_mode,
+                'id':payload.id,
                 'project':state.choose_project[0],
                 'area':state.choose_mixunit[3],
                 'protocol':state.choose_mixunit[4],
@@ -264,9 +279,9 @@ export const  projectoprateAbout={
                 'command':payload.command,
                 'date_time':payload.date_time
             },response=>{
-                if(response.data==='DELETE_SUCCESS'){
+                if(response.data==='DELETE_SUCCESS'){     
                     state.all_command_time_list=[]
-                    state.all_command_time_search_list=[]
+                    state.all_command_time_search_list=[]              
                     send_post('/get_all_command_time',{
                         'project':state.choose_project[0],
                         'area':state.choose_mixunit[3],
@@ -277,12 +292,27 @@ export const  projectoprateAbout={
                     },response=>{
                         response.data.forEach(e=>{
                             state.all_command_time_search_list.push({'value':`${e.value[0]} | ${e.value[1]}`})
-                            state.all_command_time_list.push([e.value[0],e.value[1]])
+                            state.all_command_time_list.push([e.value[0],e.value[1],e.value[2]])
                         })
                         state.full_all_command_time_list=state.all_command_time_list
                     })
+
+                    send_post('/get_command_history_count',{
+                        'project':state.choose_project[0],
+                        'area':state.choose_mixunit[3],
+                        'protocol':state.choose_mixunit[4],
+                        'port':state.choose_mixunit[5],
+                        'ip_expression':state.choose_mixunit[9],
+                        'mode':state.oprate_mode,
+                    },response=>{
+                        state.history_command_count=response.data    
+                    })
+                    
                 }
             })
+        },
+        SET_VM(state,vm){
+            state.vm=vm
         }
     },
     state:{
@@ -299,6 +329,8 @@ export const  projectoprateAbout={
         history_command_count:0,
         all_command_time_list:[],
         all_command_time_search_list:[],
-        full_all_command_time_list:[]
+        full_all_command_time_list:[],
+        vm:{}
+
     }
 }
