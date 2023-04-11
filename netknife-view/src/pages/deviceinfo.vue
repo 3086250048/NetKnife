@@ -13,6 +13,7 @@
                             :default-active="activeIndex" class="el-menu-vertical-demo"  @select="handleSelect">
                 <el-menu-item index="first">设备状态</el-menu-item>
                 <el-menu-item index="second">管理设备</el-menu-item>
+                <el-menu-item index="three">编写文件</el-menu-item>
         </el-menu>
         <el-main>
             <router-view></router-view>
@@ -39,10 +40,17 @@ export default{
         handleSelect(key){
             this.activeIndex='first'
             if(key==='second' ){
+                this.$bus.$emit('init_active_name')
                 this.$router.push({
                     name:'create'
                 })
-            }else{
+            }
+            else if(key==='three'){
+                this.$router.push({
+                    name:'filemanage'
+                })
+            }
+            else{
                 send_get('/select_count',response=>{
                 if (response.data[0][0]<=1){
                     this.$router.push({

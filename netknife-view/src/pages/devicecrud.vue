@@ -44,6 +44,12 @@ export default{
     },
     mounted(){
         this.handleClick()
+        this.$bus.$on('init_active_name',()=>{
+            this.activename='first'
+        })
+    },
+    beforeDestroy(){
+        this.$bus.$off('init_active_name')
     }
 }
 </script>

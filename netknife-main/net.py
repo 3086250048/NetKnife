@@ -75,6 +75,12 @@ class AppNet():
                             'type':device_info['device_type']}
         def huawei_send_commands(connect,device_info,command_data):
             select_out,config_out,upload_out,download_out= '','','',''
+            print('command============================================================================')
+            print(command_data)
+            {'delete': None, 'select': 'dir', 'config': None, 'upload': None, 'download': None, 'action': None,
+            'send_parameter': {'strip_prompt': True, 'strip_command': False, 'read_timeout': 17.0}, 
+            'path_parameter': {'txt_export_path': 'C:\\Users\\30862\\Desktop\\', 'ftp_root_path': 'C:\\Users\\30862\\Desktop\\',
+             'ftp_upload_path': 'C:\\Users\\30862\\Desktop\\', 'ftp_download_path': 'C:\\Users\\30862\\Desktop\\'}}
             if command_data['delete']:
                 _cmd=f"delete {command_data['delete']}"
                 select_out += connect.send_command_timing(_cmd,**command_data['send_parameter'])

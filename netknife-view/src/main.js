@@ -10,8 +10,11 @@ Vue.use(ElementUI)
 Vue.config.productionTip = false
 // //引入Vuex插件
 import store from './store/index'
-
 import router from './router/index'
+import VueCodemirror from 'vue-codemirror'
+import 'codemirror/lib/codemirror.css'
+Vue.use(VueCodemirror)
+
 new Vue({
   el:'#app',
   store:store,

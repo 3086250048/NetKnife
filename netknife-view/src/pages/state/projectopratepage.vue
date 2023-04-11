@@ -2,7 +2,14 @@
     <el-container class="el_container">
         <el-header  height="0px"  >
             <div class="title">
-                {{ base_title }}{{ this.command_index }}
+                    <el-tag
+                    v-for="title in base_title"
+                    effect="dark"
+                    size="mini"
+                    :type="title.type"
+                    >
+                    {{ title.label  }}
+                    </el-tag><br>
             </div>     
         </el-header>
         <el-main class="el_main">
@@ -104,7 +111,6 @@
             <el-input
             type="textarea"
             :rows="18"
-            
             v-model="textarea"
             resize="none"
             class="el_main--el_input"
@@ -385,9 +391,12 @@ export default {
         },
         base_title(){
             if(this.choose_mixunit.length===0 ){
-                return `${this.choose_project[0].slice(0,22)}>`
+                return [{type:'',label:this.choose_project[0].slice(0,42)}]
             }else{
-                return `${this.choose_project[0].slice(0,22)}>${this.choose_mixunit[3]}>${this.choose_mixunit[4]}>${this.choose_mixunit[5]}>${this.choose_mixunit[9]}>`
+                return [{type:'',label:this.choose_project[0].slice(0,42)},
+                        {type:'success',label:this.choose_mixunit[3]},
+                        {type:'danger',label:`${this.choose_mixunit[4]}://${this.choose_mixunit[9]}:${this.choose_mixunit[5]}`}
+                    ]
             }
         },
         oprate_mode(){
