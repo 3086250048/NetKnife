@@ -11,9 +11,15 @@ Vue.config.productionTip = false
 // //引入Vuex插件
 import store from './store/index'
 import router from './router/index'
+//Codemirror
 import VueCodemirror from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
+import 'codemirror/theme/monokai.css' 
+import 'codemirror/theme/material.css'
+import 'codemirror/mode/javascript/javascript.js'
+import 'codemirror/addon/display/placeholder.js'
 Vue.use(VueCodemirror)
+
 
 new Vue({
   el:'#app',

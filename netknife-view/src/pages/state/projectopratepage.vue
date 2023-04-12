@@ -3,7 +3,8 @@
         <el-header  height="0px"  >
             <div class="title">
                     <el-tag
-                    v-for="title in base_title"
+                    v-for="title,i in base_title"
+                    :key="i"
                     effect="dark"
                     size="mini"
                     :type="title.type"

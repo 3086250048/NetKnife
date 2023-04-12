@@ -15,6 +15,7 @@ import mixunitpage from '../pages/state/mixunitpage.vue'
 import projectopratepage from '../pages/state/projectopratepage.vue'
 import empty from '../pages/empty.vue'
 import filemanage from '../pages/filemanage.vue'
+import filecreate from '../pages/filecreate.vue'
 
 export const originalPush = VueRouter.prototype.push
 VueRouter.prototype.push = function push(location) {
@@ -76,7 +77,14 @@ export default new VueRouter({
                 {
                     name:'filemanage',
                     path:'filemanage',
-                    component:filemanage
+                    component:filemanage,
+                    children:[
+                        {
+                            name:'filecreate',
+                            path:'filecreate',
+                            component:filecreate
+                        }
+                    ]
                 }
             ]
         },

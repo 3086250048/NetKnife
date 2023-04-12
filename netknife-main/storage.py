@@ -78,7 +78,16 @@ class AppStorage():
                 COMMAND_RESPONSE TEXT   NOT NULL,
                 DATE_TIME   TEXT    NOT NULL);'''
                 )
-                print('COMMAND_HISTORY')
+                print('COMMAND_HISTORY')    
+                cur.execute(               
+                     '''CREATE TABLE netknife_file (
+                ID             TEXT     PRIMARY KEY NOT NULL,
+                IMPORT         TEXT     NOT NULL,
+                TYPE           TEXT     NOT NULL,
+                NAME           TEXT     NOT NULL,
+
+                );'''
+                )
                 cur.execute(
                     '''CREATE TABLE SUID (FIRST_SUID   TEXT    PRIMARY KEY NOT NULL);'''
                 )

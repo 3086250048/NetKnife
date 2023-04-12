@@ -6,6 +6,7 @@ import { devicestateAbout } from './devicestateAbout'
 import { projectoprateAbout } from './projectoprateAbout'
 import { mixunitpageAbout } from './mixunitpageAbout'
 import {filemanageAbout} from './filemanageAbout'
+import {filecreateAbout} from './filecreateAbout'
 
 import Vuex from 'vuex'
 import Vue from 'vue'
@@ -20,6 +21,7 @@ export default new Vuex.Store({
         devicestateAbout:devicestateAbout,
         projectoprateAbout:projectoprateAbout,
         mixunitpageAbout:mixunitpageAbout,
-        filemanageAbout:filemanageAbout
+        filemanageAbout:filemanageAbout,
+        filecreateAbout:filecreateAbout
     }
 })
