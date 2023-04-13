@@ -300,18 +300,56 @@ class StorageProcessing():
                 _add_parameter_list.append(v)
         return _add_parameter_list
     def processing_netknife_file(self,data):
+        code=data['code']
+        file_data={}
+        file_data['name'] = re.search(r'name\s*:\s*([^:\n]+)', code).group(1).replace(" ","")
+        file_data['priority'] = re.search(r'priority\s*:\s*(\d+)', code).group(1).replace(" ","")
+        
+        ruijie_pattern = r"ruijie:{(.+?)}"
+        h3c_pattern = r"h3c:{(.+?)}"
+        cisco_pattern = r"h3c:{(.+?)}"
+        huawei_pattern = r"h3c:{(.+?)}"
+        jinja2_pattern =  r"jinja2:\{(.+?)\}"
+        excute_pattern = r"excute:{(.+?)}"
 
-        a=data['code']
-        name = re.search(r'name\s*:\s*([^:\n]+)', a).group(1).replace(" ","")
-        priority = re.search(r'priority\s*:\s*(\d+)', a).group(1).replace(" ","")
-        print(name)
-        print(priority)
-        matches = matches = re.findall(r'\{([^{}]+?)\}', a)
+    
+        ruijie_match = re.search(ruijie_pattern,code, re.DOTALL)
+        h3c_match = re.search(h3c_pattern,code, re.DOTALL)
+        cisco_match = re.search(cisco_pattern,code, re.DOTALL)
+        huawei_match = re.search(huawei_pattern,code, re.DOTALL)
+        jinja2_match = re.findall(jinja2_pattern, code, re.DOTALL)
+        excute_match = re.search(excute_pattern,code,re.DOTALL)
 
-        # 输出匹配结果
-        for match in matches:
-            print(match.strip())
-            
+        if ruijie_match:
+            content =ruijie_match.group(1)
+            exclude_content=content.replace("\t","").replace(" ","")
+            content_list=[ x for x in exclude_content.split("\n") if x !="" and x !=" "]
+            file_data['ruijie']=content_list
+        if h3c_match:
+            content =h3c_match.group(1)
+            exclude_content=content.replace("\t","").replace(" ","")
+            content_list=[ x for x in exclude_content.split("\n") if x !="" and x !=" "]
+            file_data['h3c']=content_list
+        if cisco_match:
+            content =cisco_match.group(1)
+            exclude_content=content.replace("\t","").replace(" ","")
+            content_list=[ x for x in exclude_content.split("\n") if x !="" and x !=" "]
+            file_data['cisco']=content_list
+        if huawei_match:
+            content =huawei_match.group(1)
+            exclude_content=content.replace("\t","").replace(" ","")
+            content_list=[ x for x in exclude_content.split("\n") if x !="" and x !=" "]
+            file_data['huawei']=content_list
+        if excute_match:
+            content =excute_match.group(1)
+            exclude_content=content.replace("\t","").replace(" ","")
+            content_list=[ x for x in exclude_content.split("\n") if x !="" and x !=" "]
+            file_data['excute']=content_list
+        if jinja2_match:
+            for match in jinja2_match:
+                print(match.strip())
+
+        print(file_data)
         
 if __name__ == '__main__':
     ap=AppProcessing()
