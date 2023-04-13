@@ -299,8 +299,20 @@ class StorageProcessing():
             else:
                 _add_parameter_list.append(v)
         return _add_parameter_list
+    def processing_netknife_file(self,data):
 
+        a=data['code']
+        name = re.search(r'name\s*:\s*([^:\n]+)', a).group(1).replace(" ","")
+        priority = re.search(r'priority\s*:\s*(\d+)', a).group(1).replace(" ","")
+        print(name)
+        print(priority)
+        matches = matches = re.findall(r'\{([^{}]+?)\}', a)
 
+        # 输出匹配结果
+        for match in matches:
+            print(match.strip())
+            
+        
 if __name__ == '__main__':
     ap=AppProcessing()
     # lis=[[('Myproject', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '100.100.100.100')], [('默认项目', '默认区域', 'telnet', '23', 'admin', '11', '', '192.168.123.1'), ('默认项目', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '2.1.1.1')], [('默认项目1', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2'), ('默认项目1', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.3')], [('默认项目11', '默认区域', 'telnet', '23', '1', '1', '', '2.2.2.2')], [('默认项目2', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2')], [('默认项目3', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2')], [('默认项目4', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.2'), ('默认项目4', '默认区域', 'telnet', '23', 'admin', 'admin@123', '', '1.1.1.3')]]

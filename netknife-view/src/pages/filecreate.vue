@@ -1,12 +1,12 @@
 <template>
   <div>
-    <el-button type="primary" class="create" @click="showCode" size="small">
+    <el-button type="primary" class="create" @click="create_file" size="small">
       创建文件
     </el-button>
     <codemirror
       style="
-        margin-left: -15px;
-        margin-top: -15px;
+      margin-left: -15px;
+      margin-top: -15px;
       "
       ref="myCm"
       :value="code"
@@ -20,13 +20,13 @@
 <script>
 import codemirror from "codemirror";
 import "codemirror/mode/meta";
-
+import { mapMutations} from 'vuex'
 
 export default {
   name: "FileCreate",
   data() {
     return {
-      code: `{\n  "name": "",\n  "rule": {}\n}`,
+      code: ``,
       cmOptions: {
         tabSize: 4,
         styleActiveLine: true,
@@ -38,10 +38,12 @@ export default {
       }
     };
   },
+  
   methods: {
-    showCode() {
+    ...mapMutations('filecreateAbout',{CREATE_NETKNIFE_FILE:'CREATE_NETKNIFE_FILE'}),
+    create_file() {
       const code = this.codemirror.getValue();
-      console.log(code);
+      this.CREATE_NETKNIFE_FILE(code)
     }
   },
   computed: {

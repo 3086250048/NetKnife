@@ -19,6 +19,10 @@ class AppStorage():
         self.__get_project_list_sql='''SELECT PROJECT FROM LOGININFO GROUP BY PROJECT ;'''
         self.__add_suid_sql='''INSERT INTO SUID (FIRST_SUID) VALUES (?);'''
         self.__add_command_history_sql='''INSERT INTO COMMAND_HISTORY (ID,PROJECT,AREA,PROTOCOL,PORT,IP_EXPRESSION,COMMAND,COMMAND_RESPONSE,DATE_TIME) VALUES (?,?,?,?,?,?,?,?,?);'''
+        self.__add_config_sql='''INSERT INTO CONFIG (ID,FILE_NAME,FILE_PRIORITY) VALUES(?,?,?)'''
+        self.__add_translation_sql='''INSERT INTO TRANSLATION (ID,FILE_NAME,TYPE,BEFORE_CMD,AFTER_CMD) VALUES(?,?,?,?,?)'''
+        self.__add_jinja2_sql='''INSERT INTO JINJA2 (ID,FILE_NAME,FUN_NAME,JINJA2_STR) VALUES(?,?,?,?)'''
+        self.__add_excute_sql='''INSERT INTO EXCUTE (ID,FILE_NAME,CMD) VALUES(?,?,?)'''
         #初始化创建数据库和表
         if not os.path.exists(self.__path):
             try:
@@ -80,14 +84,44 @@ class AppStorage():
                 )
                 print('COMMAND_HISTORY')    
                 cur.execute(               
-                     '''CREATE TABLE netknife_file (
+                     '''CREATE TABLE CONFIG (
                 ID             TEXT     PRIMARY KEY NOT NULL,
-                IMPORT         TEXT     NOT NULL,
-                TYPE           TEXT     NOT NULL,
-                NAME           TEXT     NOT NULL,
-
+                FILE_NAME      TEXT     NOT NULL,
+                FILE_PRIORITY       TEXT     NOT NULL,
+                UNIQUE(FILE_NAME)
                 );'''
                 )
+                print('CONFIG')
+                cur.execute(               
+                     '''CREATE TABLE TRANSLATION (
+                ID             TEXT     PRIMARY KEY NOT NULL,
+                FILE_NAME            TEXT    NOT NULL,
+                TYPE                TEXT     NOT NULL,
+                BEFORE_CMD         TEXT     NOT NULL,
+                AFTER_CMD          TEXT     NOT NULL,
+                UNIQUE(FILE_NAME,TYPE,BEFORE_CMD)
+                );'''
+                )
+                print('TRANSLATION')
+                cur.execute(               
+                     '''CREATE TABLE JINJA2 (
+                ID             TEXT     PRIMARY KEY NOT NULL,
+                FILE_NAME           TEXT     NOT NULL,
+                FUN_NAME       TEXT     NOT NULL,
+                JINJA2_STR     TEXT     NOT NULL,
+                UNIQUE(FILE_NAME,FUN_NAME)
+                );'''
+                )
+                print('JINJA2')
+                cur.execute(               
+                     '''CREATE TABLE EXCUTE (
+                ID             TEXT     PRIMARY KEY NOT NULL,
+                FILE_NAME      TEXT     NOT NULL,
+                CMD            TEXT     NOT NULL,
+                UNIQUE(FILE_NAME)
+                );'''
+                )
+                print('EXCUTE')
                 cur.execute(
                     '''CREATE TABLE SUID (FIRST_SUID   TEXT    PRIMARY KEY NOT NULL);'''
                 )
@@ -102,8 +136,16 @@ class AppStorage():
                 print('INSERT-3')
                 cur.execute(self.__add_command_history_sql,[suid]*9)
                 print('INSERT-4')
-                cur.execute(self.__add_suid_sql,[suid])
+                cur.execute(self.__add_config_sql,[suid]*3)
                 print('INSERT-5')
+                cur.execute(self.__add_translation_sql,[suid]*5)
+                print('INSERT-6')
+                cur.execute(self.__add_jinja2_sql,[suid]*4)
+                print('INSERT-7')
+                cur.execute(self.__add_excute_sql,[suid]*3)
+                print('INSERT-8')
+                cur.execute(self.__add_suid_sql,[suid])
+                print('INSERT-9')
                 con.commit()
             except sqlite3.Error as e:
                 print(e)
@@ -306,7 +348,6 @@ class AppStorage():
     def get_project_unit_list(self) -> list:
         def callback(cur,con):
             return cur.fetchall()
-        ['ensp', 'fb5377e75c6e48f0aef672a8c9c9a008']
         project_list=[ v[0] for v in self.oprate_sql(self.__get_project_list_sql,{},callback)]
         first_suid=self.oprate_sql('SELECT * FROM SUID',{},callback)[0][0]
         project_list.remove(first_suid)
@@ -587,11 +628,6 @@ class AppStorage():
                     'read_timeout': add_base_area_send_parameter_list[i][0][2],
                 })
             for e in add_none_area_list:
-                [('C:\\Users\\30862\\Desktop\\', 'C:\\Users\\30862\\Desktop\\', 'C:\\Users\\30862\\Desktop\\', 'C:\\Users\\30862\\Desktop\\')]
-                [('False', 'False', '10')]
-                print('**********************************************************')
-                print(add_none_area_file_parameter_list)
-                print(add_none_area_send_parameter_list)
                 self.add_filepath_parameter({
                     'project':e[0],
                     'area':e[1],
@@ -752,11 +788,6 @@ class AppStorage():
         before_list=dict['before']
         after_list=dict['after']
         project_after_list = [v[1] for v in after_list]
-        project_before_list = [v[1] for v in before_list]
-        print('===========================before_list===============================')
-        print(before_list)
-        print('===========================after_list================================')
-        print(after_list)
         for i in before_list:
             for j in after_list:
                 if i[0]==j[0] and i[1:]!=j[1:]:
@@ -811,9 +842,7 @@ class AppStorage():
                             update_sql=AppStorage.dynamic_sql_return('UPDATE COMMAND_HISTORY','SET',',',update_dict)
                             full_sql=update_sql+where_sql
                             self.oprate_sql(full_sql,{},callback)
-                       
-                    
-                        
+                                      
     #获取历史命令总条数
     def get_command_history_count(self,where_dict):
         def callback(cur,con):
@@ -862,9 +891,12 @@ class AppStorage():
         except:
             return False
 
-         
-        [['152e0b8d526147469141e9c0ca416958', '152e0b8d526147469141e9c0ca416958'], ['默认项目', '默认区域'], ['默认项目', '默认区域1'], ['默认项目', '默认区域12']]
-        [['152e0b8d526147469141e9c0ca416958', '152e0b8d526147469141e9c0ca416958'], ['默认项目', '默认区域1'], ['默认项目', '默认区域12']]
+#netknife文件相关
+    def add_netknife_file(self,data_dict):
+        return True
+   
+
+    
 
 if __name__ == '__main__':
     ap=AppStorage()

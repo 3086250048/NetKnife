@@ -10,6 +10,7 @@ from data import AppInfo
 from storage import AppStorage
 from net import AppNet
 from processing import AppProcessing
+from processing import StorageProcessing
 from server import APPserver
 from action import ButtonAction
 
@@ -20,6 +21,7 @@ net=AppNet()
 ap=AppProcessing()
 _as=APPserver()
 ba=ButtonAction()
+sp=StorageProcessing()
 
 netknife=Flask(__name__)
 CORS(netknife, resources={r"/*": {"origins": "*"}})
@@ -308,5 +310,14 @@ def delete_parameter_database():
         return 'DELETE_SUCCESS'
     else:
         return 'DELETE_FAULT'
+@netknife.route('/create_netknife_file',methods=['POST'])
+def create_file():
+    file_dict=sp.processing_netknife_file(json.loads(request.get_data(as_text=True)))
+    result=storage.add_netknife_file(file_dict)
+    if result:
+        return 'ADD_SUCCESS'
+    else:
+        return 'ADD_FAULT'
+
 if __name__ == '__main__':
     netknife.run('0.0.0.0',port=3000,debug=True)
