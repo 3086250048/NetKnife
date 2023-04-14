@@ -22,7 +22,8 @@ class AppStorage():
         self.__add_config_sql='''INSERT INTO CONFIG (ID,FILE_NAME,FILE_PRIORITY) VALUES(?,?,?)'''
         self.__add_translation_sql='''INSERT INTO TRANSLATION (ID,FILE_NAME,TYPE,BEFORE_CMD,AFTER_CMD) VALUES(?,?,?,?,?)'''
         self.__add_jinja2_sql='''INSERT INTO JINJA2 (ID,FILE_NAME,FUN_NAME,JINJA2_CMD) VALUES(?,?,?,?)'''
-        self.__add_excute_sql='''INSERT INTO EXCUTE (ID,FILE_NAME,CMD) VALUES(?,?,?)'''
+        self.__add_jinja2_fun_sql='''INSERT INTO JINJA2_FUN (ID,FILE_NAME,FUN_NAME) VALUES(?,?,?)'''
+        self.__add_excute_sql='''INSERT INTO EXCUTE (FILE_NAME,CMD) VALUES(?,?)'''
         #初始化创建数据库和表
         if not os.path.exists(self.__path):
             try:
@@ -108,17 +109,25 @@ class AppStorage():
                 ID             TEXT     PRIMARY KEY NOT NULL,
                 FILE_NAME           TEXT     NOT NULL,
                 FUN_NAME       TEXT     NOT NULL,
-                JINJA2_CMD     TEXT     NOT NULL,
-                UNIQUE(FILE_NAME,FUN_NAME)
+                JINJA2_CMD     TEXT     NOT NULL
                 );'''
                 )
                 print('JINJA2')
                 cur.execute(               
-                     '''CREATE TABLE EXCUTE (
+                     '''CREATE TABLE JINJA2_FUN (
                 ID             TEXT     PRIMARY KEY NOT NULL,
+                FILE_NAME           TEXT     NOT NULL,
+                FUN_NAME       TEXT     NOT NULL,
+                UNIQUE(FILE_NAME,FUN_NAME)
+                );'''
+                )
+                print('JINJA2_FUN')
+                cur.execute(               
+                     '''CREATE TABLE EXCUTE (
+                SORT_ID        INTEGER PRIMARY KEY AUTOINCREMENT,
                 FILE_NAME      TEXT     NOT NULL,
                 CMD            TEXT     NOT NULL,
-                UNIQUE(FILE_NAME)
+                UNIQUE(FILE_NAME,CMD,SORT_ID)
                 );'''
                 )
                 print('EXCUTE')
@@ -142,10 +151,12 @@ class AppStorage():
                 print('INSERT-6')
                 cur.execute(self.__add_jinja2_sql,[suid]*4)
                 print('INSERT-7')
-                cur.execute(self.__add_excute_sql,[suid]*3)
+                cur.execute(self.__add_jinja2_fun_sql,[suid]*3)
                 print('INSERT-8')
-                cur.execute(self.__add_suid_sql,[suid])
+                cur.execute(self.__add_excute_sql,[suid]*2)
                 print('INSERT-9')
+                cur.execute(self.__add_suid_sql,[suid])
+                print('INSERT-10')
                 con.commit()
             except sqlite3.Error as e:
                 print(e)
@@ -893,49 +904,64 @@ class AppStorage():
 
 #netknife文件相关
     def add_netknife_file(self,data_dict):
-       
-        uid =str(uuid.uuid4())
-        suid=''.join(uid.split('-'))
-
-        config_list=list(data_dict['config'].values())
-        config_list.insert(0,suid)
-
         def callback(cur,con):
             con.commit()
             return True
-        self.oprate_sql(self.__add_config_sql,config_list,callback)
-        
-        for k,v in data_dict['translation'].items():
-            before_lis= [_v for _v in v['before_lis']]
-            after_lis= [_v for _v in v['after_lis'] ] 
-            import_lis=[_v for _v in v['import_lis']]
-            for i in range(len(before_lis)):
-                uid =str(uuid.uuid4())
-                suid=''.join(uid.split('-'))
-                before=before_lis[i]
-                if isinstance(before,list):
-                    _before=','.join(before)
-                else:
-                    _before=before
-                after=after_lis[i]
-                if isinstance(after,list):
-                    _after=','.join(after)
-                else:
-                    _after=after
-                translation_lis=[suid,data_dict['config']['name'],k,_before,_after]
-                self.oprate_sql(self.__add_translation_sql,translation_lis,callback)
-            for i in import_lis:
-                uid =str(uuid.uuid4())
-                suid=''.join(uid.split('-'))
-                translation_lis=[suid,data_dict['config']['name'],k,i,'None']
-                self.oprate_sql(self.__add_translation_sql,translation_lis,callback)
-                
-        # ID             TEXT     PRIMARY KEY NOT NULL,
-        #         FILE_NAME            TEXT    NOT NULL,
-        #         TYPE                TEXT     NOT NULL,
-        #         BEFORE_CMD         TEXT     NOT NULL,
-        #         AFTER_CMD          TEXT     NOT NULL,
-        #         IMPORT          TEXT        NOT NULL,
+       
+        if 'config' in data_dict:
+            uid =str(uuid.uuid4())
+            suid=''.join(uid.split('-'))
+            config_list=list(data_dict['config'].values())
+            config_list.insert(0,suid)
+            self.oprate_sql(self.__add_config_sql,config_list,callback)
+        if 'translation' in data_dict:
+            for k,v in data_dict['translation'].items():
+                before_lis= [_v for _v in v['before_lis']]
+                after_lis= [_v for _v in v['after_lis'] ] 
+                import_lis=[_v for _v in v['import_lis']]
+                for i in range(len(before_lis)):
+                    uid =str(uuid.uuid4())
+                    suid=''.join(uid.split('-'))
+                    before=before_lis[i]
+                    if isinstance(before,list):
+                        _before=','.join(before)
+                    else:
+                        _before=before
+                    after=after_lis[i]
+                    if isinstance(after,list):
+                        _after=','.join(after)
+                    else:
+                        _after=after
+                    translation_lis=[suid,data_dict['config']['name'],k,_before,_after]
+                    self.oprate_sql(self.__add_translation_sql,translation_lis,callback)
+                for i in import_lis:
+                    uid =str(uuid.uuid4())
+                    suid=''.join(uid.split('-'))
+                    translation_lis=[suid,data_dict['config']['name'],k,i,'None']
+                    self.oprate_sql(self.__add_translation_sql,translation_lis,callback)
+        if 'jinja2' in data_dict:
+            for k,v in data_dict['jinja2'].items():
+                where_dict={'FILE_NAME':data_dict['config']['name'],'FUN_NAME':k}
+                if self.get_database_data_count('JINJA2_FUN',where_dict):
+                    for i in v:
+                        if isinstance(i,list):
+                            cmd=','.join(i)
+                        else:
+                            cmd=i
+                        uid =str(uuid.uuid4())
+                        suid=''.join(uid.split('-'))
+                        jinja2_lis=[suid,data_dict['config']['name'],k,cmd]
+                        
+                        self.oprate_sql(self.__add_jinja2_sql,jinja2_lis,callback)   
+                    jinja2_fun_lis=[suid,data_dict['config']['name'],k]
+                    self.oprate_sql(self.__add_jinja2_fun_sql,jinja2_fun_lis,callback)
+                    
+        if 'excute':
+            for i in data_dict['excute']:
+                excute_lis=[data_dict['config']['name'],i]
+                self.oprate_sql(self.__add_excute_sql,excute_lis,callback)
+    
+
 
     
 
