@@ -3,7 +3,7 @@ from itertools import chain
 import os,re
 from ordered_set import OrderedSet
 from copy import deepcopy
-
+from pprint import pprint
 
 
 class AppProcessing():
@@ -305,19 +305,29 @@ class StorageProcessing():
         file_data['name'] = re.search(r'name\s*:\s*([^:\n]+)', code).group(1).replace(" ","")
         file_data['priority'] = re.search(r'priority\s*:\s*(\d+)', code).group(1).replace(" ","")
         
+        translation_start = code.find("translation:{")
+        if translation_start != -1:
+            translation_start += len("translation:{")
+            translation_end = translation_start
+            brace_count = 1
+            while brace_count > 0 and translation_end < len(code):
+                if code[translation_end] == "{":
+                    brace_count += 1
+                elif code[translation_end] == "}":
+                    brace_count -= 1
+                translation_end += 1
+            translation_str = code[translation_start:translation_end-1].strip()
+
         ruijie_pattern = r"ruijie:{(.+?)}"
         h3c_pattern = r"h3c:{(.+?)}"
         cisco_pattern = r"h3c:{(.+?)}"
         huawei_pattern = r"h3c:{(.+?)}"
-        jinja2_pattern =  r"jinja2:\{(.+?)\}"
         excute_pattern = r"excute:{(.+?)}"
 
-    
-        ruijie_match = re.search(ruijie_pattern,code, re.DOTALL)
-        h3c_match = re.search(h3c_pattern,code, re.DOTALL)
-        cisco_match = re.search(cisco_pattern,code, re.DOTALL)
-        huawei_match = re.search(huawei_pattern,code, re.DOTALL)
-        jinja2_match = re.findall(jinja2_pattern, code, re.DOTALL)
+        ruijie_match = re.search(ruijie_pattern,translation_str, re.DOTALL)
+        h3c_match = re.search(h3c_pattern,translation_str, re.DOTALL)
+        cisco_match = re.search(cisco_pattern,translation_str, re.DOTALL)
+        huawei_match = re.search(huawei_pattern,translation_str, re.DOTALL)
         excute_match = re.search(excute_pattern,code,re.DOTALL)
 
         if ruijie_match:
@@ -345,11 +355,72 @@ class StorageProcessing():
             exclude_content=content.replace("\t","").replace(" ","")
             content_list=[ x for x in exclude_content.split("\n") if x !="" and x !=" "]
             file_data['excute']=content_list
-        if jinja2_match:
-            for match in jinja2_match:
-                print(match.strip())
-
+        # 处理jinja2
+        jinja2_start = code.find("jinja2:{")
+        if jinja2_start != -1:
+            jinja2_start += len("jinja2:{")
+            jinja2_end = jinja2_start
+            brace_count = 1
+            while brace_count > 0 and jinja2_end < len(code):
+                if code[jinja2_end] == "{":
+                    brace_count += 1
+                elif code[jinja2_end] == "}":
+                    brace_count -= 1
+                jinja2_end += 1
+            jinja2_str = code[jinja2_start:jinja2_end-1].strip()
+        def parse_config(jinja2_str):
+            jinja2_dict = {}
+            lines = jinja2_str.strip().split("\n")
+            current_key = None
+            current_value = ""
+            for line in lines:
+                line = line.strip()
+                if line.endswith("{"):
+                    current_key = line[:-1].strip()
+                    current_value = ""
+                elif line == "}":
+                    key=current_key.replace(":", "")
+                    jinja2_dict[key] = current_value
+                    current_key = None
+                    current_value = ""
+                elif current_key is not None:
+                    current_value += line + "\n"
+            return jinja2_dict
+        file_data['jinja2']=parse_config(jinja2_str)
+        if 'ruijie' in file_data:
+            lis=[]
+            for v in file_data['ruijie']:
+                _lis=v.split('=>')
+                if len(_lis)<=1:
+                    _lis.append('None')
+                lis.append(tuple(_lis))
+            file_data['ruijie']=lis
+        if 'h3c' in file_data:
+            lis=[]
+            for v in file_data['h3c']:
+                _lis=v.split('=>')
+                if len(_lis)<=1:
+                    _lis.append('None')
+                lis.append(tuple(_lis))
+            file_data['h3c']=lis
+        if 'cisco' in file_data:
+            lis=[]
+            for v in file_data['cisco']:
+                _lis=v.split('=>')
+                if len(_lis)<=1:
+                    _lis.append('None')
+                lis.append(tuple(_lis))
+            file_data['cisco']=lis
+        if 'huawei' in file_data:
+            lis=[]
+            for v in file_data['huawei']:
+                _lis=v.split('=>')
+                if len(_lis)<=1:
+                    _lis.append('None')
+                lis.append(tuple(_lis))
+            file_data['huawei']=lis
         print(file_data)
+
         
 if __name__ == '__main__':
     ap=AppProcessing()
