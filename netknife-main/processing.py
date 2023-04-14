@@ -301,76 +301,27 @@ class StorageProcessing():
         return _add_parameter_list
     def processing_netknife_file(self,data):
         code=data['code']
-        file_data={}
-        file_data['name'] = re.search(r'name\s*:\s*([^:\n]+)', code).group(1).replace(" ","")
-        file_data['priority'] = re.search(r'priority\s*:\s*(\d+)', code).group(1).replace(" ","")
-        
-        translation_start = code.find("translation:{")
-        if translation_start != -1:
-            translation_start += len("translation:{")
-            translation_end = translation_start
-            brace_count = 1
-            while brace_count > 0 and translation_end < len(code):
-                if code[translation_end] == "{":
-                    brace_count += 1
-                elif code[translation_end] == "}":
-                    brace_count -= 1
-                translation_end += 1
-            translation_str = code[translation_start:translation_end-1].strip()
+        file_data_config={}
+        file_data_config['name'] = re.search(r'name\s*:\s*([^:\n]+)', code).group(1).replace(" ","")
+        file_data_config['priority'] = re.search(r'priority\s*:\s*(\d+)', code).group(1).replace(" ","")
 
-        ruijie_pattern = r"ruijie:{(.+?)}"
-        h3c_pattern = r"h3c:{(.+?)}"
-        cisco_pattern = r"h3c:{(.+?)}"
-        huawei_pattern = r"h3c:{(.+?)}"
-        excute_pattern = r"excute:{(.+?)}"
-
-        ruijie_match = re.search(ruijie_pattern,translation_str, re.DOTALL)
-        h3c_match = re.search(h3c_pattern,translation_str, re.DOTALL)
-        cisco_match = re.search(cisco_pattern,translation_str, re.DOTALL)
-        huawei_match = re.search(huawei_pattern,translation_str, re.DOTALL)
-        excute_match = re.search(excute_pattern,code,re.DOTALL)
-
-        if ruijie_match:
-            content =ruijie_match.group(1)
-            exclude_content=content.replace("\t","").replace(" ","")
-            content_list=[ x for x in exclude_content.split("\n") if x !="" and x !=" "]
-            file_data['ruijie']=content_list
-        if h3c_match:
-            content =h3c_match.group(1)
-            exclude_content=content.replace("\t","").replace(" ","")
-            content_list=[ x for x in exclude_content.split("\n") if x !="" and x !=" "]
-            file_data['h3c']=content_list
-        if cisco_match:
-            content =cisco_match.group(1)
-            exclude_content=content.replace("\t","").replace(" ","")
-            content_list=[ x for x in exclude_content.split("\n") if x !="" and x !=" "]
-            file_data['cisco']=content_list
-        if huawei_match:
-            content =huawei_match.group(1)
-            exclude_content=content.replace("\t","").replace(" ","")
-            content_list=[ x for x in exclude_content.split("\n") if x !="" and x !=" "]
-            file_data['huawei']=content_list
-        if excute_match:
-            content =excute_match.group(1)
-            exclude_content=content.replace("\t","").replace(" ","")
-            content_list=[ x for x in exclude_content.split("\n") if x !="" and x !=" "]
-            file_data['excute']=content_list
-        # 处理jinja2
-        jinja2_start = code.find("jinja2:{")
-        if jinja2_start != -1:
-            jinja2_start += len("jinja2:{")
-            jinja2_end = jinja2_start
-            brace_count = 1
-            while brace_count > 0 and jinja2_end < len(code):
-                if code[jinja2_end] == "{":
-                    brace_count += 1
-                elif code[jinja2_end] == "}":
-                    brace_count -= 1
-                jinja2_end += 1
-            jinja2_str = code[jinja2_start:jinja2_end-1].strip()
-        def parse_config(jinja2_str):
-            jinja2_dict = {}
-            lines = jinja2_str.strip().split("\n")
+        def get_inner_str(flag_str):
+            search_start = code.find(flag_str)
+            if search_start != -1:
+                search_start += len(flag_str)
+                search_end = search_start
+                brace_count = 1
+                while brace_count > 0 and search_end < len(code):
+                    if code[search_end] == "{":
+                        brace_count += 1
+                    elif code[search_end] == "}":
+                        brace_count -= 1
+                    search_end += 1
+                search_str = code[search_start:search_end-1].strip()
+            return search_str
+        def inner_parse(inner_str):
+            inner_dict = {}
+            lines = inner_str.strip().split("\n")
             current_key = None
             current_value = ""
             for line in lines:
@@ -380,46 +331,87 @@ class StorageProcessing():
                     current_value = ""
                 elif line == "}":
                     key=current_key.replace(":", "")
-                    jinja2_dict[key] = current_value
+                    inner_dict[key] = current_value
                     current_key = None
                     current_value = ""
                 elif current_key is not None:
                     current_value += line + "\n"
-            return jinja2_dict
-        file_data['jinja2']=parse_config(jinja2_str)
-        if 'ruijie' in file_data:
-            lis=[]
-            for v in file_data['ruijie']:
-                _lis=v.split('=>')
-                if len(_lis)<=1:
-                    _lis.append('None')
-                lis.append(tuple(_lis))
-            file_data['ruijie']=lis
-        if 'h3c' in file_data:
-            lis=[]
-            for v in file_data['h3c']:
-                _lis=v.split('=>')
-                if len(_lis)<=1:
-                    _lis.append('None')
-                lis.append(tuple(_lis))
-            file_data['h3c']=lis
-        if 'cisco' in file_data:
-            lis=[]
-            for v in file_data['cisco']:
-                _lis=v.split('=>')
-                if len(_lis)<=1:
-                    _lis.append('None')
-                lis.append(tuple(_lis))
-            file_data['cisco']=lis
-        if 'huawei' in file_data:
-            lis=[]
-            for v in file_data['huawei']:
-                _lis=v.split('=>')
-                if len(_lis)<=1:
-                    _lis.append('None')
-                lis.append(tuple(_lis))
-            file_data['huawei']=lis
-        print(file_data)
+            return inner_dict
+        
+        file_data_translation={}
+        if 'translation:{' in code:
+            for k,v in inner_parse(get_inner_str('translation:{')).items():
+                _v=v.split('\n')
+                before_lis=[]
+                after_lis=[]
+                import_lis=[]
+                _before_lis=[]
+                _after_lis=[]
+                for v in [ v.strip() for v in _v if v !='' ]:
+                    if len(v.split('=>')) <=1:
+                        import_lis.append(v.split('=>')[0])
+                    else:
+                        before_lis.append(v.split('=>')[0])
+                        after_lis.append(v.split('=>')[1])
+                for v in after_lis:
+                    if '$' in v:
+                        lis=[]
+                        for v in v.split('$'):
+                            lis.append(v.strip())
+                        _after_lis.append(lis)
+                    else:
+                        _after_lis.append(v.strip())
+                for v in before_lis:
+                    if '$' in v:
+                        lis=[]
+                        for v in v.split('$'):
+                            lis.append(v.strip())
+                        _before_lis.append(lis)
+                    else:
+                        _before_lis.append(v.strip())
+                
+                file_data_translation[k]={'before_lis':_before_lis,'after_lis':_after_lis,'import_lis':import_lis}
+        file_data_jinja2={}
+        if 'jinja2:{' in code:
+            for k,v in inner_parse(get_inner_str('jinja2:{')).items():
+                _v=[ v.strip() for v in  v.split('\n') if v !='' ]
+                lis=[]
+                cmd_lis=[]
+                flag=False
+                for v in _v:
+                    if v.strip()[0] == '$' :
+                        lis.append(v[1:].strip())
+                        flag=True
+                        continue
+                    if flag and v.strip()[-1]!='$':
+                        lis.append(v.strip())
+                        continue
+                    if v.strip()[-1]== '$':
+                        lis.append(v[:-1].strip())
+                        cmd_lis.append(lis)
+                        lis=[]
+                        flag=False
+                        continue
+                    if v.strip()[0] != '$' and v.strip()[-1]!='$' and not flag:
+                        cmd_lis.append(v)
+                
+                file_data_jinja2[k]=cmd_lis
+        file_data_excute=[]
+        if 'excute:{' in code:
+            a=get_inner_str('excute:{')
+            file_data_excute=[ v.strip() for v in a.split('\n') if v !='']
+        netknife_file_data={}
+        if file_data_config:
+            netknife_file_data['config']=file_data_config
+        if file_data_translation:
+            netknife_file_data['translation']=file_data_translation
+        if file_data_jinja2:
+            netknife_file_data['jinja2']=file_data_jinja2
+        if file_data_excute:
+            netknife_file_data['excute']=file_data_excute
+        return netknife_file_data
+
+       
 
         
 if __name__ == '__main__':

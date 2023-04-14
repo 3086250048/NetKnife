@@ -21,7 +21,7 @@ class AppStorage():
         self.__add_command_history_sql='''INSERT INTO COMMAND_HISTORY (ID,PROJECT,AREA,PROTOCOL,PORT,IP_EXPRESSION,COMMAND,COMMAND_RESPONSE,DATE_TIME) VALUES (?,?,?,?,?,?,?,?,?);'''
         self.__add_config_sql='''INSERT INTO CONFIG (ID,FILE_NAME,FILE_PRIORITY) VALUES(?,?,?)'''
         self.__add_translation_sql='''INSERT INTO TRANSLATION (ID,FILE_NAME,TYPE,BEFORE_CMD,AFTER_CMD) VALUES(?,?,?,?,?)'''
-        self.__add_jinja2_sql='''INSERT INTO JINJA2 (ID,FILE_NAME,FUN_NAME,JINJA2_STR) VALUES(?,?,?,?)'''
+        self.__add_jinja2_sql='''INSERT INTO JINJA2 (ID,FILE_NAME,FUN_NAME,JINJA2_CMD) VALUES(?,?,?,?)'''
         self.__add_excute_sql='''INSERT INTO EXCUTE (ID,FILE_NAME,CMD) VALUES(?,?,?)'''
         #初始化创建数据库和表
         if not os.path.exists(self.__path):
@@ -108,7 +108,7 @@ class AppStorage():
                 ID             TEXT     PRIMARY KEY NOT NULL,
                 FILE_NAME           TEXT     NOT NULL,
                 FUN_NAME       TEXT     NOT NULL,
-                JINJA2_STR     TEXT     NOT NULL,
+                JINJA2_CMD     TEXT     NOT NULL,
                 UNIQUE(FILE_NAME,FUN_NAME)
                 );'''
                 )
@@ -893,8 +893,49 @@ class AppStorage():
 
 #netknife文件相关
     def add_netknife_file(self,data_dict):
-        return True
-   
+       
+        uid =str(uuid.uuid4())
+        suid=''.join(uid.split('-'))
+
+        config_list=list(data_dict['config'].values())
+        config_list.insert(0,suid)
+
+        def callback(cur,con):
+            con.commit()
+            return True
+        self.oprate_sql(self.__add_config_sql,config_list,callback)
+        
+        for k,v in data_dict['translation'].items():
+            before_lis= [_v for _v in v['before_lis']]
+            after_lis= [_v for _v in v['after_lis'] ] 
+            import_lis=[_v for _v in v['import_lis']]
+            for i in range(len(before_lis)):
+                uid =str(uuid.uuid4())
+                suid=''.join(uid.split('-'))
+                before=before_lis[i]
+                if isinstance(before,list):
+                    _before=','.join(before)
+                else:
+                    _before=before
+                after=after_lis[i]
+                if isinstance(after,list):
+                    _after=','.join(after)
+                else:
+                    _after=after
+                translation_lis=[suid,data_dict['config']['name'],k,_before,_after]
+                self.oprate_sql(self.__add_translation_sql,translation_lis,callback)
+            for i in import_lis:
+                uid =str(uuid.uuid4())
+                suid=''.join(uid.split('-'))
+                translation_lis=[suid,data_dict['config']['name'],k,i,'None']
+                self.oprate_sql(self.__add_translation_sql,translation_lis,callback)
+                
+        # ID             TEXT     PRIMARY KEY NOT NULL,
+        #         FILE_NAME            TEXT    NOT NULL,
+        #         TYPE                TEXT     NOT NULL,
+        #         BEFORE_CMD         TEXT     NOT NULL,
+        #         AFTER_CMD          TEXT     NOT NULL,
+        #         IMPORT          TEXT        NOT NULL,
 
     
 
