@@ -904,66 +904,92 @@ class AppStorage():
 
 #netknife文件相关
     def add_netknife_file(self,data_dict):
-        def callback(cur,con):
-            con.commit()
-            return True
-       
-        if 'config' in data_dict:
-            uid =str(uuid.uuid4())
-            suid=''.join(uid.split('-'))
-            config_list=list(data_dict['config'].values())
-            config_list.insert(0,suid)
-            self.oprate_sql(self.__add_config_sql,config_list,callback)
-        if 'translation' in data_dict:
-            for k,v in data_dict['translation'].items():
-                before_lis= [_v for _v in v['before_lis']]
-                after_lis= [_v for _v in v['after_lis'] ] 
-                import_lis=[_v for _v in v['import_lis']]
-                for i in range(len(before_lis)):
-                    uid =str(uuid.uuid4())
-                    suid=''.join(uid.split('-'))
-                    before=before_lis[i]
-                    if isinstance(before,list):
-                        _before=','.join(before)
-                    else:
-                        _before=before
-                    after=after_lis[i]
-                    if isinstance(after,list):
-                        _after=','.join(after)
-                    else:
-                        _after=after
-                    translation_lis=[suid,data_dict['config']['name'],k,_before,_after]
-                    self.oprate_sql(self.__add_translation_sql,translation_lis,callback)
-                for i in import_lis:
-                    uid =str(uuid.uuid4())
-                    suid=''.join(uid.split('-'))
-                    translation_lis=[suid,data_dict['config']['name'],k,i,'None']
-                    self.oprate_sql(self.__add_translation_sql,translation_lis,callback)
-        if 'jinja2' in data_dict:
-            for k,v in data_dict['jinja2'].items():
-                where_dict={'FILE_NAME':data_dict['config']['name'],'FUN_NAME':k}
-                if self.get_database_data_count('JINJA2_FUN',where_dict):
-                    for i in v:
-                        if isinstance(i,list):
-                            cmd=','.join(i)
-                        else:
-                            cmd=i
+        try:
+            def callback(cur,con):
+                con.commit()
+                return True
+            if 'config' in data_dict:
+                uid =str(uuid.uuid4())
+                suid=''.join(uid.split('-'))
+                config_list=list(data_dict['config'].values())
+                config_list.insert(0,suid)
+                self.oprate_sql(self.__add_config_sql,config_list,callback)
+            if 'translation' in data_dict:
+                for k,v in data_dict['translation'].items():
+                    before_lis= [_v for _v in v['before_lis']]
+                    after_lis= [_v for _v in v['after_lis'] ] 
+                    import_lis=[_v for _v in v['import_lis']]
+                    for i in range(len(before_lis)):
                         uid =str(uuid.uuid4())
                         suid=''.join(uid.split('-'))
-                        jinja2_lis=[suid,data_dict['config']['name'],k,cmd]
-                        
-                        self.oprate_sql(self.__add_jinja2_sql,jinja2_lis,callback)   
-                    jinja2_fun_lis=[suid,data_dict['config']['name'],k]
-                    self.oprate_sql(self.__add_jinja2_fun_sql,jinja2_fun_lis,callback)
-                    
-        if 'excute':
-            for i in data_dict['excute']:
-                excute_lis=[data_dict['config']['name'],i]
-                self.oprate_sql(self.__add_excute_sql,excute_lis,callback)
-    
+                        before=before_lis[i]
+                        if isinstance(before,list):
+                            _before=','.join(before)
+                        else:
+                            _before=before
+                        after=after_lis[i]
+                        if isinstance(after,list):
+                            _after=','.join(after)
+                        else:
+                            _after=after
+                        translation_lis=[suid,data_dict['config']['name'],k,_before,_after]
+                        self.oprate_sql(self.__add_translation_sql,translation_lis,callback)
+                    for i in import_lis:
+                        uid =str(uuid.uuid4())
+                        suid=''.join(uid.split('-'))
+                        translation_lis=[suid,data_dict['config']['name'],k,i,'None']
+                        self.oprate_sql(self.__add_translation_sql,translation_lis,callback)
+            if 'jinja2' in data_dict:
+                for k,v in data_dict['jinja2'].items():
+                    where_dict={'FILE_NAME':data_dict['config']['name'],'FUN_NAME':k}
+                    if self.get_database_data_count('JINJA2_FUN',where_dict):
+                        for i in v:
+                            if isinstance(i,list):
+                                cmd=','.join(i)
+                            else:
+                                cmd=i
+                            uid =str(uuid.uuid4())
+                            suid=''.join(uid.split('-'))
+                            jinja2_lis=[suid,data_dict['config']['name'],k,cmd]
+                            
+                            self.oprate_sql(self.__add_jinja2_sql,jinja2_lis,callback)   
+                        jinja2_fun_lis=[suid,data_dict['config']['name'],k]
+                        self.oprate_sql(self.__add_jinja2_fun_sql,jinja2_fun_lis,callback)     
+            if 'excute' in data_dict:
+                for i in data_dict['excute']:
+                    excute_lis=[data_dict['config']['name'],i]
+                    self.oprate_sql(self.__add_excute_sql,excute_lis,callback)
+            return True
+        except Exception as e:
+            print(e)
+            return False
+    def delete_netknife_file(self,file_name):
+        try:
+            where_dict={'FILE_NAME':file_name}
+            self.del_database_data('CONFIG',where_dict)
+            self.del_database_data('TRANSLATION',where_dict)
+            self.del_database_data('JINJA2',where_dict)
+            self.del_database_data('JINJA2_FUN',where_dict)
+            self.del_database_data('EXCUTE',where_dict)
+            return True
+        except Exception as e:
+            print(e)
+            return False
+    def change_netknife_file(self,file_name,data_dict):
+        try:
+            self.delete_netknife_file(file_name)
+            self.add_netknife_file(data_dict)
+            return True
+        except Exception as e:
+            print(e)
+            return False
 
-
-    
+    def check_netknife_file_if_exist(self,file_name):
+        where_dict={'FILE_NAME':file_name}
+        if self.get_database_data_count('CONFIG',where_dict):
+            return False
+        else:
+            return True
 
 if __name__ == '__main__':
     ap=AppStorage()

@@ -13,7 +13,7 @@
                             :default-active="activeIndex" class="el-menu-vertical-demo"  @select="handleSelect">
                 <el-menu-item index="first">设备状态</el-menu-item>
                 <el-menu-item index="second">管理设备</el-menu-item>
-                <el-menu-item index="three">编写文件</el-menu-item>
+                <el-menu-item index="three">管理文件</el-menu-item>
         </el-menu>
         <el-main>
             <router-view></router-view>
@@ -47,7 +47,7 @@ export default{
             }
             else if(key==='three'){
                 this.$router.push({
-                    name:'filecreate'
+                    name:'filemanage'
                 })
             }
             else{

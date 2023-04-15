@@ -310,14 +310,49 @@ def delete_parameter_database():
         return 'DELETE_SUCCESS'
     else:
         return 'DELETE_FAULT'
+    
 @netknife.route('/create_netknife_file',methods=['POST'])
 def create_file():
     file_dict=sp.processing_netknife_file(json.loads(request.get_data(as_text=True)))
+    if not file_dict: return 'SYNTAX_ERROR'
     result=storage.add_netknife_file(file_dict)
     if result:
-        return 'ADD_SUCCESS'
+        return file_dict['config']['name']
     else:
         return 'ADD_FAULT'
+
+@netknife.route('/delete_netknife_file',methods=['POST'])
+def delete_file():
+    file_name=sp.processing_file_name_netknife_file(json.loads(request.get_data(as_text=True)))
+    print(file_name)
+    if not file_name: return 'SYNTAX_ERROR'
+    result=storage.delete_netknife_file(file_name)
+    if result:
+        return 'DELETE_SUCCESS'
+    else:
+        return 'DELETE_FAULT' 
+
+@netknife.route('/change_netknife_file',methods=['POST'])
+def change_file():
+    file_dict=sp.processing_netknife_file(json.loads(request.get_data(as_text=True)))
+    file_name=sp.processing_file_name_netknife_file(json.loads(request.get_data(as_text=True)))
+    print(file_dict)
+    if not file_dict : return 'SYNTAX_ERROR'
+    result=storage.change_netknife_file(file_name,file_dict)
+    if result:
+        return 'CHANGE_SUCCESS'
+    else:
+        return 'CHANGE_FAULT'
+@netknife.route('/check_netknife_file_if_exist',methods=['POST'])
+def check_file_if_exist():
+    file_name=sp.processing_file_name_netknife_file(json.loads(request.get_data(as_text=True)))
+    if not file_name: return 'SYNTAX_ERROR'
+    result=storage.check_netknife_file_if_exist(file_name)
+    if result:
+        return 'EXIST'
+    else:
+        return 'NOT_EXIST'
+
 
 if __name__ == '__main__':
     netknife.run('0.0.0.0',port=3000,debug=True)

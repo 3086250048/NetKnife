@@ -1,11 +1,18 @@
 <template>
   <el-container class="crud_div">
         <el-main style="margin-left: -30px;margin-top: -40px;">
-            <el-tabs type="border-card" v-model="activename" @tab-click="handleClick">
-            <el-tab-pane label="编写文件" name="first">
-            </el-tab-pane>
-            <el-tab-pane label="修改文件" name="second"></el-tab-pane>
-            <router-view></router-view>
+            <el-tabs v-model="activename" type="card" closable  @tab-remove="remove"  >
+              <el-tab-pane
+              style="width: 940px;"
+                v-for="(item, index) in tabs"
+                :key="item.name"
+                :label="item.title"
+                :name="item.name"
+              >
+              <div style="margin-top: 15px;">
+                <router-view></router-view>
+              </div>
+              </el-tab-pane>
             </el-tabs>
         </el-main>
     </el-container>
@@ -16,18 +23,77 @@ export default{
   name:"FileManage",
   data(){
     return {
-        activename:"first"
+        // activename:"first"
+        activename:'0',
+        tabs:[
+          {
+            title:'窗口 0',
+            name:'0',
+          }
+        ],
+        tabindex:0
     }
   },
   methods:{
-    handleClick(){
-      if(this.activename==="first"){
-        this.$router.push({
-          name:'filecreate'
-          }).then(
-        )
-      }
+    remove(targetName){
+        let tabs = this.tabs;
+        if (tabs.length===1){
+          this.$message({
+            showClose: true,
+            message: '已经是最后一个页面',
+            type: 'warning'
+          });
+          return
+        }
+        let activeName = this.activename;
+        if (activeName === targetName) {
+          tabs.forEach((tab, index) => {
+            if (tab.name === targetName) {
+              let nextTab = tabs[index + 1] || tabs[index - 1];
+              if (nextTab) {
+                activeName = nextTab.name;
+              }
+            }
+          });
+        }
+        this.activename = activeName;
+        this.tabs = tabs.filter(tab => tab.name !== targetName);
+    },
+    push_filecreate(){
+      this.$router.push({
+        name:'filecreate'
+      })
     }
+
+  },
+  watch:{
+      tabs(new_value){
+        console.log(new_value)
+      }
+  },
+  mounted(){
+      this.$bus.$on('add',()=>{
+        let newTabName = ++this.tabindex + '';
+        this.tabs.push({
+          title: `窗口 ${this.tabindex}`,
+          name: newTabName,
+        });
+        this.activename = newTabName;
+        this.push_filecreate()
+       
+      }),
+      this.$bus.$on('change',(file_name)=>{
+          this.tabs.forEach(tab=>{
+            if(tab.name==this.activename){
+              tab.title=file_name
+            }
+          })
+      })
+      this.push_filecreate()
+  },
+  beforeDestroy(){
+      this.$bus.$off('add')
+      this.$bus.$off('change')
   }
 }
 </script>

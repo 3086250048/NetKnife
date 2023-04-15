@@ -3,11 +3,22 @@
     <el-button type="primary" class="create" @click="create_file" size="small">
       创建文件
     </el-button>
+    <el-button type="primary" class="delete" @click="delete_file" size="small">
+      删除文件
+    </el-button>
+    <el-button type="primary" class="update" @click="update_file" size="small">
+      更新文件
+    </el-button>
+    <el-button type="primary" class="open" @click="" size="small">
+      打开文件
+    </el-button>
+    <el-button type="primary" class="empty_add" @click="add_empty" size="small">
+      ＋新窗口
+    </el-button>
     <codemirror
       style="
-      margin-left: -15px;
-      margin-top: -15px;
-      "
+      margin-left:-15px;
+      margin-top: -15px;"
       ref="myCm"
       :value="code"
       :options="cmOptions"
@@ -20,13 +31,12 @@
 <script>
 import codemirror from "codemirror";
 import "codemirror/mode/meta";
-import { mapMutations} from 'vuex'
-
+import { mapMutations,mapActions } from 'vuex'
 export default {
   name: "FileCreate",
   data() {
     return {
-      code: ``,
+      code: `name:\npriority:\n\n\ntranslation:{\n\n\n}\n\njinja2:{\n\n\n}\n\nexcute:{\n\n}\n\n`,
       cmOptions: {
         tabSize: 4,
         styleActiveLine: true,
@@ -40,18 +50,48 @@ export default {
   },
   
   methods: {
-    ...mapMutations('filecreateAbout',{CREATE_NETKNIFE_FILE:'CREATE_NETKNIFE_FILE'}),
+    ...mapMutations('filecreateAbout',{
+      SET_VM:'SET_VM'
+    }),
+    ...mapActions('filecreateAbout',{
+      create_netknife_file:'create_netknife_file',
+      delete_netknife_file:'delete_netknife_file',
+      update_netknife_file:'update_netknife_file'
+    }),
     create_file() {
       const code = this.codemirror.getValue();
-      this.CREATE_NETKNIFE_FILE(code)
+      this.create_netknife_file(code)
+    },
+    delete_file(){
+      const code = this.codemirror.getValue();
+      this.delete_netknife_file(code)
+    },
+    update_file(){
+      const code = this.codemirror.getValue();
+      this.update_netknife_file(code)
+    },
+    add_empty(){
+      this.$bus.$emit('add')
     }
   },
   computed: {
     codemirror() {
       return this.$refs.myCm.codemirror;
+    },
+    file_name(){
+      return this.$store.state.filecreateAbout.file_name
     }
   },
-  mounted() {}
+  mounted(){
+    this.SET_VM(this)
+    this.$bus.$on('init',(code)=>{
+      this.code=code
+    })
+  },
+  beforeDestroy(){
+    this.$bus.$off('init')
+  }
+  
 };
 </script>
 
@@ -62,7 +102,25 @@ export default {
   max-height: 500px;
 }
 .create {
-  float: right;
-  margin-right: -15px;
+  position: relative;
+  top:-10px
+  
+}
+.delete{
+  position: relative;
+  top:-10px
+}
+.update{
+  position: relative;
+  top:-10px
+}
+.open{
+  position: relative;
+  top:-10px
+}
+.empty_add{
+  position: relative;
+  top:-10px;
+
 }
 </style>
