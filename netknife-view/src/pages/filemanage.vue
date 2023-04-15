@@ -26,12 +26,12 @@ export default{
         // activename:"first"
         activename:'0',
         tabs:[
-          {
-            title:'窗口 0',
-            name:'0',
-          }
+          // {
+          //   title:'窗口 0',
+          //   name:'0',
+          // }
         ],
-        tabindex:0
+        tabindex:-1
     }
   },
   methods:{
@@ -72,15 +72,40 @@ export default{
       }
   },
   mounted(){
+      if(Object.keys(localStorage.valueOf()).length <= 0){
+            let tab_obj={
+              title: '窗口 0',
+              name: '0',
+            }
+            this.tabs.push(tab_obj);
+            this.activename = '0';
+            this.push_filecreate()
+            localStorage.setItem(this.tabs[0]['title'],JSON.stringify(this.tabs[0]))
+      }else{
+        let newTabName=0
+        Object.entries(localStorage.valueOf()).forEach(([key,value])=>{
+            if(Object.keys(localStorage.valueOf()).length >=1){
+               newTabName = ++this.tabindex + '';
+            }else{
+               newTabName = this.tabindex+'';
+            }
+            let tab_obj=JSON.parse(value)
+            this.tabs.push(tab_obj);
+            this.activename = newTabName;
+            this.push_filecreate()
+        })
+      }
+     
       this.$bus.$on('add',()=>{
         let newTabName = ++this.tabindex + '';
-        this.tabs.push({
+        let tab_obj={
           title: `窗口 ${this.tabindex}`,
           name: newTabName,
-        });
+        }
+        this.tabs.push(tab_obj);
         this.activename = newTabName;
         this.push_filecreate()
-       
+        localStorage.setItem(tab_obj.title,JSON.stringify(tab_obj))
       }),
       this.$bus.$on('change',(file_name)=>{
           this.tabs.forEach(tab=>{
@@ -89,7 +114,6 @@ export default{
             }
           })
       })
-      this.push_filecreate()
   },
   beforeDestroy(){
       this.$bus.$off('add')
