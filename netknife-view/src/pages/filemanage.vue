@@ -5,7 +5,7 @@
               <el-tab-pane
               style="width: 940px;"
                 v-for="(item, index) in tabs"
-                :key="item.name"
+                :key=index
                 :label="item.title"
                 :name="item.name"
               >
@@ -23,15 +23,16 @@ export default{
   name:"FileManage",
   data(){
     return {
-        // activename:"first"
         activename:'0',
         tabs:[
-          // {
-          //   title:'窗口 0',
-          //   name:'0',
-          // }
+          {
+            title:'窗口 0',
+            name:'0',
+          }
         ],
-        tabindex:-1
+        load_tabs:[],
+        tabindex:0,
+        code:''
     }
   },
   methods:{
@@ -58,13 +59,14 @@ export default{
         }
         this.activename = activeName;
         this.tabs = tabs.filter(tab => tab.name !== targetName);
+        // localStorage['tabs_obj']=JSON.stringify(this.tabs)
     },
     push_filecreate(){
       this.$router.push({
-        name:'filecreate'
+        name:'filecreate',
+       
       })
     }
-
   },
   watch:{
       tabs(new_value){
@@ -72,30 +74,6 @@ export default{
       }
   },
   mounted(){
-      if(Object.keys(localStorage.valueOf()).length <= 0){
-            let tab_obj={
-              title: '窗口 0',
-              name: '0',
-            }
-            this.tabs.push(tab_obj);
-            this.activename = '0';
-            this.push_filecreate()
-            localStorage.setItem(this.tabs[0]['title'],JSON.stringify(this.tabs[0]))
-      }else{
-        let newTabName=0
-        Object.entries(localStorage.valueOf()).forEach(([key,value])=>{
-            if(Object.keys(localStorage.valueOf()).length >=1){
-               newTabName = ++this.tabindex + '';
-            }else{
-               newTabName = this.tabindex+'';
-            }
-            let tab_obj=JSON.parse(value)
-            this.tabs.push(tab_obj);
-            this.activename = newTabName;
-            this.push_filecreate()
-        })
-      }
-     
       this.$bus.$on('add',()=>{
         let newTabName = ++this.tabindex + '';
         let tab_obj={
@@ -103,9 +81,9 @@ export default{
           name: newTabName,
         }
         this.tabs.push(tab_obj);
+        // localStorage['tabs_obj']=JSON.stringify(this.tabs)
         this.activename = newTabName;
         this.push_filecreate()
-        localStorage.setItem(tab_obj.title,JSON.stringify(tab_obj))
       }),
       this.$bus.$on('change',(file_name)=>{
           this.tabs.forEach(tab=>{
@@ -113,11 +91,14 @@ export default{
               tab.title=file_name
             }
           })
+          // localStorage['tabs_obj']=JSON.stringify(this.tabs)
       })
+     this.push_filecreate()
   },
   beforeDestroy(){
       this.$bus.$off('add')
       this.$bus.$off('change')
+    
   }
 }
 </script>

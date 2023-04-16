@@ -60,6 +60,7 @@ export default {
     }),
     create_file() {
       const code = this.codemirror.getValue();
+      // change在CREATE_NETKNIFE_FILE里面
       this.create_netknife_file(code)
     },
     delete_file(){
@@ -80,16 +81,13 @@ export default {
     },
     file_name(){
       return this.$store.state.filecreateAbout.file_name
-    }
+    },
   },
   mounted(){
+    console.log('被船创建了')
     this.SET_VM(this)
-    this.$bus.$on('init',(code)=>{
-      this.code=code
-    })
   },
   beforeDestroy(){
-    this.$bus.$off('init')
   }
   
 };
