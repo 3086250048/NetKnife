@@ -47,7 +47,7 @@ export default{
             }
             else if(key==='three'){
                 this.$router.push({
-                    name:'filecreate'
+                    name:'filemanage'
                 })
             }
             else{

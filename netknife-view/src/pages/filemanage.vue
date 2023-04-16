@@ -19,6 +19,7 @@
 </template>
 
 <script>
+
 import { mapMutations,mapActions } from 'vuex'
 export default{
   name:"FileManage",
@@ -29,6 +30,7 @@ export default{
           {
             title:'窗口 0',
             name:'0',
+            // component:'filecreate'
           }
         ],
         load_tabs:[],
@@ -62,17 +64,15 @@ export default{
         this.activename = activeName;
         this.tabs = tabs.filter(tab => tab.name !== targetName);
     },
-    push_filecreate(){
+    push_filecreate(name,title){
       this.$router.push({
-        name:'filecreate',
+        name:`filecreate${name}`,
+        params:{
+          title:title
+        }
       })
     }
-  },
-  watch:{
-      tabs(new_value){
-        console.log(new_value)
-      }
-  },
+  }, 
   mounted(){
       this.$bus.$on('add',()=>{
         let newTabName = ++this.tabindex + '';
@@ -82,7 +82,9 @@ export default{
         }
         this.tabs.push(tab_obj);
         this.activename = newTabName;
-        this.push_filecreate()
+        console.log('=============')
+        console.log(tab_obj['title'])
+        this.push_filecreate(tab_obj['name'],tab_obj['title'])
       }),
       this.$bus.$on('change',(file_name)=>{
           this.tabs.forEach(tab=>{
@@ -90,7 +92,14 @@ export default{
               tab.title=file_name
             }
           })
+          this.$bus.$emit('change_title',file_name)
+
       })
+      this.tabs.forEach(item=>{//动态添加路由的方法找到了，明天这里开始
+        this.$router.addRoute('filemanage',{path:`filecreate0`,component:()=>import(`@/pages/filecreate.vue`),name:'filecreate0'});
+      })
+    console.log(this.$router)
+      this.push_filecreate(this.tabs[0]['name'],'filecreate0')
   },
   beforeDestroy(){
       this.$bus.$off('add')

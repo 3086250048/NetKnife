@@ -78,13 +78,13 @@ export default new VueRouter({
                     name:'filemanage',
                     path:'filemanage',
                     component:filemanage,
-                    children:[
-                        {
-                            name:'filecreate',
-                            path:'filecreate',
-                            component:filecreate
-                        }
-                    ]
+                    // children:[
+                    //     {
+                    //         name:'filecreate',
+                    //         path:'filecreate',
+                    //         component:filecreate
+                    //     }
+                    // ]
                 }
             ]
         },

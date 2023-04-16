@@ -44,7 +44,8 @@ export default {
         mode: "default",
         lineWrapping: true,
         theme: "monokai",
-      }
+      },
+      title:''
     };
   },
   
@@ -86,10 +87,16 @@ export default {
     },
   },
   mounted(){
-    console.log('被船创建了')
     this.SET_VM(this)
+    console.log(this.$route.params.title)
+    this.title=this.$route.params.title
+    this.$bus.$on('change_title',(title)=>{
+      this.title=title
+    })
+    console.log(this.title)
   },
   beforeDestroy(){
+    this.$bus.$off('change_title')
   }
   
 };
