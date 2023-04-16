@@ -9,15 +9,14 @@
     <el-button type="primary" class="update" @click="update_file" size="small">
       更新文件
     </el-button>
-    <el-button type="primary" class="open" @click="" size="small">
+    <el-button type="primary" class="open" @click="open_file" size="small">
       打开文件
     </el-button>
     <el-button type="primary" class="empty_add" @click="add_empty" size="small">
       ＋新窗口
     </el-button>
     <codemirror
-      style="
-      margin-left:-15px;
+      style="margin-left:-15px;
       margin-top: -15px;"
       ref="myCm"
       :value="code"
@@ -73,6 +72,9 @@ export default {
     },
     add_empty(){
       this.$bus.$emit('add')
+    },
+    open_file(){
+      // 待完成打开逻辑
     }
   },
   computed: {

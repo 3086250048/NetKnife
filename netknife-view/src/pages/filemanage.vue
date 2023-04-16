@@ -5,7 +5,7 @@
               <el-tab-pane
               style="width: 940px;"
                 v-for="(item, index) in tabs"
-                :key=index
+                :key='item.name'
                 :label="item.title"
                 :name="item.name"
               >
@@ -19,6 +19,7 @@
 </template>
 
 <script>
+import { mapMutations,mapActions } from 'vuex'
 export default{
   name:"FileManage",
   data(){
@@ -36,6 +37,7 @@ export default{
     }
   },
   methods:{
+    ...mapMutations('filemanageAbout',{SET_TITLE:'SET_TITLE'}),
     remove(targetName){
         let tabs = this.tabs;
         if (tabs.length===1){
@@ -59,12 +61,10 @@ export default{
         }
         this.activename = activeName;
         this.tabs = tabs.filter(tab => tab.name !== targetName);
-        // localStorage['tabs_obj']=JSON.stringify(this.tabs)
     },
     push_filecreate(){
       this.$router.push({
         name:'filecreate',
-       
       })
     }
   },
@@ -81,7 +81,6 @@ export default{
           name: newTabName,
         }
         this.tabs.push(tab_obj);
-        // localStorage['tabs_obj']=JSON.stringify(this.tabs)
         this.activename = newTabName;
         this.push_filecreate()
       }),
@@ -91,9 +90,7 @@ export default{
               tab.title=file_name
             }
           })
-          // localStorage['tabs_obj']=JSON.stringify(this.tabs)
       })
-     this.push_filecreate()
   },
   beforeDestroy(){
       this.$bus.$off('add')

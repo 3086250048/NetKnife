@@ -5,7 +5,11 @@ export const filemanageAbout={
     actions:{
     },
     mutations:{         
+        SET_TITLE(state,title){
+            state.title=title
+        }
     },
     state:{
+        title:''
     }
 }
