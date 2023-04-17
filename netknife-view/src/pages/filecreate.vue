@@ -15,13 +15,14 @@
     <el-button type="primary" class="empty_add" @click="add_empty" size="small">
       ＋新窗口
     </el-button>
-    <codemirror
+    <codemirror 
       style="margin-left:-15px;
       margin-top: -15px;"
-      ref="myCm"
+      ref="myCm" 
       :value="code"
       :options="cmOptions"
-      class="editor"
+      class="editor" 
+      @input="change_text"
     >
     </codemirror>
   </div>
@@ -33,9 +34,9 @@ import "codemirror/mode/meta";
 import { mapMutations,mapActions } from 'vuex'
 export default {
   name: "FileCreate",
+  props:['title','name','code'],
   data() {
     return {
-      code: `name:\npriority:\n\n\ntranslation:{\n\n\n}\n\njinja2:{\n\n\n}\n\nexcute:{\n\n}\n\n`,
       cmOptions: {
         tabSize: 4,
         styleActiveLine: true,
@@ -44,11 +45,10 @@ export default {
         mode: "default",
         lineWrapping: true,
         theme: "monokai",
+       
       },
-      title:''
     };
   },
-  
   methods: {
     ...mapMutations('filecreateAbout',{
       SET_VM:'SET_VM'
@@ -59,7 +59,7 @@ export default {
       update_netknife_file:'update_netknife_file'
     }),
     create_file() {
-      const code = this.codemirror.getValue();
+     const code =  this.codemirror.getValue();
       // change在CREATE_NETKNIFE_FILE里面
       this.create_netknife_file(code)
     },
@@ -72,10 +72,14 @@ export default {
       this.update_netknife_file(code)
     },
     add_empty(){
-      this.$bus.$emit('add')
+        this.$bus.$emit('add')
     },
     open_file(){
-      // 待完成打开逻辑
+      console.log(this.title)
+      console.log(this.name)
+    },
+    change_text(){
+      localStorage[this.name]=JSON.stringify({ name:this.name,title:this.title,code:this.codemirror.getValue()})
     }
   },
   computed: {
@@ -85,20 +89,20 @@ export default {
     file_name(){
       return this.$store.state.filecreateAbout.file_name
     },
+ 
   },
   mounted(){
+    
     this.SET_VM(this)
-    console.log(this.$route.params.title)
-    this.title=this.$route.params.title
-    this.$bus.$on('change_title',(title)=>{
-      this.title=title
-    })
-    console.log(this.title)
+    console.log('创建了')
+    // console.log(this.name)
+    // console.log(this.title)
+    // console.log(this.code)
+    this.$bus.$emit('create_tabs')
   },
   beforeDestroy(){
-    this.$bus.$off('change_title')
+    console.log('Destory')
   }
-  
 };
 </script>
 

@@ -121,6 +121,7 @@ export const filecreateAbout={
                             message: '删除成功',
                             type: 'success'
                           });
+                        state.vm.$bus.$emit('change','空窗口')
                     }
                 })
         },
