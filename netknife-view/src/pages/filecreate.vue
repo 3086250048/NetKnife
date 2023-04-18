@@ -15,7 +15,8 @@
     <el-button type="primary" class="empty_add" @click="add_empty" size="small">
       ＋新窗口
     </el-button>
-    <codemirror 
+    <codemirror
+      id="codemirror"
       style="margin-left:-15px;
       margin-top: -15px;"
       ref="myCm" 
@@ -42,11 +43,13 @@ export default {
         styleActiveLine: true,
         lineNumbers: true,
         line: true,
-        mode: "default",
-        lineWrapping: true,
+        mode: 'text/javascript',
+        lineWrapping: false,
         theme: "monokai",
        
+       
       },
+  
     };
   },
   methods: {
@@ -92,13 +95,17 @@ export default {
  
   },
   mounted(){
-    
     this.SET_VM(this)
     console.log('创建了')
     // console.log(this.name)
     // console.log(this.title)
     // console.log(this.code)
-    this.$bus.$emit('create_tabs')
+    setTimeout(()=>{
+      this.$bus.$emit('create_tabs')
+  
+    },1)
+    
+    // this.$refs.myCm.codemirror.refresh()
   },
   beforeDestroy(){
     console.log('Destory')

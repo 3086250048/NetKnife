@@ -1,7 +1,7 @@
 <template>
   <el-container class="crud_div">
         <el-main style="margin-left: -30px;margin-top: -40px;">
-            <el-tabs v-model="activename" type="card" editable  @tab-remove="remove" >
+            <el-tabs v-model="activename" type="card" closable @tab-remove="remove" >
               <el-tab-pane
               style="width: 940px;"
                 v-for="(item, index) in tabs"
@@ -114,12 +114,12 @@ export default{
             code:tab['code']
           }
           this.tabs.push(tab_obj);
-          this.activename = newTabName;
-        }
-       
+          this.activename = newTabName;}    
       })
-      
-      this.$bus.$emit('create_tabs')
+      setTimeout(()=>{
+        this.$bus.$emit('create_tabs')
+      },1)
+     
   },
   beforeDestroy(){
       this.$bus.$off('add')
