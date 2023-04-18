@@ -49,7 +49,8 @@ export default {
        
        
       },
-  
+      delete_able:false,
+      update_able:false
     };
   },
   methods: {
@@ -78,8 +79,10 @@ export default {
         this.$bus.$emit('add')
     },
     open_file(){
-      console.log(this.title)
-      console.log(this.name)
+        this.$bus.$emit('switch_activeIndex','three')
+        this.$router.push({
+          name:'filestate'
+        })
     },
     change_text(){
       localStorage[this.name]=JSON.stringify({ name:this.name,title:this.title,code:this.codemirror.getValue()})
@@ -97,9 +100,6 @@ export default {
   mounted(){
     this.SET_VM(this)
     console.log('创建了')
-    // console.log(this.name)
-    // console.log(this.title)
-    // console.log(this.code)
     setTimeout(()=>{
       this.$bus.$emit('create_tabs')
   

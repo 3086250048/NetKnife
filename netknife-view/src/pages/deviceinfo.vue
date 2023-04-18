@@ -13,7 +13,8 @@
                             :default-active="activeIndex" class="el-menu-vertical-demo"  @select="handleSelect">
                 <el-menu-item index="first">设备状态</el-menu-item>
                 <el-menu-item index="second">管理设备</el-menu-item>
-                <el-menu-item index="three">管理文件</el-menu-item>
+                <el-menu-item index="three">文件状态</el-menu-item>
+                <el-menu-item index="four">管理文件</el-menu-item>
         </el-menu>
         <el-main>
             <router-view></router-view>
@@ -22,7 +23,7 @@
 </template>
 
 <script>
-import { send_get } from '@/store/tools'
+import { send_get, send_post } from '@/store/tools'
 import { mapMutations } from 'vuex'
 export default{
     name:'DeviceInfo',
@@ -31,6 +32,7 @@ export default{
             activeName:'first',
             activeIndex:'first',
             if_first_load:false,
+           
             
         }
     },
@@ -38,17 +40,37 @@ export default{
         ...mapMutations('devicestateAbout',{SET_PROJECT_VIEW_ABLE:'SET_PROJECT_VIEW_ABLE'}),
         ...mapMutations('projectoprateAbout',{SET_OPRATE_MODE:'SET_OPRATE_MODE'}),
         handleSelect(key){
-            this.activeIndex='first'
+            this.activeIndex=key
             if(key==='second' ){
                 this.$bus.$emit('init_active_name')
                 this.$router.push({
                     name:'create'
                 })
             }
-            else if(key==='three'){
-                this.$router.push({
-                    name:'filemanage'
+            else if (key==='three'){
+                send_get('/if_exist_netknife_file',response=>{
+                    if(response.data==='NOT_EXIST'){
+                        this.$router.push({
+                            name:'fileempty'
+                        })
+                    }else{
+                        this.$router.push({
+                            name:'filestate'
+                        })
+                    }
                 })
+            }
+            else if(key==='four'){
+                this.switch_filemanage=false
+                if(localStorage.length===0){
+                    this.$router.push({
+                        name:'pageempty'
+                    })
+                }else{
+                    this.$router.push({
+                        name:'filemanage'
+                    })
+                }
             }
             else{
                 send_get('/select_count',response=>{
@@ -82,7 +104,12 @@ export default{
     },
     mounted(){
         this.handleSelect()
-     
+        this.$bus.$on('switch_activeIndex',(index)=>{
+            this.activeIndex=index
+        })
+    },
+    beforeDestroy(){
+       this.$bus.$off('switch_activeIndex')
     }
 }
 </script>

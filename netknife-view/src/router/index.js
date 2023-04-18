@@ -15,7 +15,10 @@ import mixunitpage from '../pages/state/mixunitpage.vue'
 import projectopratepage from '../pages/state/projectopratepage.vue'
 import empty from '../pages/empty.vue'
 import filemanage from '../pages/filemanage.vue'
-import filecreate from '../pages/filecreate.vue'
+import pageempty from '../pages/pageempty.vue'
+import filestate from '../pages/filestate.vue'
+import fileempty from '../pages/fileempty.vue'
+
 
 export const originalPush = VueRouter.prototype.push
 VueRouter.prototype.push = function push(location) {
@@ -79,12 +82,26 @@ export default new VueRouter({
                     path:'filemanage',
                     component:filemanage,
                     // children:[
-                    //     {
-                    //         name:'filecreate',
-                    //         path:'filecreate',
+                    //      {
+                    //          name:'filecreate',
+                    //          path:'filecreate',
                     //         component:filecreate
                     //     }
                     // ]
+                },{
+                    name:'pageempty',
+                    path:'pageempty',
+                    component:pageempty
+                },
+                {
+                    name:'filestate',
+                    path:'filestate',
+                    component:filestate
+                },
+                {
+                    name:'fileempty',
+                    path:'fileempty',
+                    component:fileempty
                 }
             ]
         },

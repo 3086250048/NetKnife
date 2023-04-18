@@ -246,14 +246,14 @@ class AppStorage():
         full_sql=f"DELETE FROM {database_name} {where_sql} {other_sql}"
         return self.oprate_sql(full_sql,{},callback)
     #获取任意数据库的条目数
-    def get_database_data_count(self,database_name,where_dict={}):
+    def get_database_data_count(self,database_name,where_dict={},other_sql=''):
         def callback(cur,con):
             return cur.fetchall()
         if where_dict:
             where_sql=AppStorage.dynamic_sql_return('','WHERE','AND',where_dict)
         else:
             where_sql=''
-        full_sql=f"SELECT COUNT(*) FROM {database_name} {where_sql}"
+        full_sql=f"SELECT COUNT(*) FROM {database_name} {where_sql} {other_sql}"
         print('===================================full_sql')
         print(full_sql)
         result= self.oprate_sql(full_sql,{},callback)

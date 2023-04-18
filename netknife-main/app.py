@@ -352,7 +352,14 @@ def check_file_if_exist():
         return 'EXIST'
     else:
         return 'NOT_EXIST'
-
+@netknife.route('/if_exist_netknife_file')
+def if_exist_netknife_file():
+    first_suid=storage.get_database_data('SUID',['FIRST_SUID'])[0][0]
+    result=storage.get_database_data_count('CONFIG',{},f"WHERE ID !='{first_suid}'")
+    if result:
+        return 'NOT_EXIST'
+    else:
+        return 'EXIST'
 
 if __name__ == '__main__':
     netknife.run('0.0.0.0',port=3000,debug=True)
