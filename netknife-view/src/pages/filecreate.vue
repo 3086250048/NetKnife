@@ -1,24 +1,21 @@
 <template>
   <div>
-    <el-button type="primary" class="create" @click="create_file" size="small">
-      创建文件
+    <el-button type="primary" class="create" @click="save_file" icon="el-icon-folder-add" size="small">
+      保存
     </el-button>
-    <el-button type="primary" class="delete" @click="delete_file" size="small">
-      删除文件
+    <el-button type="primary" class="delete" @click="delete_file" icon="el-icon-folder-delete" size="small">
+      删除
     </el-button>
-    <el-button type="primary" class="update" @click="update_file" size="small">
-      更新文件
-    </el-button>
-    <el-button type="primary" class="open" @click="open_file" size="small">
+    <el-button type="primary" class="open" @click="open_file" icon="el-icon-folder-opened" size="small">
       打开文件
     </el-button>
-    <el-button type="primary" class="empty_add" @click="add_empty" size="small">
-      ＋新窗口
+    <el-button type="primary" class="empty_add" @click="add_empty" icon="el-icon-view" size="small">
+      新窗口+
     </el-button>
     <codemirror
       id="codemirror"
       style="margin-left:-15px;
-      margin-top: -15px;"
+      margin-top: -15px;" 
       ref="myCm" 
       :value="code"
       :options="cmOptions"
@@ -58,22 +55,16 @@ export default {
       SET_VM:'SET_VM'
     }),
     ...mapActions('filecreateAbout',{
-      create_netknife_file:'create_netknife_file',
+      save_netknife_file:'save_netknife_file',
       delete_netknife_file:'delete_netknife_file',
-      update_netknife_file:'update_netknife_file'
     }),
-    create_file() {
-     const code =  this.codemirror.getValue();
-      // change在CREATE_NETKNIFE_FILE里面
-      this.create_netknife_file(code)
+    save_file(){
+      const code=this.codemirror.getValue()
+      this.save_netknife_file(code)
     },
     delete_file(){
       const code = this.codemirror.getValue();
       this.delete_netknife_file(code)
-    },
-    update_file(){
-      const code = this.codemirror.getValue();
-      this.update_netknife_file(code)
     },
     add_empty(){
         this.$bus.$emit('add')

@@ -3,27 +3,24 @@ import { send_post,pop_info, send_get,findNonexistentItems,combineFromStartAndEn
 export const filecreateAbout={
     namespaced:true,
     actions:{
-        create_netknife_file(context,code){
+        save_netknife_file(context,code){
             context.state.code=code
             send_post('/check_netknife_file_if_exist',{'code':context.state.code},response=>{
-                   if(response.data==='SYNTAX_ERROR'){
-                        context.state.vm.$message({
-                            showClose: true,
-                            message: '语法错误',
-                            type: 'warning'
-                          });
-                   }
-                   if(response.data==='EXIST'){
-                        context.state.vm.$message({
-                            showClose: true,
-                            message: '文件已经存在',
-                            type: 'warning'
-                        });
-                   }
-                   if(response.data==='NOT_EXIST'){
-                        context.commit('CREATE_NETKNIFE_FILE')
-                   }
-            })
+                if(response.data==='SYNTAX_ERROR'){
+                     context.state.vm.$message({
+                         showClose: true,
+                         message: '语法错误',
+                         type: 'warning'
+                       });
+                }
+                if(response.data==='NOT_EXIST'){
+                   context.commit('CREATE_NETKNIFE_FILE')
+                }
+                if(response.data==='EXIST'){
+                    context.commit('UPDATE_NETKNIFE_FILE')
+                }
+               
+         })
         },
         delete_netknife_file(context,code){
             context.state.code=code
@@ -48,29 +45,7 @@ export const filecreateAbout={
                
          })
         },
-        update_netknife_file(context,code){
-            context.state.code=code
-            send_post('/check_netknife_file_if_exist',{'code':context.state.code},response=>{
-                if(response.data==='SYNTAX_ERROR'){
-                     context.state.vm.$message({
-                         showClose: true,
-                         message: '语法错误',
-                         type: 'warning'
-                       });
-                }
-                if(response.data==='NOT_EXIST'){
-                    context.state.vm.$message({
-                        showClose: true,
-                        message: '文件不存在',
-                        type: 'warning'
-                    });
-                }
-                if(response.data==='EXIST'){
-                    context.commit('UPDATE_NETKNIFE_FILE')
-                }
-               
-         })
-        }
+       
     },
     mutations:{         
         CREATE_NETKNIFE_FILE(state){
@@ -122,6 +97,7 @@ export const filecreateAbout={
                             type: 'success'
                           });
                         state.vm.$bus.$emit('change','空窗口')
+                        state.vm.codemirror.setValue(`name:\npriority:\n\n\ntranslation:{\n\n\n}\n\njinja2:{\n\n\n}\n\nexcute:{\n\n}\n\n`)
                     }
                 })
         },

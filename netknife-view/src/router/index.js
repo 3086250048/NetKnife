@@ -13,11 +13,11 @@ import devicedelete from '../pages/crud/devicedelete.vue'
 import deviceupdate from '../pages/crud/deviceupdate.vue'
 import mixunitpage from '../pages/state/mixunitpage.vue'
 import projectopratepage from '../pages/state/projectopratepage.vue'
-import empty from '../pages/empty.vue'
+import empty from '../pages/empty/empty.vue'
 import filemanage from '../pages/filemanage.vue'
-import pageempty from '../pages/pageempty.vue'
+import pageempty from '../pages/empty/pageempty.vue'
 import filestate from '../pages/filestate.vue'
-import fileempty from '../pages/fileempty.vue'
+import fileempty from '../pages/empty/fileempty.vue'
 
 
 export const originalPush = VueRouter.prototype.push

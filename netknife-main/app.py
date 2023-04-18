@@ -360,6 +360,15 @@ def if_exist_netknife_file():
         return 'NOT_EXIST'
     else:
         return 'EXIST'
+@netknife.route('/get_netknife_file_data')
+def get_netknife_file_data():
+    config_result=storage.get_database_data('CONFIG',['FILE_NAME','FILE_PRIORITY'])
+    translation_result=storage.get_database_data('TRANSLATION',['TYPE','BEFORE_CMD','AFTER_CMD'])
+    jinja2_result=storage.get_database_data('JINJA2',['FUN_NAME','JINJA2_CMD'])
+    print(config_result)
+    print(translation_result)
+    print(jinja2_result)
+    return 'A'
 
 if __name__ == '__main__':
     netknife.run('0.0.0.0',port=3000,debug=True)

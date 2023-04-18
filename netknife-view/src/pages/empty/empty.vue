@@ -11,10 +11,11 @@ export default{
     name:'Empty',
     methods:{
         forward_to_create(){
-            this.$route.params.infopage.activeIndex='second'
-            this.$router.push({
-               name:'crud'
-           })
+        //     this.$route.params.infopage.activeIndex='second'
+        //     this.$router.push({
+        //        name:'crud'
+        //    })
+        this.$bus.$emit('switch_activeIndex','second')
        }
     },
 }

@@ -31,11 +31,6 @@ export default{
         base_code:`name:\npriority:\n\n\ntranslation:{\n\n\n}\n\njinja2:{\n\n\n}\n\nexcute:{\n\n}\n\n`,
         activename:'0',
         tabs:[
-          // {
-          //   title:'空窗口',
-          //   name:'0',
-          //   code:`name:\npriority:\n\n\ntranslation:{\n\n\n}\n\njinja2:{\n\n\n}\n\nexcute:{\n\n}\n\n`
-          // }
         ],
         tabindex:-1,
         storage_tabs:[],
@@ -69,7 +64,7 @@ export default{
         this.activename = activeName;
         this.tabs = tabs.filter(tab => tab.name !== targetName);
         delete localStorage[targetName]
-        if(this.tabs.length===0 && typeof(localStorage['last_key'])!=='undefined'){
+        if((this.tabs.length===0 && typeof(localStorage['last_key'])!=='undefined') || localStorage['last_key'] === targetName ){
           delete localStorage['last_key']
         }
     },

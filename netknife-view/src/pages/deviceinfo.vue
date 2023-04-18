@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { send_get, send_post } from '@/store/tools'
+import { send_get } from '@/store/tools'
 import { mapMutations } from 'vuex'
 export default{
     name:'DeviceInfo',
@@ -40,7 +40,11 @@ export default{
         ...mapMutations('devicestateAbout',{SET_PROJECT_VIEW_ABLE:'SET_PROJECT_VIEW_ABLE'}),
         ...mapMutations('projectoprateAbout',{SET_OPRATE_MODE:'SET_OPRATE_MODE'}),
         handleSelect(key){
-            this.activeIndex=key
+            if(key===undefined){
+                this.activeIndex='first'
+            }else{
+                this.activeIndex=key
+            }
             if(key==='second' ){
                 this.$bus.$emit('init_active_name')
                 this.$router.push({
@@ -61,7 +65,6 @@ export default{
                 })
             }
             else if(key==='four'){
-                this.switch_filemanage=false
                 if(localStorage.length===0){
                     this.$router.push({
                         name:'pageempty'
@@ -94,18 +97,48 @@ export default{
             }
           
         },
-    },
-    computed:{
-        // screen_height(){
-        //     var h=window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-        //     return h+'px'
-        // },
-        
+        switch_handler(index){
+            if (index==='first'){
+                this.activeIndex='first'
+            }
+            if(index==='second'){
+                this.activeIndex='second'
+                this.$router.push({
+                    name:'create'
+                })
+            }
+            if(index==='three'){
+                this.activeIndex='three'
+                send_get('/if_exist_netknife_file',response=>{
+                    if(response.data==='NOT_EXIST'){
+                        this.$router.push({
+                            name:'fileempty'
+                        })
+                    }else{
+                        this.$router.push({
+                            name:'filestate'
+                        })
+                    }
+                })
+            }
+            if(index==='four'){
+                this.activeIndex='four'
+                if(localStorage.length===0){
+                    this.$router.push({
+                        name:'pageempty'
+                    })
+                }else{
+                    this.$router.push({
+                        name:'filemanage'
+                    })
+                }
+            }
+        }
     },
     mounted(){
         this.handleSelect()
         this.$bus.$on('switch_activeIndex',(index)=>{
-            this.activeIndex=index
+            this.switch_handler(index)
         })
     },
     beforeDestroy(){

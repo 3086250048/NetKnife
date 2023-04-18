@@ -10,9 +10,6 @@ export default{
     methods:{
         forward_filemanage(){
             this.$bus.$emit('switch_activeIndex','four')
-            this.$router.push({
-                name:'filemanage'
-            })
         }
     },
 }

@@ -7,6 +7,7 @@ import { projectoprateAbout } from './projectoprateAbout'
 import { mixunitpageAbout } from './mixunitpageAbout'
 import {filemanageAbout} from './filemanageAbout'
 import {filecreateAbout} from './filecreateAbout'
+import { filestateAbout } from './filestateAbout'
 
 import Vuex from 'vuex'
 import Vue from 'vue'
@@ -22,6 +23,7 @@ export default new Vuex.Store({
         projectoprateAbout:projectoprateAbout,
         mixunitpageAbout:mixunitpageAbout,
         filemanageAbout:filemanageAbout,
-        filecreateAbout:filecreateAbout
+        filecreateAbout:filecreateAbout,
+        filestateAbout:filestateAbout
     }
 })
