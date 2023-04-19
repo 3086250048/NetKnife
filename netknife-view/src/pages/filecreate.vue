@@ -64,7 +64,7 @@ export default {
     },
     delete_file(){
       const code = this.codemirror.getValue();
-      this.delete_netknife_file(code)
+      this.delete_netknife_file(code,this.name)
     },
     add_empty(){
         this.$bus.$emit('add')

@@ -314,7 +314,8 @@ def delete_parameter_database():
 @netknife.route('/create_netknife_file',methods=['POST'])
 def create_file():
     file_dict=sp.processing_netknife_file(json.loads(request.get_data(as_text=True)))
-    if not file_dict: return 'SYNTAX_ERROR'
+    if not file_dict: 
+        return 'SYNTAX_ERROR'
     result=storage.add_netknife_file(file_dict)
     if result:
         return file_dict['config']['name']
@@ -370,31 +371,16 @@ def get_netknife_file_data():
     jinja2_result=storage.get_database_data('JINJA2',['FILE_NAME','FUN_NAME','JINJA2_CMD'],{},condition_sql)
     excute_result=storage.get_database_data('EXCUTE',['SORT_ID','FILE_NAME','CMD','PARAMETER','CONDITION'],{},'WHERE SORT_ID !=1')
     if config_result:
-        pass
+        result_dict['config']=config_result
     if translation_result:
-        pass
+        result_dict['translation']=translation_result
     if jinja2_result:
-        pass
+        result_dict['jinja2']=jinja2_result
     if excute_result:
-        pass
-
-    '''
-    [('558cca54d1a14969824b2e267902dd27', '558cca54d1a14969824b2e267902dd27'), ('TEST', '100')]
-    [ ('TEST', 'ruijie', 'display ip int b', 'show ip int b'), 
-    ('TEST', 'ruijie', 'ospf {{ item[0] }},area {{ item [1] }},network {{ item[2] }}', 'ospf {{ item[0] }},network {{ item[2] }} area {{ item[1] }}'), ('TEST', 'huawei', 'dip', 'display ip int b'), ('TEST', 'huawei', 'dir', 'display ip routing table'), ('TEST', 'huawei', 'dm', 'display ip mac-address')]
-    [ ('TEST', 'set_interface', '{%- for i in range(item[0]) %}'), 
-    ('TEST', 'set_interface', 'int g0/0/{{ i }}'), 
-    ('TEST', 'set_interface', 'ip address {{ item[1] }}{{ i+1 }} {{ item[2] }}')
-    ('TEST', 'set_interface', '{%- endfor%}'), 
-    ('TEST', 'set_bgp_peer', 'bgp {{ item[0] }}')
-    ('TEST', 'set_bgp_peer', 'peer {{ item[1] }} as-number {{ item[2] }}'),
-    ('TEST', 'set_bgp_peer', 'peer {{ item[3] }} connect-interface {{ item[4] }}')]
-    '''
-    print(config_result)
-    print(translation_result)
-    print(jinja2_result)
-    print(excute_result)
-    return 'A'
+        result_dict['excute']=excute_result
+    result=sp.processing_netknife_result_data(result_dict)
+    print(result)
+    return result
 
 if __name__ == '__main__':
     netknife.run('0.0.0.0',port=3000,debug=True)

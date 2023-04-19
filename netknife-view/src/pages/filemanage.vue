@@ -81,7 +81,7 @@ export default{
         this.activename = newTabName;
         localStorage.setItem(tab_obj['name'],JSON.stringify(tab_obj))
       }),
-      this.$bus.$on('change',(file_name)=>{
+      this.$bus.$on('change_title',(file_name)=>{
           this.tabs.forEach(tab=>{
             if(tab.name==this.activename){
               tab.title=file_name
@@ -90,6 +90,13 @@ export default{
               localStorage[tab.name]=JSON.stringify(ori_tab_obj)
             }
           })    
+      })
+      this.$bus.$on('change_code',(name,code)=>{
+        this.tabs.forEach(tab=>{
+            if(tab['name']===name){
+              tab['code']=code
+            }
+        })
       })
       Object.entries(localStorage).forEach(([key,value])=>{
         if(parseInt(key)>=0 && parseInt(key) <=9 ){
@@ -131,7 +138,8 @@ export default{
   },
   beforeDestroy(){
       this.$bus.$off('add')
-      this.$bus.$off('change')
+      this.$bus.$off('change_title')
+      this.$bus.$off('change_code')
     
   }
 }

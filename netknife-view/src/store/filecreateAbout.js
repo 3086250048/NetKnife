@@ -12,11 +12,14 @@ export const filecreateAbout={
                          message: '语法错误',
                          type: 'warning'
                        });
+                    console.log('语法错误')
                 }
                 if(response.data==='NOT_EXIST'){
+                    console.log('不存在')
                    context.commit('CREATE_NETKNIFE_FILE')
                 }
                 if(response.data==='EXIST'){
+                    console.log('存在')
                     context.commit('UPDATE_NETKNIFE_FILE')
                 }
                
@@ -74,11 +77,11 @@ export const filecreateAbout={
                         message: '创建成功',
                         type: 'success'
                         });
-                    state.vm.$bus.$emit('change',state.file_name+'')
+                    state.vm.$bus.$emit('change_title',state.file_name+'')
                 }
             })
         },
-        DELETE_NETKNIFE_FILE(state){
+        DELETE_NETKNIFE_FILE(state,name){
             send_post('/delete_netknife_file',{
                 'code':state.code
                 },response=>{
@@ -96,8 +99,8 @@ export const filecreateAbout={
                             message: '删除成功',
                             type: 'success'
                           });
-                        state.vm.$bus.$emit('change','空窗口')
-                        state.vm.codemirror.setValue(`name:\npriority:\n\n\ntranslation:{\n\n\n}\n\njinja2:{\n\n\n}\n\nexcute:{\n\n}\n\n`)
+                        state.vm.$bus.$emit('change_title','空窗口')
+                        state.vm.$bus.$emit('change_code',name,`name:\npriority:\n\n\ntranslation:{\n\n\n}\n\njinja2:{\n\n\n}\n\nexcute:{\n\n}\n\n`)
                     }
                 })
         },
@@ -135,6 +138,6 @@ export const filecreateAbout={
     state:{
         code:'',
         vm:'',
-        file_name:''
+        file_name:'',
     }
 }
