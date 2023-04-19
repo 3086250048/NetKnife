@@ -41,7 +41,7 @@ export default {
         lineNumbers: true,
         line: true,
         mode: 'text/javascript',
-        lineWrapping: false,
+        lineWrapping: true,
         theme: "monokai",
        
        

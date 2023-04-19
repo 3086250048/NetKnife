@@ -23,7 +23,7 @@ class AppStorage():
         self.__add_translation_sql='''INSERT INTO TRANSLATION (ID,FILE_NAME,TYPE,BEFORE_CMD,AFTER_CMD) VALUES(?,?,?,?,?)'''
         self.__add_jinja2_sql='''INSERT INTO JINJA2 (ID,FILE_NAME,FUN_NAME,JINJA2_CMD) VALUES(?,?,?,?)'''
         self.__add_jinja2_fun_sql='''INSERT INTO JINJA2_FUN (ID,FILE_NAME,FUN_NAME) VALUES(?,?,?)'''
-        self.__add_excute_sql='''INSERT INTO EXCUTE (FILE_NAME,CMD) VALUES(?,?)'''
+        self.__add_excute_sql='''INSERT INTO EXCUTE (FILE_NAME,CMD,PARAMETER,CONDITION) VALUES(?,?,?,?)'''
         #初始化创建数据库和表
         if not os.path.exists(self.__path):
             try:
@@ -127,6 +127,8 @@ class AppStorage():
                 SORT_ID        INTEGER PRIMARY KEY AUTOINCREMENT,
                 FILE_NAME      TEXT     NOT NULL,
                 CMD            TEXT     NOT NULL,
+                PARAMETER      TEXT    NOT NULL,
+                CONDITION      TEXT   NOT NULL, 
                 UNIQUE(FILE_NAME,CMD,SORT_ID)
                 );'''
                 )
@@ -153,7 +155,7 @@ class AppStorage():
                 print('INSERT-7')
                 cur.execute(self.__add_jinja2_fun_sql,[suid]*3)
                 print('INSERT-8')
-                cur.execute(self.__add_excute_sql,[suid]*2)
+                cur.execute(self.__add_excute_sql,[suid]*4)
                 print('INSERT-9')
                 cur.execute(self.__add_suid_sql,[suid])
                 print('INSERT-10')
@@ -957,7 +959,7 @@ class AppStorage():
                         self.oprate_sql(self.__add_jinja2_fun_sql,jinja2_fun_lis,callback)     
             if 'excute' in data_dict:
                 for i in data_dict['excute']:
-                    excute_lis=[data_dict['config']['name'],i]
+                    excute_lis=[data_dict['config']['name']]+i
                     self.oprate_sql(self.__add_excute_sql,excute_lis,callback)
             return True
         except Exception as e:

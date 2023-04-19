@@ -328,7 +328,7 @@ class StorageProcessing():
                         search_end += 1
                     search_str = code[search_start:search_end-1].strip()
                 return search_str
-            def inner_parse(inner_str):
+            def inner_parse(inner_str,left_str='{',right_str='}'):
                 inner_dict = {}
                 lines = inner_str.strip().split("\n")
                 current_key = None
@@ -407,8 +407,24 @@ class StorageProcessing():
                     file_data_jinja2[k]=cmd_lis
             file_data_excute=[]
             if 'excute:{' in code:
-                a=get_inner_str('excute:{')
-                file_data_excute=[ v.strip() for v in a.split('\n') if v !='']
+                inner_str=get_inner_str('excute:{')
+                lines = inner_str.strip().split("\n")
+                for line in lines:
+                    line = line.strip()
+                    if len(line.split('('))>1:
+                        fun=line.split('(')[0]
+                        parameter=''.join(line.split('(')[1]).split(')')[0]
+                    else:
+                        fun=line.split('=>')[0]
+                        parameter='None'
+                    condition=line.split('=>')
+                    if len(condition)>1:
+                        condition=condition[1]
+                    else:
+                        condition='None'
+                    _lis=[fun.strip(),parameter.strip(),condition.strip()]
+                    file_data_excute.append(_lis)
+
             netknife_file_data={}
             if file_data_config:
                 netknife_file_data['config']=file_data_config

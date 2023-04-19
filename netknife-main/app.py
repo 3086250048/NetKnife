@@ -362,12 +362,38 @@ def if_exist_netknife_file():
         return 'EXIST'
 @netknife.route('/get_netknife_file_data')
 def get_netknife_file_data():
-    config_result=storage.get_database_data('CONFIG',['FILE_NAME','FILE_PRIORITY'])
-    translation_result=storage.get_database_data('TRANSLATION',['TYPE','BEFORE_CMD','AFTER_CMD'])
-    jinja2_result=storage.get_database_data('JINJA2',['FUN_NAME','JINJA2_CMD'])
+    result_dict={}
+    first_id=storage.get_database_data('SUID',['FIRST_SUID'])[0][0]
+    condition_sql=f"WHERE ID !='{first_id}' "
+    config_result=storage.get_database_data('CONFIG',['FILE_NAME','FILE_PRIORITY'],{},condition_sql)
+    translation_result=storage.get_database_data('TRANSLATION',['FILE_NAME','TYPE','BEFORE_CMD','AFTER_CMD'],{},condition_sql)
+    jinja2_result=storage.get_database_data('JINJA2',['FILE_NAME','FUN_NAME','JINJA2_CMD'],{},condition_sql)
+    excute_result=storage.get_database_data('EXCUTE',['SORT_ID','FILE_NAME','CMD','PARAMETER','CONDITION'],{},'WHERE SORT_ID !=1')
+    if config_result:
+        pass
+    if translation_result:
+        pass
+    if jinja2_result:
+        pass
+    if excute_result:
+        pass
+
+    '''
+    [('558cca54d1a14969824b2e267902dd27', '558cca54d1a14969824b2e267902dd27'), ('TEST', '100')]
+    [ ('TEST', 'ruijie', 'display ip int b', 'show ip int b'), 
+    ('TEST', 'ruijie', 'ospf {{ item[0] }},area {{ item [1] }},network {{ item[2] }}', 'ospf {{ item[0] }},network {{ item[2] }} area {{ item[1] }}'), ('TEST', 'huawei', 'dip', 'display ip int b'), ('TEST', 'huawei', 'dir', 'display ip routing table'), ('TEST', 'huawei', 'dm', 'display ip mac-address')]
+    [ ('TEST', 'set_interface', '{%- for i in range(item[0]) %}'), 
+    ('TEST', 'set_interface', 'int g0/0/{{ i }}'), 
+    ('TEST', 'set_interface', 'ip address {{ item[1] }}{{ i+1 }} {{ item[2] }}')
+    ('TEST', 'set_interface', '{%- endfor%}'), 
+    ('TEST', 'set_bgp_peer', 'bgp {{ item[0] }}')
+    ('TEST', 'set_bgp_peer', 'peer {{ item[1] }} as-number {{ item[2] }}'),
+    ('TEST', 'set_bgp_peer', 'peer {{ item[3] }} connect-interface {{ item[4] }}')]
+    '''
     print(config_result)
     print(translation_result)
     print(jinja2_result)
+    print(excute_result)
     return 'A'
 
 if __name__ == '__main__':
