@@ -25,8 +25,8 @@ export const filecreateAbout={
                
          })
         },
-        delete_netknife_file(context,code){
-            context.state.code=code
+        delete_netknife_file(context,payload){
+            context.state.code=payload['code']
             send_post('/check_netknife_file_if_exist',{'code':context.state.code},response=>{
                 if(response.data==='SYNTAX_ERROR'){
                      context.state.vm.$message({
@@ -43,7 +43,7 @@ export const filecreateAbout={
                     });
                 }
                 if(response.data==='EXIST'){
-                    context.commit('DELETE_NETKNIFE_FILE')
+                    context.commit('DELETE_NETKNIFE_FILE',payload['name'])
                 }
                
          })
@@ -52,7 +52,6 @@ export const filecreateAbout={
     },
     mutations:{         
         CREATE_NETKNIFE_FILE(state){
-            console.log(state.code)
             send_post('/create_netknife_file',{
             'code':state.code
             },response=>{
@@ -85,7 +84,6 @@ export const filecreateAbout={
             send_post('/delete_netknife_file',{
                 'code':state.code
                 },response=>{
-                    console.log(response.data)
                     if(response.data==='DELETE_FAULT'){
                         state.vm.$message({
                             showClose: true,

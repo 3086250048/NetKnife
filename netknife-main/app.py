@@ -382,15 +382,22 @@ def get_netknife_file_data():
     if excute_result:
         result_dict['excute']=excute_result
     result=sp.processing_netknife_result_data(result_dict)
-    print(result)
-    return result
-
+    if result:
+        return result
+    else:
+        return 'NOT_EXIST'
 @netknife.route('/get_raw_code',methods=['POST'])
 def get_raw_code():
-  
     where_dict={'FILE_NAME':json.loads(request.get_data(as_text=True))['file_name']}
     result=storage.get_database_data('CODE',['CODE'],where_dict)[0][0]
     return result
+
+# 执行Netknife文件
+@netknife.route('/excute_netknife_file',methods=['POST'])
+def excute_netknife_file():
+    json.loads(request.get_data(as_text=True))['file_name']
+    return 'EXCUTE_FAULT'
+
 
 
 if __name__ == '__main__':

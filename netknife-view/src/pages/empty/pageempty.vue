@@ -15,6 +15,7 @@ export default{
             })
         },
         open_page(){
+            this.$bus.$emit('switch_activeIndex','three')
         }
     },
 }

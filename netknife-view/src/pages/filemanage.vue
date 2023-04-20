@@ -108,7 +108,10 @@ export default{
       })
       //点击删除按钮时,将编辑框中的代码重置为初始代码
       this.$bus.$on('change_code',(name,code)=>{
+        console.log(name)
+        console.log(code)
         this.tabs.forEach(tab=>{
+          console.log(tab['name'])
             if(tab['name']===name){
               tab['code']=code
             }
@@ -169,12 +172,44 @@ export default{
       if(localStorage.length===0){
         this.$bus.$emit('add')
       }
-  
+      this.$bus.$on('excute',(file_name)=>{
+        send_post('/excute_netknife_file',{'file_name':file_name},response=>{
+            if(response.data==='NOT_EXIST'){
+              this.$message({
+                showClose: true,
+                message: 'Excute中没有等待执行的语句',
+                type: 'warning'
+              });
+            }
+            if(response.data==='NOT_FIND'){
+              this.$message({
+                showClose: true,
+                message: 'Excute中存在Jinja2中不存在的函数',
+                type: 'warning'
+              });
+            }
+            if(response.data==='EXCUTE_SUCCESS'){
+              this.$message({
+                showClose: true,
+                message: '执行成功',
+                type: 'success'
+              });
+            }
+            if(response.data==='EXCUTE_FAULT'){
+              this.$message({
+                showClose: true,
+                message: '执行失败',
+                type: 'error'
+              });
+            }
+        })
+      })
   },
   beforeDestroy(){
       this.$bus.$off('add')
       this.$bus.$off('change_title')
       this.$bus.$off('change_code')
+      this.$bus.$off('excute')
   }
 }
 </script>

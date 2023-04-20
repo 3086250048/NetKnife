@@ -7,6 +7,7 @@ export const filestateAbout={
     mutations:{    
         GET_NETKNIFE_DATA(state){
             send_get('/get_netknife_file_data',response=>{
+                if (response.data==='NOT_EXIST'){return}
                 state.netknife_data=response.data
                 state.netknife_data.forEach(e=>{
                     if(e['translation'].length<=0){

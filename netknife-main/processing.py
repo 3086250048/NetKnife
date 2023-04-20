@@ -443,7 +443,7 @@ class StorageProcessing():
             print(e)
             return False
     def processing_netknife_result_data(self,data):
-        print(data)
+        if not data:return False
         result=[]
         for i in data['config']:
             key=i[0]

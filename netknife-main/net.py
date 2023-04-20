@@ -32,6 +32,11 @@ class AppNet():
         return fault_tcp_ping
 
     def send_command(self,login_dict,command_data):
+
+        print('login_dict')
+        print(login_dict)
+        print('command_data')
+        print(command_data)
         SEND_COMMANDS_MAP,DEVICE_TYPE_MAP={},{}
 
         DEVICE_TYPE_MAP['huaweissh']='huawei'

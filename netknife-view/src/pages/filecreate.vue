@@ -12,10 +12,13 @@
     <el-button type="primary" class="empty_add" @click="add_empty" icon="el-icon-view" size="small">
       新窗口+
     </el-button>
+    <el-button type="danger" class="excute" @click="excute_file" icon="el-icon-video-play" size="small">
+      运行
+    </el-button>
     <codemirror
       id="codemirror"
       style="margin-left:-15px;
-      margin-top: -15px;" 
+      margin-top: -15px;"  
       ref="myCm" 
       :value="code"
       :options="cmOptions"
@@ -64,7 +67,7 @@ export default {
     },
     delete_file(){
       const code = this.codemirror.getValue();
-      this.delete_netknife_file(code,this.name)
+      this.delete_netknife_file({code:code,name:this.name})
     },
     add_empty(){
         this.$bus.$emit('add')
@@ -77,7 +80,10 @@ export default {
         })
     },
     change_text(){
-      localStorage[this.name]=JSON.stringify({ name:this.name,title:this.title,code:this.codemirror.getValue()})
+      localStorage[this.name]=JSON.stringify({name:this.name,title:this.title,code:this.codemirror.getValue()})
+    },
+    excute_file(){
+      this.$bus.$emit('excute',this.title)
     }
   },
   computed: {
@@ -132,5 +138,10 @@ export default {
   position: relative;
   top:-10px;
 
+}
+.excute{
+  position: relative;
+  top:-10px;
+  
 }
 </style>
