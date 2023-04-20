@@ -24,6 +24,7 @@ class AppStorage():
         self.__add_jinja2_sql='''INSERT INTO JINJA2 (ID,FILE_NAME,FUN_NAME,JINJA2_CMD) VALUES(?,?,?,?)'''
         self.__add_jinja2_fun_sql='''INSERT INTO JINJA2_FUN (ID,FILE_NAME,FUN_NAME) VALUES(?,?,?)'''
         self.__add_excute_sql='''INSERT INTO EXCUTE (FILE_NAME,CMD,PARAMETER,CONDITION) VALUES(?,?,?,?)'''
+        self.__add_code_sql='''INSERT INTO CODE (ID,FILE_NAME,CODE) VALUES(?,?,?)'''
         #初始化创建数据库和表
         if not os.path.exists(self.__path):
             try:
@@ -133,6 +134,15 @@ class AppStorage():
                 );'''
                 )
                 print('EXCUTE')
+                cur.execute(               
+                     '''CREATE TABLE CODE (
+                ID             TEXT PRIMARY KEY NOT NULL,
+                FILE_NAME      TEXT     NOT NULL,
+                CODE           TEXT     NOT NULL,
+                UNIQUE(FILE_NAME)
+                );'''
+                )
+                print('CODE')
                 cur.execute(
                     '''CREATE TABLE SUID (FIRST_SUID   TEXT    PRIMARY KEY NOT NULL);'''
                 )
@@ -157,8 +167,10 @@ class AppStorage():
                 print('INSERT-8')
                 cur.execute(self.__add_excute_sql,[suid]*4)
                 print('INSERT-9')
-                cur.execute(self.__add_suid_sql,[suid])
+                cur.execute(self.__add_code_sql,[suid]*3)
                 print('INSERT-10')
+                cur.execute(self.__add_suid_sql,[suid])
+                print('INSERT-11')
                 con.commit()
             except sqlite3.Error as e:
                 print(e)
@@ -265,8 +277,6 @@ class AppStorage():
         else:
             return False
         
-
-
     #向数据库中插入数据
     #返回:布尔值
     #传入:{'projet':'',area:'',protocol:'',port:'',ip_expression:'',username:'',password:'',secret:''} 
@@ -904,12 +914,24 @@ class AppStorage():
         except:
             return False
 
+
+   
 #netknife文件相关
-    def add_netknife_file(self,data_dict):
+    def add_netknife_file(self,data_dict,ori_code):
         try:
             def callback(cur,con):
                 con.commit()
                 return True
+            if ori_code:
+                uid =str(uuid.uuid4())
+                suid=''.join(uid.split('-'))
+                code_dict={}
+                code_dict['FILE_NAME']=data_dict['config']['name']
+                code_dict['CODE']=ori_code
+                code_list=list(code_dict.values())
+                code_list.insert(0,suid)
+                self.oprate_sql(self.__add_code_sql,code_list,callback)
+
             if 'config' in data_dict:
                 uid =str(uuid.uuid4())
                 suid=''.join(uid.split('-'))
@@ -926,12 +948,12 @@ class AppStorage():
                         suid=''.join(uid.split('-'))
                         before=before_lis[i]
                         if isinstance(before,list):
-                            _before=','.join(before)
+                            _before='$'.join(before)
                         else:
                             _before=before
                         after=after_lis[i]
                         if isinstance(after,list):
-                            _after=','.join(after)
+                            _after='$'.join(after)
                         else:
                             _after=after
                         translation_lis=[suid,data_dict['config']['name'],k,_before,_after]
@@ -973,14 +995,15 @@ class AppStorage():
             self.del_database_data('JINJA2',where_dict)
             self.del_database_data('JINJA2_FUN',where_dict)
             self.del_database_data('EXCUTE',where_dict)
+            self.del_database_data('CODE',where_dict)
             return True
         except Exception as e:
             print(e)
             return False
-    def change_netknife_file(self,file_name,data_dict):
+    def change_netknife_file(self,file_name,data_dict,ori_code):
         try:
             self.delete_netknife_file(file_name)
-            self.add_netknife_file(data_dict)
+            self.add_netknife_file(data_dict,ori_code)
             return True
         except Exception as e:
             print(e)
@@ -992,6 +1015,8 @@ class AppStorage():
             return False
         else:
             return True
+
+    
 
 if __name__ == '__main__':
     ap=AppStorage()

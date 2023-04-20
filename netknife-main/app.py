@@ -313,10 +313,12 @@ def delete_parameter_database():
     
 @netknife.route('/create_netknife_file',methods=['POST'])
 def create_file():
+    
     file_dict=sp.processing_netknife_file(json.loads(request.get_data(as_text=True)))
     if not file_dict: 
         return 'SYNTAX_ERROR'
-    result=storage.add_netknife_file(file_dict)
+    ori_code=json.loads(request.get_data(as_text=True))['code']
+    result=storage.add_netknife_file(file_dict,ori_code)
     if result:
         return file_dict['config']['name']
     else:
@@ -335,11 +337,12 @@ def delete_file():
 
 @netknife.route('/change_netknife_file',methods=['POST'])
 def change_file():
+    ori_code=json.loads(request.get_data(as_text=True))['code']
     file_dict=sp.processing_netknife_file(json.loads(request.get_data(as_text=True)))
     file_name=sp.processing_file_name_netknife_file(json.loads(request.get_data(as_text=True)))
     print(file_dict)
     if not file_dict : return 'SYNTAX_ERROR'
-    result=storage.change_netknife_file(file_name,file_dict)
+    result=storage.change_netknife_file(file_name,file_dict,ori_code)
     if result:
         return 'CHANGE_SUCCESS'
     else:
@@ -381,6 +384,14 @@ def get_netknife_file_data():
     result=sp.processing_netknife_result_data(result_dict)
     print(result)
     return result
+
+@netknife.route('/get_raw_code',methods=['POST'])
+def get_raw_code():
+  
+    where_dict={'FILE_NAME':json.loads(request.get_data(as_text=True))['file_name']}
+    result=storage.get_database_data('CODE',['CODE'],where_dict)[0][0]
+    return result
+
 
 if __name__ == '__main__':
     netknife.run('0.0.0.0',port=3000,debug=True)

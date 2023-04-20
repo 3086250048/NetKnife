@@ -443,14 +443,24 @@ class StorageProcessing():
             print(e)
             return False
     def processing_netknife_result_data(self,data):
+        print(data)
         result=[]
         for i in data['config']:
             key=i[0]
             item={}
             item['config']=i
-            item['translation']=[v[1:] for v in data['translation'] if  v[0]==key ]
-            item['jinja2']=[v[1:] for v in data['jinja2'] if v[0] == key ]
-            item['excute']=[v[2:] for v in data['excute'] if v[1]==key]
+            if 'translation' in data:
+                item['translation']=[v[1:] for v in data['translation'] if  v[0]==key ]
+            else:
+                item['translation']=[]
+            if 'jinja2' in data:
+                item['jinja2']=[v[1:] for v in data['jinja2'] if v[0] == key ]
+            else:
+                item['jinja2']=[]
+            if 'excute' in data:
+                item['excute']=[v[2:] for v in data['excute'] if v[1]==key]
+            else:
+                item['excute']=[]
             result.append(item)
         return result
        

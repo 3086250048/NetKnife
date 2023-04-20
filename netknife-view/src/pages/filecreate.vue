@@ -70,6 +70,7 @@ export default {
         this.$bus.$emit('add')
     },
     open_file(){
+        // this.$bus.$emit('change_open_file_flag',true)
         this.$bus.$emit('switch_activeIndex','three')
         this.$router.push({
           name:'filestate'

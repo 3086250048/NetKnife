@@ -6,11 +6,11 @@
               <el-tag >文件名:{{ item['config'][0].length>30?item['config'][0].slice(0,30)+'...':item['config'][0] }}</el-tag>
               &nbsp;
               <el-tag type="danger" >优先级:{{ item['config'][1]}}</el-tag>
-              <el-button style="float: right; padding: 3px 0" type="text">打开文件</el-button>
+              <el-button style="float: right; padding: 3px 0" type="text" @click="open_file(item)">打开文件</el-button>
               <el-button-group class="button_group">
-              <el-button size="small" :disabled="item['translation'].length>0?false:true"  @click="show_translation(item['translation'])"  :class="item['translation_class']">Translation</el-button>
-              <el-button size="small" :disabled="item['jinja2'].length>0?false:true"  @click="show_jinja2(item['jinja2'])"  :class="item['jinja2_class']">Jinja2</el-button>
-              <el-button size="small" :disabled="item['excute'].length>0?false:true"  @click="show_excute(item['excute'])"  :class="item['excute_class']">Excute</el-button>
+              <el-button size="small" :disabled="!item['translation'].length>0"  @click="show_translation(item['translation'])"  :class="item['translation_class']">Translation</el-button>
+              <el-button size="small" :disabled="!item['jinja2'].length>0"  @click="show_jinja2(item['jinja2'])"  :class="item['jinja2_class']">Jinja2</el-button>
+              <el-button size="small" :disabled="!item['excute'].length>0"  @click="show_excute(item['excute'])"  :class="item['excute_class']">Excute</el-button>
               </el-button-group>
           </el-card>
         </li>
@@ -30,7 +30,9 @@
     </el-dialog>
     <el-dialog title="Excute" :visible.sync="excute_pop_able" width="1000px">
       <el-table :data="file_data" height="500"  stripe>
-        <el-table-column property="cmd" label="执行命令" width="1000"></el-table-column>
+        <el-table-column property="cmd" label="执行命令" width="333"></el-table-column>
+        <el-table-column property="parameter" label="参数" width="333"></el-table-column>
+        <el-table-column property="condition" label="执行条件" width="333"></el-table-column>
       </el-table>
     </el-dialog>
   </div>
@@ -64,26 +66,27 @@ export default{
         show_jinja2(data){
           this.file_data=[]
           this.jinja2_pop_able=true
-          let before_key=data[0][0]
-          let after_key=''
-          let value=''
-          data.forEach(element => {
-                console.log(element)
-                after_key=element[0]
-                value+=`\n${element[1]}`
-                if(before_key!==after_key){
-                  this.file_data.push({'fun_name':before_key,'fun_text':value})
-                  value=''
-                }
-                before_key=element[0]
-            });
+          let fun_dict={}
+          for(let i=0;i<data.length;i++){
+            if(!fun_dict.hasOwnProperty(data[i][0])){
+                fun_dict[data[i][0]]=data[i][1]
+              }else{
+                fun_dict[data[i][0]]+=`;${data[i][1]}`
+              }
+          }
+          Object.entries(fun_dict).forEach((item,index)=>{
+            this.file_data.push({'fun_name':item[0],'fun_text':item[1]})
+          })
         },
         show_excute(data){
           this.file_data=[]
           this.excute_pop_able=true
           data.forEach(element=>{
-            this.file_data.push({'cmd':element})
+            this.file_data.push({'cmd':element[0],'parameter':element[1],'condition':element[2]})
           })
+        },
+        open_file(item){
+          this.$bus.$emit('switch_activeIndex','open_file',item)
         }
     },
     computed:{

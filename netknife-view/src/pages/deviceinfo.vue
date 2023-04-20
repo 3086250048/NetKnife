@@ -97,7 +97,7 @@ export default{
             }
           
         },
-        switch_handler(index){
+        switch_handler(index,item){
             if (index==='first'){
                 this.activeIndex='first'
             }
@@ -133,12 +133,23 @@ export default{
                     })
                 }
             }
+            if(index==='open_file'){
+                this.activeIndex='four'
+                this.$router.push({
+                    name:'filemanage',
+                    params:{
+                        item:item
+                    }
+                })
+                
+              
+            }
         }
     },
     mounted(){
         this.handleSelect()
-        this.$bus.$on('switch_activeIndex',(index)=>{
-            this.switch_handler(index)
+        this.$bus.$on('switch_activeIndex',(index,item)=>{
+            this.switch_handler(index,item)
         })
     },
     beforeDestroy(){
