@@ -320,7 +320,7 @@ def create_file():
     ori_code=json.loads(request.get_data(as_text=True))['code']
     result=storage.add_netknife_file(file_dict,ori_code)
     if result:
-        return file_dict['config']['name']
+        return file_dict['netknife']['name']
     else:
         return 'ADD_FAULT'
 
@@ -359,7 +359,7 @@ def check_file_if_exist():
 @netknife.route('/if_exist_netknife_file')
 def if_exist_netknife_file():
     first_suid=storage.get_database_data('SUID',['FIRST_SUID'])[0][0]
-    result=storage.get_database_data_count('CONFIG',{},f"WHERE ID !='{first_suid}'")
+    result=storage.get_database_data_count('NETKNIFE',{},f"WHERE ID !='{first_suid}'")
     if result:
         return 'NOT_EXIST'
     else:
@@ -369,18 +369,21 @@ def get_netknife_file_data():
     result_dict={}
     first_id=storage.get_database_data('SUID',['FIRST_SUID'])[0][0]
     condition_sql=f"WHERE ID !='{first_id}' "
-    config_result=storage.get_database_data('CONFIG',['FILE_NAME','FILE_PRIORITY'],{},condition_sql)
+    netknife_result=storage.get_database_data('NETKNIFE',['FILE_NAME','FILE_PRIORITY'],{},condition_sql)
     translation_result=storage.get_database_data('TRANSLATION',['FILE_NAME','TYPE','BEFORE_CMD','AFTER_CMD'],{},condition_sql)
     jinja2_result=storage.get_database_data('JINJA2',['FILE_NAME','FUN_NAME','JINJA2_CMD'],{},condition_sql)
     excute_result=storage.get_database_data('EXCUTE',['SORT_ID','FILE_NAME','CMD','PARAMETER','CONDITION'],{},'WHERE SORT_ID !=1')
-    if config_result:
-        result_dict['config']=config_result
+    config_result=storage.get_database_data('CONFIG',['FILE_NAME','PARAMETER_CLASS','PARAMETER_KEY','PARAMETER_VALUE'],{},condition_sql)
+    if netknife_result:
+        result_dict['netknife']=netknife_result
     if translation_result:
         result_dict['translation']=translation_result
     if jinja2_result:
         result_dict['jinja2']=jinja2_result
     if excute_result:
         result_dict['excute']=excute_result
+    if config_result:
+        result_dict['config']=config_result
     result=sp.processing_netknife_result_data(result_dict)
     if result:
         return result

@@ -25,6 +25,11 @@ export const filestateAbout={
                     }else{
                       e['excute_class']='el-icon-success'
                     } 
+                    if(e['config'].length<=0){
+                        e['config_class']='el-icon-circle-close'
+                    }else{
+                        e['config_class']='el-icon-success'
+                    }
                 })
             })   
         }

@@ -19,12 +19,13 @@ class AppStorage():
         self.__get_project_list_sql='''SELECT PROJECT FROM LOGININFO GROUP BY PROJECT ;'''
         self.__add_suid_sql='''INSERT INTO SUID (FIRST_SUID) VALUES (?);'''
         self.__add_command_history_sql='''INSERT INTO COMMAND_HISTORY (ID,PROJECT,AREA,PROTOCOL,PORT,IP_EXPRESSION,COMMAND,COMMAND_RESPONSE,DATE_TIME) VALUES (?,?,?,?,?,?,?,?,?);'''
-        self.__add_config_sql='''INSERT INTO CONFIG (ID,FILE_NAME,FILE_PRIORITY) VALUES(?,?,?)'''
+        self.__add_netknife_sql='''INSERT INTO NETKNIFE (ID,FILE_NAME,FILE_PRIORITY) VALUES(?,?,?)'''
         self.__add_translation_sql='''INSERT INTO TRANSLATION (ID,FILE_NAME,TYPE,BEFORE_CMD,AFTER_CMD) VALUES(?,?,?,?,?)'''
         self.__add_jinja2_sql='''INSERT INTO JINJA2 (ID,FILE_NAME,FUN_NAME,JINJA2_CMD) VALUES(?,?,?,?)'''
         self.__add_jinja2_fun_sql='''INSERT INTO JINJA2_FUN (ID,FILE_NAME,FUN_NAME) VALUES(?,?,?)'''
         self.__add_excute_sql='''INSERT INTO EXCUTE (FILE_NAME,CMD,PARAMETER,CONDITION) VALUES(?,?,?,?)'''
         self.__add_code_sql='''INSERT INTO CODE (ID,FILE_NAME,CODE) VALUES(?,?,?)'''
+        self.__add_config_sql='''INSERT INTO CONFIG (ID,FILE_NAME,PARAMETER_CLASS,PARAMETER_KEY,PARAMETER_VALUE) VALUES(?,?,?,?,?)'''
         #初始化创建数据库和表
         if not os.path.exists(self.__path):
             try:
@@ -86,14 +87,14 @@ class AppStorage():
                 )
                 print('COMMAND_HISTORY')    
                 cur.execute(               
-                     '''CREATE TABLE CONFIG (
+                     '''CREATE TABLE NETKNIFE (
                 ID             TEXT     PRIMARY KEY NOT NULL,
                 FILE_NAME      TEXT     NOT NULL,
                 FILE_PRIORITY       TEXT     NOT NULL,
                 UNIQUE(FILE_NAME)
                 );'''
                 )
-                print('CONFIG')
+                print('NETKNIFE')
                 cur.execute(               
                      '''CREATE TABLE TRANSLATION (
                 ID             TEXT     PRIMARY KEY NOT NULL,
@@ -143,6 +144,17 @@ class AppStorage():
                 );'''
                 )
                 print('CODE')
+                cur.execute(               
+                     '''CREATE TABLE CONFIG (
+                ID             TEXT PRIMARY KEY NOT NULL,
+                FILE_NAME      TEXT     NOT NULL,
+                PARAMETER_CLASS   TEXT  NOT NULL,
+                PARAMETER_KEY   TEXT    NOT NULL,
+                PARAMETER_VALUE  TEXT   NOT NULL,
+                UNIQUE(FILE_NAME,PARAMETER_CLASS,PARAMETER_KEY)
+                );'''
+                )
+                print('CONFIG')
                 cur.execute(
                     '''CREATE TABLE SUID (FIRST_SUID   TEXT    PRIMARY KEY NOT NULL);'''
                 )
@@ -157,7 +169,7 @@ class AppStorage():
                 print('INSERT-3')
                 cur.execute(self.__add_command_history_sql,[suid]*9)
                 print('INSERT-4')
-                cur.execute(self.__add_config_sql,[suid]*3)
+                cur.execute(self.__add_netknife_sql,[suid]*3)
                 print('INSERT-5')
                 cur.execute(self.__add_translation_sql,[suid]*5)
                 print('INSERT-6')
@@ -169,8 +181,10 @@ class AppStorage():
                 print('INSERT-9')
                 cur.execute(self.__add_code_sql,[suid]*3)
                 print('INSERT-10')
-                cur.execute(self.__add_suid_sql,[suid])
+                cur.execute(self.__add_config_sql,[suid]*5)
                 print('INSERT-11')
+                cur.execute(self.__add_suid_sql,[suid])
+                print('INSERT-12')
                 con.commit()
             except sqlite3.Error as e:
                 print(e)
@@ -926,18 +940,18 @@ class AppStorage():
                 uid =str(uuid.uuid4())
                 suid=''.join(uid.split('-'))
                 code_dict={}
-                code_dict['FILE_NAME']=data_dict['config']['name']
+                code_dict['FILE_NAME']=data_dict['netknife']['name']
                 code_dict['CODE']=ori_code
                 code_list=list(code_dict.values())
                 code_list.insert(0,suid)
                 self.oprate_sql(self.__add_code_sql,code_list,callback)
 
-            if 'config' in data_dict:
+            if 'netknife' in data_dict:
                 uid =str(uuid.uuid4())
                 suid=''.join(uid.split('-'))
-                config_list=list(data_dict['config'].values())
-                config_list.insert(0,suid)
-                self.oprate_sql(self.__add_config_sql,config_list,callback)
+                netknife_list=list(data_dict['netknife'].values())
+                netknife_list.insert(0,suid)
+                self.oprate_sql(self.__add_netknife_sql,netknife_list,callback)
             if 'translation' in data_dict:
                 for k,v in data_dict['translation'].items():
                     before_lis= [_v for _v in v['before_lis']]
@@ -956,16 +970,16 @@ class AppStorage():
                             _after='$'.join(after)
                         else:
                             _after=after
-                        translation_lis=[suid,data_dict['config']['name'],k,_before,_after]
+                        translation_lis=[suid,data_dict['netknife']['name'],k,_before,_after]
                         self.oprate_sql(self.__add_translation_sql,translation_lis,callback)
                     for i in import_lis:
                         uid =str(uuid.uuid4())
                         suid=''.join(uid.split('-'))
-                        translation_lis=[suid,data_dict['config']['name'],k,i,'None']
+                        translation_lis=[suid,data_dict['netknife']['name'],k,i,'None']
                         self.oprate_sql(self.__add_translation_sql,translation_lis,callback)
             if 'jinja2' in data_dict:
                 for k,v in data_dict['jinja2'].items():
-                    where_dict={'FILE_NAME':data_dict['config']['name'],'FUN_NAME':k}
+                    where_dict={'FILE_NAME':data_dict['netknife']['name'],'FUN_NAME':k}
                     if self.get_database_data_count('JINJA2_FUN',where_dict):
                         for i in v:
                             if isinstance(i,list):
@@ -974,28 +988,51 @@ class AppStorage():
                                 cmd=i
                             uid =str(uuid.uuid4())
                             suid=''.join(uid.split('-'))
-                            jinja2_lis=[suid,data_dict['config']['name'],k,cmd]
+                            jinja2_lis=[suid,data_dict['netknife']['name'],k,cmd]
                             
                             self.oprate_sql(self.__add_jinja2_sql,jinja2_lis,callback)   
-                        jinja2_fun_lis=[suid,data_dict['config']['name'],k]
+                        jinja2_fun_lis=[suid,data_dict['netknife']['name'],k]
                         self.oprate_sql(self.__add_jinja2_fun_sql,jinja2_fun_lis,callback)     
             if 'excute' in data_dict:
                 for i in data_dict['excute']:
-                    excute_lis=[data_dict['config']['name']]+i
+                    excute_lis=[data_dict['netknife']['name']]+i
                     self.oprate_sql(self.__add_excute_sql,excute_lis,callback)
+           
+
+            if'config' in data_dict:
+                 for k,v in data_dict['config'].items():
+                    key_lis= [_v for _v in v['key_lis']]
+                    value_lis= [_v for _v in v['value_lis'] ] 
+                    import_lis=[_v for _v in v['import_lis']]
+                    for i in range(len(key_lis)):
+                        uid =str(uuid.uuid4())
+                        suid=''.join(uid.split('-'))
+                        key=key_lis[i]
+                        _key=key
+                        value=value_lis[i]
+                        _value=value
+                        config_lis=[suid,data_dict['netknife']['name'],k,_key,_value]
+                        self.oprate_sql(self.__add_config_sql,config_lis,callback)
+                    for i in import_lis:
+                        uid =str(uuid.uuid4())
+                        suid=''.join(uid.split('-'))
+                        config_lis=[suid,data_dict['netknife']['name'],k,_key,'None']
+                        self.oprate_sql(self.__add_config_sql,config_lis,callback)  
             return True
+
         except Exception as e:
             print(e)
             return False
     def delete_netknife_file(self,file_name):
         try:
             where_dict={'FILE_NAME':file_name}
-            self.del_database_data('CONFIG',where_dict)
+            self.del_database_data('NETKNIFE',where_dict)
             self.del_database_data('TRANSLATION',where_dict)
             self.del_database_data('JINJA2',where_dict)
             self.del_database_data('JINJA2_FUN',where_dict)
             self.del_database_data('EXCUTE',where_dict)
             self.del_database_data('CODE',where_dict)
+            self.del_database_data('CONFIG',where_dict)
             return True
         except Exception as e:
             print(e)
@@ -1011,7 +1048,7 @@ class AppStorage():
 
     def check_netknife_file_if_exist(self,file_name):
         where_dict={'FILE_NAME':file_name}
-        if self.get_database_data_count('CONFIG',where_dict):
+        if self.get_database_data_count('NETKNIFE',where_dict):
             return False
         else:
             return True

@@ -3,11 +3,12 @@
     <ul>
         <li v-for="item,index in netknife_data" :key="index">
           <el-card class="box-card card">
-              <el-tag >文件名:{{ item['config'][0].length>30?item['config'][0].slice(0,30)+'...':item['config'][0] }}</el-tag>
+              <el-tag >文件名:{{ item['netknife'][0].length>30?item['netknife'][0].slice(0,30)+'...':item['netknife'][0] }}</el-tag>
               &nbsp;
-              <el-tag type="danger" >优先级:{{ item['config'][1]}}</el-tag>
+              <el-tag type="danger" >优先级:{{ item['netknife'][1]}}</el-tag>
               <el-button style="float: right; padding: 3px 0" type="text" @click="open_file(item)">打开文件</el-button>
               <el-button-group class="button_group">
+              <el-button size="small" :disabled="!item['config'].length>0"  @click="show_config(item['config'])"  :class="item['config_class']">Config</el-button>
               <el-button size="small" :disabled="!item['translation'].length>0"  @click="show_translation(item['translation'])"  :class="item['translation_class']">Translation</el-button>
               <el-button size="small" :disabled="!item['jinja2'].length>0"  @click="show_jinja2(item['jinja2'])"  :class="item['jinja2_class']">Jinja2</el-button>
               <el-button size="small" :disabled="!item['excute'].length>0"  @click="show_excute(item['excute'])"  :class="item['excute_class']">Excute</el-button>
@@ -35,6 +36,13 @@
         <el-table-column property="condition" label="执行条件" width="333"></el-table-column>
       </el-table>
     </el-dialog>
+    <el-dialog title="Config" :visible.sync="config_pop_able" width="1000px">
+      <el-table :data="file_data" height="500"  stripe>
+        <el-table-column property="parameter_class" label="参数类型" width="333"></el-table-column>
+        <el-table-column property="parameter_key" label="参数键" width="333"></el-table-column>
+        <el-table-column property="parameter_value" label="参数值" width="333"></el-table-column>
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
@@ -47,6 +55,7 @@ export default{
             translation_pop_able:false,
             jinja2_pop_able:false,
             excute_pop_able:false,
+            config_pop_able:false,
             file_data:[]
         }
     },
@@ -87,6 +96,13 @@ export default{
         },
         open_file(item){
           this.$bus.$emit('switch_activeIndex','open_file',item)
+        },
+        show_config(data){
+          this.file_data=[]
+          this.config_pop_able=true
+          data.forEach(element => {
+              this.file_data.push({'parameter_class':element[0],'parameter_key':element[1],'parameter_value':element[2]})
+          });
         }
     },
     computed:{

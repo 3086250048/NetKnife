@@ -143,7 +143,7 @@ export default{
                 open_file_flag=false
                 this.tabs.forEach(e=>{
                   if(e['name']===localStorage['last_key']){
-                    e['title']=this.$route.params.item['config'][0]
+                    e['title']=this.$route.params.item['netknife'][0]
                     send_post('/get_raw_code',{'file_name':e['title']},response=>{
                       e['code']=response.data
                       localStorage[e['name']]=JSON.stringify(e)

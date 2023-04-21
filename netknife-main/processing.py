@@ -300,7 +300,6 @@ class StorageProcessing():
                 _add_parameter_list.append(v)
         return _add_parameter_list
     def processing_file_name_netknife_file(self,data):
-        print(data)
         try:
             code=data['code']
             return re.search(r'name\s*:\s*([^:\n]+)', code).group(1).replace(" ","")
@@ -310,9 +309,12 @@ class StorageProcessing():
     def processing_netknife_file(self,data):
         try:
             code=data['code']
-            file_data_config={}
-            file_data_config['name'] = re.search(r'name\s*:\s*([^:\n]+)', code).group(1).replace(" ","")
-            file_data_config['priority'] = re.search(r'priority\s*:\s*(\d+)', code).group(1).replace(" ","")
+            file_data_netknife={}
+
+            print(code)
+
+            file_data_netknife['name'] = re.search(r'name\s*:\s*([^:\n]+)', code).group(1).replace(" ","")
+            file_data_netknife['priority'] = re.search(r'priority\s*:\s*(\d+)', code).group(1).replace(" ","")
         
             def get_inner_str(flag_str):
                 search_start = code.find(flag_str)
@@ -418,26 +420,53 @@ class StorageProcessing():
                             fun=line.split('(')[0]
                             parameter=''.join(line.split('(')[1]).split(')')[0]
                         else:
-                            fun=line.split('=>')[0]
+                            fun=line.split('where')[0]
                             parameter='None'
-                        condition=line.split('=>')
+                        condition=line.split('where')
                         if len(condition)>1:
                             condition=condition[1]
                         else:
                             condition='None'
                         _lis=[fun.strip(),parameter.strip(),condition.strip()]
                         file_data_excute.append(_lis)
-                
+
+            file_data_config={}
+            if 'config:{' in code:
+                for k,v in inner_parse(get_inner_str('config:{')).items():
+                    _v=v.split('\n')
+                    key_lis=[]
+                    value_lis=[]
+                    import_lis=[]
+                    _key_lis=[]
+                    _value_lis=[]
+                    for v in [ v.strip() for v in _v if v !='' ]:
+                        if len(v.split(':')) <=1:
+                            import_lis.append(v.split(':')[0])
+                        elif len(v.split(':'))>=3:
+                            key_lis.append(v.split(':')[0])
+                            value_lis.append(':'.join(v.split(':')[1:]))
+                        else:
+                            key_lis.append(v.split(':')[0])
+                            value_lis.append(v.split(':')[1])
+
+                    _key_lis=[v.strip() for v in key_lis]  
+                    _value_lis=[v.strip() for v in value_lis]
+                    
+                    file_data_config[k]={'key_lis':_key_lis,'value_lis':_value_lis,'import_lis':import_lis}
+
+
             netknife_file_data={}
-            if file_data_config:
-                netknife_file_data['config']=file_data_config
+            if file_data_netknife:
+                netknife_file_data['netknife']=file_data_netknife
             if file_data_translation:
                 netknife_file_data['translation']=file_data_translation
             if file_data_jinja2:
                 netknife_file_data['jinja2']=file_data_jinja2
             if file_data_excute:
                 netknife_file_data['excute']=file_data_excute
-           
+            if file_data_config:
+                netknife_file_data['config']=file_data_config
+            print(netknife_file_data)
             return netknife_file_data
         except Exception as e:
             print(e)
@@ -445,10 +474,10 @@ class StorageProcessing():
     def processing_netknife_result_data(self,data):
         if not data:return False
         result=[]
-        for i in data['config']:
+        for i in data['netknife']:
             key=i[0]
             item={}
-            item['config']=i
+            item['netknife']=i
             if 'translation' in data:
                 item['translation']=[v[1:] for v in data['translation'] if  v[0]==key ]
             else:
@@ -461,6 +490,10 @@ class StorageProcessing():
                 item['excute']=[v[2:] for v in data['excute'] if v[1]==key]
             else:
                 item['excute']=[]
+            if 'config' in data:
+                item['config']=[v[1:] for v in data['config'] if v[0] == key ]
+            else:
+                item['config']=[]
             result.append(item)
         return result
        
