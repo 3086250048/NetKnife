@@ -97,6 +97,7 @@ export default{
       }),
       //点击保存按钮或删除按钮时更改Tab的titile
       this.$bus.$on('change_title',(file_name)=>{
+          console.log('11111111111111111111111111111111111')
           this.tabs.forEach(tab=>{
             if(tab.name==this.activename){
               tab.title=file_name
@@ -174,17 +175,31 @@ export default{
       }
       this.$bus.$on('excute',(file_name)=>{
         send_post('/excute_netknife_file',{'file_name':file_name},response=>{
-            if(response.data==='NOT_EXIST'){
+            if(response.data==='FILE_NOT_EXIST'){
+              this.$message({
+                showClose: true,
+                message: '请保存后运行',
+                type: 'error'
+              });
+            }
+            if(response.data==='EXCUTE_NOT_EXIST'){
               this.$message({
                 showClose: true,
                 message: 'Excute中没有等待执行的语句',
                 type: 'warning'
               });
             }
-            if(response.data==='NOT_FIND'){
+            if(response.data==='FUN_NOT_EXIST'){
               this.$message({
                 showClose: true,
-                message: 'Excute中存在Jinja2中不存在的函数',
+                message: 'Excute中存在本地Jinja2中不存在的函数',
+                type: 'warning'
+              });
+            }
+            if(response.data==='IMPORT_FUN_NOT_EXIST'){
+              this.$message({
+                showClose: true,
+                message: 'Excute中导入的Jinja2函数不存在',
                 type: 'warning'
               });
             }

@@ -311,8 +311,6 @@ class StorageProcessing():
             code=data['code']
             file_data_netknife={}
 
-            print(code)
-
             file_data_netknife['name'] = re.search(r'name\s*:\s*([^:\n]+)', code).group(1).replace(" ","")
             file_data_netknife['priority'] = re.search(r'priority\s*:\s*(\d+)', code).group(1).replace(" ","")
         
@@ -412,8 +410,9 @@ class StorageProcessing():
             file_data_excute=[]
             if 'excute:{' in code:
                 inner_str=get_inner_str('excute:{')
-                lines = inner_str.strip().split("\n")
-                if lines[0]!='':
+                lines = [ v.strip() for v in  inner_str.strip().split("\n") if v.strip() ]
+                print(lines)
+                if len(lines)>0:
                     for line in lines:
                         line = line.strip()
                         if len(line.split('('))>1:

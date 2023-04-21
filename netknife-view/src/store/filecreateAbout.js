@@ -48,36 +48,42 @@ export const filecreateAbout={
                
          })
         },
-       
+        
     },
     mutations:{         
         CREATE_NETKNIFE_FILE(state){
             send_post('/create_netknife_file',{
             'code':state.code
             },response=>{
+                console.log(response.data)
                 if(response.data==='SYNTAX_ERROR'){
                     state.vm.$message({
                         showClose: true,
                         message: '语法错误',
                         type: 'warning'
                       });
+                    return
                 }
-                else if(response.data==='ADD_FAULT'){
+                if(response.data==='ADD_FAULT'){
                     state.vm.$message({
                         showClose: true,
                         message: '创建失败',
                         type: 'error'
                       });
+                    return
                 }
-                else{
-                    state.file_name=response.data
+                state.file_name=response.data
+                state.vm.$bus.$emit('change_title',state.file_name+'')
+                if(!state.vm.excute_flag){
                     state.vm.$message({
                         showClose: true,
                         message: '创建成功',
                         type: 'success'
                         });
-                    state.vm.$bus.$emit('change_title',state.file_name+'')
-                }
+                }else{
+                    state.vm.excute_flag=false
+                    state.vm.$bus.$emit('excute',state.file_name)
+                }      
             })
         },
         DELETE_NETKNIFE_FILE(state,name){
@@ -120,12 +126,18 @@ export const filecreateAbout={
                             type: 'warning'
                           });
                     }
-                    if(response.data==='CHANGE_SUCCESS'){
-                        state.vm.$message({
-                            showClose: true,
-                            message: '更新成功',
-                            type: 'success'
-                          });
+                    if(response.data==='CHANGE_SUCCESS'  ){
+                        if(!state.vm.excute_flag){
+                            state.vm.$message({
+                                showClose: true,
+                                message: '更新成功',
+                                type: 'success'
+                              });
+                        }else{  
+                            state.vm.excute_flag=false
+                            state.vm.$bus.$emit('excute',state.vm.title)
+                        }
+                       
                     }
                 })
         },

@@ -50,7 +50,8 @@ export default {
        
       },
       delete_able:false,
-      update_able:false
+      update_able:false,
+      excute_flag:false
     };
   },
   methods: {
@@ -83,7 +84,10 @@ export default {
       localStorage[this.name]=JSON.stringify({name:this.name,title:this.title,code:this.codemirror.getValue()})
     },
     excute_file(){
-      this.$bus.$emit('excute',this.title)
+      this.excute_flag=true
+      const code=this.codemirror.getValue()
+      this.save_netknife_file(code)
+      
     }
   },
   computed: {

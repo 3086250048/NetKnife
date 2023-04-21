@@ -315,6 +315,9 @@ def delete_parameter_database():
 def create_file():
     
     file_dict=sp.processing_netknife_file(json.loads(request.get_data(as_text=True)))
+    print('============================================')
+    print(file_dict)
+    print('================================================')
     if not file_dict: 
         return 'SYNTAX_ERROR'
     ori_code=json.loads(request.get_data(as_text=True))['code']
@@ -352,10 +355,12 @@ def check_file_if_exist():
     file_name=sp.processing_file_name_netknife_file(json.loads(request.get_data(as_text=True)))
     if not file_name: return 'SYNTAX_ERROR'
     result=storage.check_netknife_file_if_exist(file_name)
+
     if result:
         return 'EXIST'
     else:
         return 'NOT_EXIST'
+
 @netknife.route('/if_exist_netknife_file')
 def if_exist_netknife_file():
     first_suid=storage.get_database_data('SUID',['FIRST_SUID'])[0][0]
@@ -398,7 +403,28 @@ def get_raw_code():
 # 执行Netknife文件
 @netknife.route('/excute_netknife_file',methods=['POST'])
 def excute_netknife_file():
-    json.loads(request.get_data(as_text=True))['file_name']
+    file_name=json.loads(request.get_data(as_text=True))['file_name']
+    where_dict={'file_name':file_name}
+    file_name_exist=storage.get_database_data_count('NETKNIFE',where_dict)
+    excute_exist=storage.get_database_data_count('EXCUTE',where_dict)
+    if file_name_exist:
+        return 'FILE_NOT_EXIST'
+    if excute_exist:
+        return 'EXCUTE_NOT_EXIST'
+    excute_result=storage.get_database_data('EXCUTE',['CMD'],where_dict)
+    jinja2_result=storage.get_database_data('JINJA2_FUN',['FUN_NAME'],where_dict)
+    excute_lis=[v[0] for v in excute_result if '.'  not in v[0]]
+    import_excute_lis=[v[0] for v in excute_result if '.' in v[0]]
+    jinja2_lis=[v[0] for v in jinja2_result]
+    for i in list(set(excute_lis)):
+        if i not in jinja2_lis:
+            return 'FUN_NOT_EXIST'
+  
+    for i in import_excute_lis:
+      import_excute_exist=storage.get_database_data_count('JINJA2_FUN', {'FILE_NAME':i.split('.')[0],'FUN_NAME':i.split('.')[1]})
+      if import_excute_exist :
+          return 'IMPORT_FUN_NOT_EXIST'
+
     return 'EXCUTE_FAULT'
 
 
