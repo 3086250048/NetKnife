@@ -7,7 +7,8 @@ from storage import AppStorage
 from processing import AppProcessing
 from processing import NetProcessing
 from action import AppAction
-
+from pprint import pprint
+from jinja2 import Template
 
 storage=AppStorage()
 ap=AppProcessing()
@@ -142,7 +143,7 @@ class AppNet():
         SEND_COMMANDS_MAP['huawei']=huawei_send_commands
         SEND_COMMANDS_MAP['ruijie']=ruijie_send_commands
 
-
+     
         DEVICE_LIST=np.get_device_list(login_dict,DEVICE_TYPE_MAP)
        
 
@@ -185,6 +186,87 @@ class AppNet():
             aa.action_class_map(command_data['action'][0],command_data['path_parameter']['txt_export_path']+command_data['action'][1],np.get_export_data(results))
             
         return results
+
+    def netknife_send_command(self,cmd_login_list,file_name):
+
+        DEVICE_TYPE_MAP={}
+        DEVICE_TYPE_MAP['huaweissh']='huawei'
+        DEVICE_TYPE_MAP['huaweitelnet']='huawei_telnet'
+        DEVICE_TYPE_MAP['ruijiessh']='ruijie_os'
+        DEVICE_TYPE_MAP['ruijietelnet']='ruijie_os_telnet'
+        DEVICE_TYPE_MAP['h3cssh']='hp_comware'
+        DEVICE_TYPE_MAP['h3ctelnet']='hp_comware_telnet'
+        DEVICE_TYPE_MAP['linuxssh']='linux'
+
+        ori_cmd_lis=[v[0] for v in cmd_login_list]
+        all_cmd_login_info_lis=[v[1:][0] for v in cmd_login_list ]
+        all_full_login_info_lis=[]
+        for each_login_info in all_cmd_login_info_lis:
+            all_full_login_info_lis.append(np.get_device_list(each_login_info,DEVICE_TYPE_MAP))
+        all_cmd_device_type_lis=[]
+        for device_info in all_full_login_info_lis:
+            all_cmd_device_type_lis.append([v['device_type'] for v in device_info ] )
+
+        where_dict={'FILE_NAME':file_name}
+        translation_result= storage.get_database_data('TRANSLATION',['TYPE','BEFORE_CMD','AFTER_CMD'],where_dict)
+      
+        MATCH_TYPE_MAP={}
+        MATCH_TYPE_MAP['huawei_telnet']='huawei'
+        MATCH_TYPE_MAP['huawei_ssh']='huawei'
+        MATCH_TYPE_MAP['ruijie_os']='ruijie'
+        MATCH_TYPE_MAP['ruijie_os_telnet']='ruijie'
+        MATCH_TYPE_MAP['hp_comware']='h3c'
+        MATCH_TYPE_MAP['hp_comware_telnet']='h3c'
+        
+        all_device_type_cmd=[]
+        for index,cmds in enumerate(ori_cmd_lis):
+            each_device_type_cmd=[]
+            for each_device_type in all_cmd_device_type_lis[index]: 
+                _cmds=[v for v in cmds]
+                for _index,cmd in enumerate(_cmds): 
+                    for each_translation_result in translation_result:
+                        # print(each_device_type)
+                        # print(cmd)
+                        if MATCH_TYPE_MAP[each_device_type]==each_translation_result[0] and cmd.replace(" ", "") == each_translation_result[1].replace(" ", ""):
+                            _cmds[_index]=each_translation_result[2] 
+                each_device_type_cmd.append(_cmds)
+            all_device_type_cmd.append(each_device_type_cmd)
+
+        _all_device_type_cmd_lis=[]
+        for index,device_type_cmd in enumerate(all_device_type_cmd):
+            device_type_cmd_lis=[]
+            for _index,cmds in enumerate(device_type_cmd):
+                _lis='$'.join(cmds).split('$')
+                device_type_cmd_lis.append(_lis)
+            _all_device_type_cmd_lis.append(device_type_cmd_lis)
+
+        excute_parameter_result=storage.get_database_data('EXCUTE',['PARAMETER'],where_dict,'ORDER BY SORT_ID')
+        excute_parameter_lis=[ v[0].replace(" ","") for v in excute_parameter_result]
+        print(excute_parameter_lis)
+        ['ip=1.1.1.1,pid=2.2.2.2', 'ip=2.2.2.2,pid=200']
+        _excute_parameter_lis=[ v.split(',') for v in excute_parameter_lis ]
+        print(_excute_parameter_lis)
+        [['ip=1.1.1.1', 'pid=2.2.2.2'], ['ip=2.2.2.2', 'pid=200']]
+        excute_parameter_dict_lis=[]
+        for parameter_lis in _excute_parameter_lis:
+            if parameter_lis[0]=='None':
+                parameter_dict={}
+            else:
+                parameter_dict={ v.split('=')[0]:v.split('=')[1] for v in parameter_lis}
+            excute_parameter_dict_lis.append(parameter_dict)           
+        print(excute_parameter_dict_lis)
+        jinja2_all_cmds_lis=[]
+        for index,cmds_lis in  enumerate(_all_device_type_cmd_lis):
+            jinja2_cmds_lis=[]
+            for cmds in cmds_lis:
+                print('++++++++++++++++++++++++++++++++++++++')
+                jinja2_str='\n'.join(cmds)
+                template=Template(jinja2_str)
+                result=template.render(excute_parameter_dict_lis[index])
+                print(result)
+                print('++++++++++++++++++++++++++++++++++++++')
+        # print(all_full_login_info_lis)          
+    
 
 if __name__ == '__main__':
     net =AppNet()

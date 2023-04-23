@@ -118,6 +118,21 @@ class AppProcessing():
     def processing_effect_login_data(self,command_data):
         input_data = command_data['command']
         where_dict={}
+        if command_data['mode']=='global':
+            where_pattern = r"(?<=where\s)(.*?)(?=\sset|\sselect|\saction|\supload|\sdownload|$)"
+            where_match = re.search(where_pattern,input_data)
+            if where_match:
+                where_key_value_list=where_match.group(1).split(',')
+                for item in where_key_value_list:
+                    if item !='':
+                        _kv=item.split('=')
+                        if len(_kv)<=1:continue
+                        if _kv[0]=='ip':
+                            where_dict['ip_expression']=_kv[1]
+                        else:
+                            where_dict[_kv[0]]=_kv[1]
+            return self.__storage.get_full_login_list(where_dict)
+        
         if command_data['mode']=='project':
             where_pattern = r"(?<=where\s)(.*?)(?=\sset|\sselect|\saction|\supload|\sdownload|$)"
             where_match = re.search(where_pattern,input_data)
@@ -257,6 +272,10 @@ class NetProcessing():
         if not hasattr(cls,'_instance'):
             cls._instance=super().__new__(cls,*args,**kwds)
         return cls._instance 
+    def __init__(self) -> None:
+        from storage import AppStorage
+        self.__ap=AppProcessing()
+        self.__storage=AppStorage()
     def get_device_and_command_list(self,command_data,device_list):
         command_data_list=[]
         for source_path  in command_data['download'][1]:
@@ -285,7 +304,27 @@ class NetProcessing():
     def get_export_data(self,export_data):
         _lis=[v['response'] for v in export_data]
         return ''.join(_lis)
-
+    def processing_jinja2_command(self,excute_result,file_name):
+        print(excute_result)
+        login_dict_and_cmd_lis=[]
+        for item in excute_result:
+            if '.' in item[0]:
+                where_dict={'FILE_NAME':item[0].split('.')[0],'FUN_NAME':item[0].split('.')[1]}
+            else:
+                where_dict={'FILE_NAME':file_name,'FUN_NAME':item[0]}
+            
+            if item[2]!='None':
+                login_where_dict={'mode':'global','command':f'where {item[2]}'}
+                login_dict=self.__ap.processing_effect_login_data(login_where_dict)
+                if login_dict :
+                    login_dict_and_cmd_lis.append(([ v[0] for v in self.__storage.get_database_data('JINJA2',['JINJA2_CMD'],where_dict)],login_dict))
+                else:
+                    return 'MIXUNIT_NOT_EXIST'
+            else:
+                return 'NOT_CHOOSE_EFFECT_RANGE'
+        return login_dict_and_cmd_lis
+        
+       
 class StorageProcessing():
     def __new__(cls,*args, **kwds):
         if not hasattr(cls,'_instance'):
@@ -495,7 +534,8 @@ class StorageProcessing():
                 item['config']=[]
             result.append(item)
         return result
-       
+    
+    
 
         
 if __name__ == '__main__':

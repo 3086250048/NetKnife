@@ -72,7 +72,7 @@ export const filecreateAbout={
                       });
                     return
                 }
-                state.file_name=response.data
+                state.file_name=response.data           
                 state.vm.$bus.$emit('change_title',state.file_name+'')
                 if(!state.vm.excute_flag){
                     state.vm.$message({
@@ -118,6 +118,7 @@ export const filecreateAbout={
                             message: '语法错误',
                             type: 'warning'
                           });
+                          return
                     }
                     if(response.data==='CHANGE_FAULT'){
                         state.vm.$message({
@@ -125,25 +126,28 @@ export const filecreateAbout={
                             message: '更新失败',
                             type: 'warning'
                           });
+                          return
                     }
-                    if(response.data==='CHANGE_SUCCESS'  ){
-                        if(!state.vm.excute_flag){
-                            state.vm.$message({
-                                showClose: true,
-                                message: '更新成功',
-                                type: 'success'
-                              });
-                        }else{  
-                            state.vm.excute_flag=false
-                            state.vm.$bus.$emit('excute',state.vm.title)
-                        }
+                    state.file_name=response.data
+                    state.vm.$bus.$emit('change_title',state.file_name+'')
+                    console.log(state.vm.excute_flag)
+                    if(!state.vm.excute_flag){
                        
+                        state.vm.$message({
+                            showClose: true,
+                            message: '更新成功',
+                            type: 'success'
+                            });
+                    }else{  
+                        state.vm.excute_flag=false
+                        state.vm.$bus.$emit('excute',state.file_name)
                     }
                 })
         },
         SET_VM(state,vm){
             state.vm=vm
         }
+        
     },
     state:{
         code:'',

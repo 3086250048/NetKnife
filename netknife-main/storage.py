@@ -983,7 +983,7 @@ class AppStorage():
                     if self.get_database_data_count('JINJA2_FUN',where_dict):
                         for i in v:
                             if isinstance(i,list):
-                                cmd=','.join(i)
+                                cmd='$'.join(i)
                             else:
                                 cmd=i
                             uid =str(uuid.uuid4())

@@ -63,18 +63,22 @@ export default {
       delete_netknife_file:'delete_netknife_file',
     }),
     save_file(){
+      this.SET_VM(this)
+      this.excute_flag=false
       const code=this.codemirror.getValue()
       this.save_netknife_file(code)
     },
     delete_file(){
+      this.SET_VM(this)
       const code = this.codemirror.getValue();
       this.delete_netknife_file({code:code,name:this.name})
     },
     add_empty(){
-        this.$bus.$emit('add')
+      this.SET_VM(this)
+      this.$bus.$emit('add')
     },
     open_file(){
-        // this.$bus.$emit('change_open_file_flag',true)
+        this.SET_VM(this)
         this.$bus.$emit('switch_activeIndex','three')
         this.$router.push({
           name:'filestate'
@@ -84,6 +88,7 @@ export default {
       localStorage[this.name]=JSON.stringify({name:this.name,title:this.title,code:this.codemirror.getValue()})
     },
     excute_file(){
+      this.SET_VM(this)
       this.excute_flag=true
       const code=this.codemirror.getValue()
       this.save_netknife_file(code)
@@ -100,14 +105,14 @@ export default {
  
   },
   mounted(){
+    // 由于没有使用路由切换，组件不会销毁，这里的SET_VM需要多次调用，防止vuex中直接调用this的数据停留在最后一次加载的页面上
     this.SET_VM(this)
     console.log('创建了')
     setTimeout(()=>{
       this.$bus.$emit('create_tabs')
   
     },1)
-    
-    // this.$refs.myCm.codemirror.refresh()
+
   },
   beforeDestroy(){
     console.log('Destory')

@@ -11,6 +11,7 @@ from storage import AppStorage
 from net import AppNet
 from processing import AppProcessing
 from processing import StorageProcessing
+from processing import NetProcessing
 from server import APPserver
 from action import ButtonAction
 
@@ -22,6 +23,7 @@ ap=AppProcessing()
 _as=APPserver()
 ba=ButtonAction()
 sp=StorageProcessing()
+np=NetProcessing()
 
 netknife=Flask(__name__)
 CORS(netknife, resources={r"/*": {"origins": "*"}})
@@ -347,7 +349,7 @@ def change_file():
     if not file_dict : return 'SYNTAX_ERROR'
     result=storage.change_netknife_file(file_name,file_dict,ori_code)
     if result:
-        return 'CHANGE_SUCCESS'
+        return file_dict['netknife']['name']
     else:
         return 'CHANGE_FAULT'
 @netknife.route('/check_netknife_file_if_exist',methods=['POST'])
@@ -411,20 +413,26 @@ def excute_netknife_file():
         return 'FILE_NOT_EXIST'
     if excute_exist:
         return 'EXCUTE_NOT_EXIST'
-    excute_result=storage.get_database_data('EXCUTE',['CMD'],where_dict)
+    excute_result=storage.get_database_data('EXCUTE',['CMD','PARAMETER','CONDITION'],where_dict,'ORDER BY SORT_ID')
     jinja2_result=storage.get_database_data('JINJA2_FUN',['FUN_NAME'],where_dict)
-    excute_lis=[v[0] for v in excute_result if '.'  not in v[0]]
+    local_excute_lis=[v[0] for v in excute_result if '.'  not in v[0]]
     import_excute_lis=[v[0] for v in excute_result if '.' in v[0]]
     jinja2_lis=[v[0] for v in jinja2_result]
-    for i in list(set(excute_lis)):
+    for i in list(set( local_excute_lis)):
         if i not in jinja2_lis:
-            return 'FUN_NOT_EXIST'
+            return 'LOCAL_FUN_NOT_EXIST'
   
     for i in import_excute_lis:
       import_excute_exist=storage.get_database_data_count('JINJA2_FUN', {'FILE_NAME':i.split('.')[0],'FUN_NAME':i.split('.')[1]})
       if import_excute_exist :
           return 'IMPORT_FUN_NOT_EXIST'
-
+    
+    jinja2_command_result=np.processing_jinja2_command(excute_result,file_name)
+    if jinja2_command_result=='NOT_CHOOSE_EFFECT_RANGE':
+        return 'NOT_CHOOSE_EFFECT_RANGE'
+    if jinja2_command_result=='MIXUNIT_NOT_EXIST':
+        return 'MIXUNIT_NOT_EXIST'
+    net.netknife_send_command(jinja2_command_result,file_name)
     return 'EXCUTE_FAULT'
 
 

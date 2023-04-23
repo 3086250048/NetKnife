@@ -33,7 +33,7 @@ export default{
   name:"FileManage",
   data(){
     return {
-        base_code:`name:\npriority:\n\n\ntranslation:{\n\n\n}\n\njinja2:{\n\n\n}\n\nexcute:{\n\n}\n\n`,
+        base_code:`name:\npriority:\n\nconfig:{\n\n}\n\ntranslation:{\n\n\n}\n\njinja2:{\n\n\n}\n\nexcute:{\n\n}\n\n`,
         activename:'0',
         tabs:[
         ],
@@ -45,7 +45,9 @@ export default{
   },
   methods:{
     ...mapMutations('filemanageAbout',{SET_TITLE:'SET_TITLE'}),
-    record_index(){
+
+    record_index(tab){
+      this.activename=tab.name
       localStorage.setItem('last_key',this.activename)
     },
     remove(targetName){
@@ -80,6 +82,14 @@ export default{
     },
   }, 
   mounted(){
+     //将localStorage中的页面状态信息读入列表，用于被页面迭代创建
+     Object.entries(localStorage).forEach(([key,value])=>{
+        if(key!=='last_key' ){
+          this.tabindex=Math.max(this.tabindex,parseInt(key))
+          this.index_list.push(parseInt(key))
+          this.storage_tabs.push(JSON.parse(value))
+        }
+      })
       // 向编辑页面添加新窗口
       this.$bus.$on('add',()=>{
         let newTabName = ++this.tabindex+ '';
@@ -88,16 +98,13 @@ export default{
           title: `空窗口`,
           code:this.base_code
         }
-        console.log(tab_obj)
         this.tabs.push(tab_obj);
         this.activename = newTabName;
-        console.log(tab_obj)
         localStorage.setItem(tab_obj['name'],JSON.stringify(tab_obj))
         localStorage['last_key']=newTabName
       }),
       //点击保存按钮或删除按钮时更改Tab的titile
       this.$bus.$on('change_title',(file_name)=>{
-          console.log('11111111111111111111111111111111111')
           this.tabs.forEach(tab=>{
             if(tab.name==this.activename){
               tab.title=file_name
@@ -117,14 +124,6 @@ export default{
               tab['code']=code
             }
         })
-      })
-      //将localStorage中的页面状态信息读入列表，用于被页面迭代创建
-      Object.entries(localStorage).forEach(([key,value])=>{
-        if(key!=='last_key' ){
-          this.tabindex=Math.max(this.tabindex,parseInt(key))
-          this.index_list.push(parseInt(key))
-          this.storage_tabs.push(JSON.parse(value))
-        }
       })
       //排序索引列表保证创建页面的顺序
       this.index_list.sort(function(a,b){
@@ -181,6 +180,7 @@ export default{
                 message: '请保存后运行',
                 type: 'error'
               });
+              return
             }
             if(response.data==='EXCUTE_NOT_EXIST'){
               this.$message({
@@ -188,13 +188,15 @@ export default{
                 message: 'Excute中没有等待执行的语句',
                 type: 'warning'
               });
+              return
             }
-            if(response.data==='FUN_NOT_EXIST'){
+            if(response.data==='LOCAL_FUN_NOT_EXIST'){
               this.$message({
                 showClose: true,
                 message: 'Excute中存在本地Jinja2中不存在的函数',
                 type: 'warning'
               });
+              return
             }
             if(response.data==='IMPORT_FUN_NOT_EXIST'){
               this.$message({
@@ -202,6 +204,7 @@ export default{
                 message: 'Excute中导入的Jinja2函数不存在',
                 type: 'warning'
               });
+              return
             }
             if(response.data==='EXCUTE_SUCCESS'){
               this.$message({
@@ -209,6 +212,7 @@ export default{
                 message: '执行成功',
                 type: 'success'
               });
+              return
             }
             if(response.data==='EXCUTE_FAULT'){
               this.$message({
@@ -216,6 +220,23 @@ export default{
                 message: '执行失败',
                 type: 'error'
               });
+              return
+            }
+            if(response.data==='NOT_CHOOSE_EFFECT_RANGE'){
+              this.$message({
+                showClose: true,
+                message: 'Excute中存在无指定范围的指令',
+                type: 'warning'
+              });
+              return
+            }
+            if(response.data==='MIXUNIT_NOT_EXIST'){
+              this.$message({
+                showClose: true,
+                message: 'Excute中存在指定范围无效的指令',
+                type: 'warning'
+              });
+              return
             }
         })
       })
