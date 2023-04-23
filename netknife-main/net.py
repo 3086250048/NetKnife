@@ -199,10 +199,12 @@ class AppNet():
         DEVICE_TYPE_MAP['linuxssh']='linux'
 
         ori_cmd_lis=[v[0] for v in cmd_login_list]
-        all_cmd_login_info_lis=[v[1:][0] for v in cmd_login_list ]
+        all_cmd_login_info_lis=[v[1:][0] for v in cmd_login_list]
+       
         all_full_login_info_lis=[]
         for each_login_info in all_cmd_login_info_lis:
             all_full_login_info_lis.append(np.get_device_list(each_login_info,DEVICE_TYPE_MAP))
+        
         all_cmd_device_type_lis=[]
         for device_info in all_full_login_info_lis:
             all_cmd_device_type_lis.append([v['device_type'] for v in device_info ] )
@@ -225,9 +227,12 @@ class AppNet():
                 _cmds=[v for v in cmds]
                 for _index,cmd in enumerate(_cmds): 
                     for each_translation_result in translation_result:
-                        # print(each_device_type)
+                        print(each_device_type)
                         # print(cmd)
-                        if MATCH_TYPE_MAP[each_device_type]==each_translation_result[0] and cmd.replace(" ", "") == each_translation_result[1].replace(" ", ""):
+                        # print(MATCH_TYPE_MAP[each_device_type])
+                        print(cmd)
+                        if each_device_type==each_translation_result[0] and cmd.replace(" ", "") == each_translation_result[1].replace(" ", ""):
+                            print('1111111111111111111111111111111111111111111111111111111111111111111111111111111111')
                             _cmds[_index]=each_translation_result[2] 
                 each_device_type_cmd.append(_cmds)
             all_device_type_cmd.append(each_device_type_cmd)
@@ -242,31 +247,70 @@ class AppNet():
 
         excute_parameter_result=storage.get_database_data('EXCUTE',['PARAMETER'],where_dict,'ORDER BY SORT_ID')
         excute_parameter_lis=[ v[0].replace(" ","") for v in excute_parameter_result]
-        print(excute_parameter_lis)
-        ['ip=1.1.1.1,pid=2.2.2.2', 'ip=2.2.2.2,pid=200']
-        _excute_parameter_lis=[ v.split(',') for v in excute_parameter_lis ]
-        print(_excute_parameter_lis)
-        [['ip=1.1.1.1', 'pid=2.2.2.2'], ['ip=2.2.2.2', 'pid=200']]
+
+        _excute_parameter_lis=[ v.split('$') for v in excute_parameter_lis ]
+      
         excute_parameter_dict_lis=[]
         for parameter_lis in _excute_parameter_lis:
             if parameter_lis[0]=='None':
                 parameter_dict={}
             else:
-                parameter_dict={ v.split('=')[0]:v.split('=')[1] for v in parameter_lis}
+                parameter_dict={ v.split('=')[0]:eval(v.split('=')[1]) for v in parameter_lis}
             excute_parameter_dict_lis.append(parameter_dict)           
-        print(excute_parameter_dict_lis)
+       
         jinja2_all_cmds_lis=[]
         for index,cmds_lis in  enumerate(_all_device_type_cmd_lis):
             jinja2_cmds_lis=[]
             for cmds in cmds_lis:
-                print('++++++++++++++++++++++++++++++++++++++')
                 jinja2_str='\n'.join(cmds)
                 template=Template(jinja2_str)
                 result=template.render(excute_parameter_dict_lis[index])
-                print(result)
-                print('++++++++++++++++++++++++++++++++++++++')
-        # print(all_full_login_info_lis)          
-    
+                jinja2_cmds_lis.append(result.split('\n'))
+            jinja2_all_cmds_lis.append(jinja2_cmds_lis)
+        
+        
+        ALL_CMDS_LIS=jinja2_all_cmds_lis
+        ALL_LOGIN_INFO_LIS=all_full_login_info_lis
+        pprint(ALL_CMDS_LIS)
+        pprint(ALL_LOGIN_INFO_LIS)
+        
+        def send_commands_handler(connect,commands):
+            out=''
+            # for cmd in commands:
+            #     if 'display' in cmd :
+            #         out += connect.send_command_timing(cmd)
+            #     else:
+            out += connect.send_config_set(commands)
+            connect.save_config()
+            return out
+      
+        def send_commands(device_info, commands):
+            try:
+                with ConnectHandler(**device_info) as connect:
+                    return send_commands_handler(connect,commands)
+            except Exception as e:
+                return {'ip':device_info['ip'],
+                        'response':f'连接错误:{e}',
+                        'port':device_info['port'],
+                        'type':device_info['device_type']
+                        }
+        
+        def process_device(device_info, commands):
+            result = send_commands(device_info, commands)
+            return result
+        
+        ALL_RESULTS=[]
+        for index,each_device_lis in enumerate(ALL_LOGIN_INFO_LIS):
+            results = []
+            with ThreadPoolExecutor(max_workers=len(each_device_lis)) as executor:
+                futures = []
+                for _index,device_info in  enumerate(each_device_lis):
+                    futures.append(executor.submit(process_device, device_info, ALL_CMDS_LIS[index][_index]))
+                for future in futures:
+                    result = future.result()
+                    results.append(result)
+            ALL_RESULTS.append(results)
+        print(ALL_RESULTS)
 
 if __name__ == '__main__':
     net =AppNet()
