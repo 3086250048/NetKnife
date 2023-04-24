@@ -15,6 +15,9 @@
     <el-button type="danger" class="excute" @click="excute_file" icon="el-icon-video-play" size="small">
       运行
     </el-button>
+    <el-button type="danger" class="excute" @click="show_excute_result" icon="el-icon-warning-outline" size="small">
+      执行结果
+    </el-button>
     <codemirror
       id="codemirror"
       style="margin-left:-15px;
@@ -93,6 +96,9 @@ export default {
       const code=this.codemirror.getValue()
       this.save_netknife_file(code)
       
+    },
+    show_excute_result(){
+      this.$bus.$emit('show_excute_result')
     }
   },
   computed: {
@@ -153,4 +159,5 @@ export default {
   top:-10px;
   
 }
+
 </style>

@@ -187,130 +187,152 @@ class AppNet():
             
         return results
 
-    def netknife_send_command(self,cmd_login_list,file_name):
+    def netknife_send_command(self,cmd_login_list,file_name,excute_fun_name_lis):
+        try:
+            DEVICE_TYPE_MAP={}
+            DEVICE_TYPE_MAP['huaweissh']='huawei'
+            DEVICE_TYPE_MAP['huaweitelnet']='huawei_telnet'
+            DEVICE_TYPE_MAP['ruijiessh']='ruijie_os'
+            DEVICE_TYPE_MAP['ruijietelnet']='ruijie_os_telnet'
+            DEVICE_TYPE_MAP['h3cssh']='hp_comware'
+            DEVICE_TYPE_MAP['h3ctelnet']='hp_comware_telnet'
+            DEVICE_TYPE_MAP['linuxssh']='linux'
 
-        DEVICE_TYPE_MAP={}
-        DEVICE_TYPE_MAP['huaweissh']='huawei'
-        DEVICE_TYPE_MAP['huaweitelnet']='huawei_telnet'
-        DEVICE_TYPE_MAP['ruijiessh']='ruijie_os'
-        DEVICE_TYPE_MAP['ruijietelnet']='ruijie_os_telnet'
-        DEVICE_TYPE_MAP['h3cssh']='hp_comware'
-        DEVICE_TYPE_MAP['h3ctelnet']='hp_comware_telnet'
-        DEVICE_TYPE_MAP['linuxssh']='linux'
+            ori_cmd_lis=[v[0] for v in cmd_login_list]
+            print('=======================ORI_CMD_LIS=================================')
+            print(ori_cmd_lis)
 
-        ori_cmd_lis=[v[0] for v in cmd_login_list]
-        all_cmd_login_info_lis=[v[1:][0] for v in cmd_login_list]
-       
-        all_full_login_info_lis=[]
-        for each_login_info in all_cmd_login_info_lis:
-            all_full_login_info_lis.append(np.get_device_list(each_login_info,DEVICE_TYPE_MAP))
+            all_cmd_login_info_lis=[v[1:][0] for v in cmd_login_list]
         
-        all_cmd_device_type_lis=[]
-        for device_info in all_full_login_info_lis:
-            all_cmd_device_type_lis.append([v['device_type'] for v in device_info ] )
+            all_full_login_info_lis=[]
+            for each_login_info in all_cmd_login_info_lis:
+                all_full_login_info_lis.append(np.get_device_list(each_login_info,DEVICE_TYPE_MAP))
+            
+            all_cmd_device_type_lis=[]
+            for device_info in all_full_login_info_lis:
+                all_cmd_device_type_lis.append([v['device_type'] for v in device_info ] )
 
-        where_dict={'FILE_NAME':file_name}
-        translation_result= storage.get_database_data('TRANSLATION',['TYPE','BEFORE_CMD','AFTER_CMD'],where_dict)
-      
-        MATCH_TYPE_MAP={}
-        MATCH_TYPE_MAP['huawei_telnet']='huawei'
-        MATCH_TYPE_MAP['huawei_ssh']='huawei'
-        MATCH_TYPE_MAP['ruijie_os']='ruijie'
-        MATCH_TYPE_MAP['ruijie_os_telnet']='ruijie'
-        MATCH_TYPE_MAP['hp_comware']='h3c'
-        MATCH_TYPE_MAP['hp_comware_telnet']='h3c'
-        
-        all_device_type_cmd=[]
-        for index,cmds in enumerate(ori_cmd_lis):
-            each_device_type_cmd=[]
-            for each_device_type in all_cmd_device_type_lis[index]: 
-                _cmds=[v for v in cmds]
-                for _index,cmd in enumerate(_cmds): 
-                    for each_translation_result in translation_result:
-                        print(each_device_type)
-                        # print(cmd)
-                        # print(MATCH_TYPE_MAP[each_device_type])
-                        print(cmd)
-                        if each_device_type==each_translation_result[0] and cmd.replace(" ", "") == each_translation_result[1].replace(" ", ""):
-                            print('1111111111111111111111111111111111111111111111111111111111111111111111111111111111')
-                            _cmds[_index]=each_translation_result[2] 
-                each_device_type_cmd.append(_cmds)
-            all_device_type_cmd.append(each_device_type_cmd)
+            where_dict={'FILE_NAME':file_name}
+            translation_result= storage.get_database_data('TRANSLATION',['TYPE','BEFORE_CMD','AFTER_CMD'],where_dict)
+            print('==========================================TRANSLATION_RESULT===============================')
+            MATCH_TYPE_MAP={}
+            MATCH_TYPE_MAP['huawei_telnet']='huawei'
+            MATCH_TYPE_MAP['huawei']='huawei'
+            MATCH_TYPE_MAP['ruijie_os']='ruijie'
+            MATCH_TYPE_MAP['ruijie_os_telnet']='ruijie'
+            MATCH_TYPE_MAP['hp_comware']='h3c'
+            MATCH_TYPE_MAP['hp_comware_telnet']='h3c'
+            
+            all_device_type_cmd=[]
+            print(ori_cmd_lis)
+            for index,cmds in enumerate(ori_cmd_lis):
+                each_device_type_cmd=[]
+                for each_device_type in all_cmd_device_type_lis[index]: 
+                    _cmds=[v for v in cmds]
+                    for _index,cmd in enumerate(_cmds): 
+                        for each_translation_result in translation_result:
+                            print(each_translation_result)
+                            # print(each_device_type)
+                            # print(cmd)
+                            print('======================================TYPE=======================================')
+                            print(MATCH_TYPE_MAP[each_device_type])
+                            print('======================================CMD=======================================')
+                            print(cmd)
+                            if MATCH_TYPE_MAP[each_device_type]==each_translation_result[0] and cmd.replace(" ", "") == each_translation_result[1].replace(" ", ""):
+                                print('1111111111111111111111111111111111111111111111111111111111111111111111111111111111')
+                                _cmds[_index]=each_translation_result[2] 
+                    each_device_type_cmd.append(_cmds)
+                all_device_type_cmd.append(each_device_type_cmd)
 
-        _all_device_type_cmd_lis=[]
-        for index,device_type_cmd in enumerate(all_device_type_cmd):
-            device_type_cmd_lis=[]
-            for _index,cmds in enumerate(device_type_cmd):
-                _lis='$'.join(cmds).split('$')
-                device_type_cmd_lis.append(_lis)
-            _all_device_type_cmd_lis.append(device_type_cmd_lis)
+            _all_device_type_cmd_lis=[]
+            for index,device_type_cmd in enumerate(all_device_type_cmd):
+                device_type_cmd_lis=[]
+                for _index,cmds in enumerate(device_type_cmd):
+                    _lis='$'.join(cmds).split('$')
+                    device_type_cmd_lis.append(_lis)
+                _all_device_type_cmd_lis.append(device_type_cmd_lis)
+            print(_all_device_type_cmd_lis)
 
-        excute_parameter_result=storage.get_database_data('EXCUTE',['PARAMETER'],where_dict,'ORDER BY SORT_ID')
-        excute_parameter_lis=[ v[0].replace(" ","") for v in excute_parameter_result]
+            excute_parameter_result=storage.get_database_data('EXCUTE',['PARAMETER'],where_dict,'ORDER BY SORT_ID')
+            excute_parameter_lis=[ v[0].replace(" ","") for v in excute_parameter_result]
 
-        _excute_parameter_lis=[ v.split('$') for v in excute_parameter_lis ]
-      
-        excute_parameter_dict_lis=[]
-        for parameter_lis in _excute_parameter_lis:
-            if parameter_lis[0]=='None':
-                parameter_dict={}
-            else:
-                parameter_dict={ v.split('=')[0]:eval(v.split('=')[1]) for v in parameter_lis}
-            excute_parameter_dict_lis.append(parameter_dict)           
-       
-        jinja2_all_cmds_lis=[]
-        for index,cmds_lis in  enumerate(_all_device_type_cmd_lis):
-            jinja2_cmds_lis=[]
-            for cmds in cmds_lis:
-                jinja2_str='\n'.join(cmds)
-                template=Template(jinja2_str)
-                result=template.render(excute_parameter_dict_lis[index])
-                jinja2_cmds_lis.append(result.split('\n'))
-            jinja2_all_cmds_lis.append(jinja2_cmds_lis)
+            _excute_parameter_lis=[ v.split('$') for v in excute_parameter_lis ]
         
+            excute_parameter_dict_lis=[]
+            for parameter_lis in _excute_parameter_lis:
+                if parameter_lis[0]=='None':
+                    parameter_dict={}
+                else:
+                    parameter_dict={ v.split('=')[0]:eval(v.split('=')[1]) for v in parameter_lis}
+                excute_parameter_dict_lis.append(parameter_dict)           
         
-        ALL_CMDS_LIS=jinja2_all_cmds_lis
-        ALL_LOGIN_INFO_LIS=all_full_login_info_lis
-        pprint(ALL_CMDS_LIS)
-        pprint(ALL_LOGIN_INFO_LIS)
+            jinja2_all_cmds_lis=[]
+            for index,cmds_lis in  enumerate(_all_device_type_cmd_lis):
+                print('==================CMDS_LIST=====================')
+                print(cmds_lis)
+                jinja2_cmds_lis=[]
+                for cmds in cmds_lis:
+                    jinja2_str='\n'.join(cmds)
+                    print('==================JINJA2_STR=====================')
+                    print(jinja2_str)
+                    template=Template(jinja2_str)
+                    result=template.render(excute_parameter_dict_lis[index])
+                    print('==================RESULT=====================')
+                    print(result)
+                    jinja2_cmds_lis.append([ v for v in result.split('\n') if v])
+                jinja2_all_cmds_lis.append(jinja2_cmds_lis)
+            
+            
+            ALL_CMDS_LIS=jinja2_all_cmds_lis
+            ALL_LOGIN_INFO_LIS=all_full_login_info_lis
+            pprint(ALL_CMDS_LIS)
+            pprint(ALL_LOGIN_INFO_LIS)
+            
+            def send_commands_handler(connect,commands):
+                out=''
+                out += connect.send_config_set(commands)
+                connect.save_config()
+                return out
         
-        def send_commands_handler(connect,commands):
-            out=''
-            # for cmd in commands:
-            #     if 'display' in cmd :
-            #         out += connect.send_command_timing(cmd)
-            #     else:
-            out += connect.send_config_set(commands)
-            connect.save_config()
-            return out
-      
-        def send_commands(device_info, commands):
-            try:
-                with ConnectHandler(**device_info) as connect:
-                    return send_commands_handler(connect,commands)
-            except Exception as e:
-                return {'ip':device_info['ip'],
-                        'response':f'连接错误:{e}',
-                        'port':device_info['port'],
-                        'type':device_info['device_type']
+            def send_commands(device_info, commands,excute_fun_name):
+                try:
+                    with ConnectHandler(**device_info) as connect:
+                        result=send_commands_handler(connect,commands)
+                        return {
+                            'ip':device_info['ip'],
+                            'response':result,
+                            'port':device_info['port'],
+                            'type':device_info['device_type'],
+                            'fun_name':excute_fun_name
+
                         }
-        
-        def process_device(device_info, commands):
-            result = send_commands(device_info, commands)
-            return result
-        
-        ALL_RESULTS=[]
-        for index,each_device_lis in enumerate(ALL_LOGIN_INFO_LIS):
-            results = []
-            with ThreadPoolExecutor(max_workers=len(each_device_lis)) as executor:
-                futures = []
-                for _index,device_info in  enumerate(each_device_lis):
-                    futures.append(executor.submit(process_device, device_info, ALL_CMDS_LIS[index][_index]))
-                for future in futures:
-                    result = future.result()
-                    results.append(result)
-            ALL_RESULTS.append(results)
-        print(ALL_RESULTS)
+                except Exception as e:
+                    return {'ip':device_info['ip'],
+                            'response':f'连接错误:{e}',
+                            'port':device_info['port'],
+                            'type':device_info['device_type'],
+                            'fun_name':excute_fun_name
+                            }
+            
+            def process_device(device_info, commands,excute_fun_name):
+                result = send_commands(device_info, commands,excute_fun_name)
+                return result
+            
+            ALL_RESULTS=[]
+            for index,each_device_lis in enumerate(ALL_LOGIN_INFO_LIS):
+                results = []
+                with ThreadPoolExecutor(max_workers=len(each_device_lis)) as executor:
+                    futures = []
+                    for _index,device_info in  enumerate(each_device_lis):
+                        futures.append(executor.submit(process_device, device_info, ALL_CMDS_LIS[index][_index],excute_fun_name_lis[index]))
+                    for future in futures:
+                        result = future.result()
+                        results.append(result)
+                ALL_RESULTS.append(results)
+            return ALL_RESULTS
+        except Exception as e:
+            print(e)
+            return False
 
 if __name__ == '__main__':
     net =AppNet()

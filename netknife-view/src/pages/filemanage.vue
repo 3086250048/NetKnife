@@ -17,6 +17,30 @@
               </el-tab-pane>
             </el-tabs>
         </el-main>
+        <el-drawer
+          title="执行结果"
+          :visible.sync="pop_able"
+          direction="btt"
+          size="90%"
+          >
+          <el-input
+            type="textarea"
+            :rows="18"
+            v-model="excute_text"
+            resize="none"
+            class="el_main--el_input"
+            >
+            </el-input>
+            <ul class="el_main-ul">
+                <el-checkbox-group v-model="check_list" >
+                    <li  v-for="item,index in excute_response_data" :key="index" class="el_main-ul-li">
+                        <el-checkbox :checked="true" :label="item.fun_name+item.ip+item.port+item.type" class="el_main-ul-li-el_checkbox" :border="true">
+                          函数:{{item.fun_name}} IP:{{item.ip}} 设备类型:{{item.type}} 
+                        </el-checkbox>
+                    </li>
+                </el-checkbox-group>
+            </ul>
+        </el-drawer>
     </el-container>
 </template>
 
@@ -25,7 +49,7 @@
 import { mapMutations} from 'vuex'
 import filecreate from '@/pages/filecreate.vue'
 import { send_post } from '@/store/tools'
-
+import { get_time } from '@/store/tools'
 
 
 export default{
@@ -40,11 +64,16 @@ export default{
         tabindex:-1,
         storage_tabs:[],
         index_list:[],
-       
+        pop_able:false,
+        check_list:[]
     }
   },
   methods:{
-    ...mapMutations('filemanageAbout',{SET_TITLE:'SET_TITLE'}),
+    ...mapMutations('filemanageAbout',{
+      SET_TITLE:'SET_TITLE',
+      HANDLER_RESPONSE_DATA:'HANDLER_RESPONSE_DATA',
+      SET_EXCUTE_TEXT:'SET_EXCUTE_TEXT',
+      SET_RESPONSE_DATE_TIME:'SET_RESPONSE_DATE_TIME'}),
 
     record_index(tab){
       this.activename=tab.name
@@ -80,7 +109,25 @@ export default{
         }
        
     },
+    handler_response_data(response_data){
+      this.pop_able=true
+      this.SET_RESPONSE_DATE_TIME(get_time())
+      this.HANDLER_RESPONSE_DATA(response_data)
+    }
   }, 
+  watch:{
+    check_list(new_value){
+      this.SET_EXCUTE_TEXT(new_value)
+    }
+  },
+  computed:{
+    excute_response_data(){
+      return this.$store.state.filemanageAbout.excute_response_data
+    },
+    excute_text(){
+      return this.$store.state.filemanageAbout.excute_text
+    }
+  },
   mounted(){
      //将localStorage中的页面状态信息读入列表，用于被页面迭代创建
      Object.entries(localStorage).forEach(([key,value])=>{
@@ -173,6 +220,7 @@ export default{
         this.$bus.$emit('add')
       }
       this.$bus.$on('excute',(file_name)=>{
+        
         send_post('/excute_netknife_file',{'file_name':file_name},response=>{
             if(response.data==='FILE_NOT_EXIST'){
               this.$message({
@@ -206,14 +254,6 @@ export default{
               });
               return
             }
-            if(response.data==='EXCUTE_SUCCESS'){
-              this.$message({
-                showClose: true,
-                message: '执行成功',
-                type: 'success'
-              });
-              return
-            }
             if(response.data==='EXCUTE_FAULT'){
               this.$message({
                 showClose: true,
@@ -238,7 +278,11 @@ export default{
               });
               return
             }
+            this.handler_response_data(response.data)
         })
+      })
+      this.$bus.$on('show_excute_result',()=>{
+        this.pop_able=true
       })
   },
   beforeDestroy(){
@@ -246,6 +290,33 @@ export default{
       this.$bus.$off('change_title')
       this.$bus.$off('change_code')
       this.$bus.$off('excute')
+      this.$bus.$off('show_excute_result')
   }
 }
 </script>
+
+<style scoped>
+   .el_main--el_input{
+      float: left;
+      margin-left: 20px;
+      font-size: larger;
+      width: 660px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);   
+    }
+    .el_main-ul{
+        float: left;
+        margin-left: 10px;
+        margin-top: 3px;
+        width: 400px;
+        height: 430px;
+        overflow-y:scroll;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
+    }
+    .el_main-ul-li{
+        list-style: none;
+        margin-bottom: 3px;
+    }
+    .el_main-ul-li-el_checkbox{
+        width: 400px;
+    }
+</style>

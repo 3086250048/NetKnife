@@ -432,8 +432,16 @@ def excute_netknife_file():
         return 'NOT_CHOOSE_EFFECT_RANGE'
     if jinja2_command_result=='MIXUNIT_NOT_EXIST':
         return 'MIXUNIT_NOT_EXIST'
-    net.netknife_send_command(jinja2_command_result,file_name)
-    return 'EXCUTE_FAULT'
+    
+    # 给reponse返回时标记执行的函数名称
+    excute_fun_name=[v[0] for v in excute_result]
+    # 第一个为将excute中函数转换为jinja2中的函数,第二个为文件名称，第三个为执行的函数名称
+    EXCUTE_RESULT= net.netknife_send_command(jinja2_command_result,file_name,excute_fun_name)
+    print(EXCUTE_RESULT)
+    if EXCUTE_RESULT:
+        return EXCUTE_RESULT
+    else:
+        return 'EXCUTE_FAULT'
 
 
 
