@@ -94,6 +94,8 @@ export default {
       this.SET_VM(this)
       this.excute_flag=true
       const code=this.codemirror.getValue()
+      this.$bus.$emit('clear_check_list')
+      this.$bus.$emit('clear_excute_response_data')
       this.save_netknife_file(code)
       
     },

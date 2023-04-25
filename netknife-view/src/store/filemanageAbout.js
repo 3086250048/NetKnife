@@ -9,6 +9,7 @@ export const filemanageAbout={
             state.title=title
         },
         HANDLER_RESPONSE_DATA(state,response_data){
+           
             state.excute_response_data=[]
             for(let i=0;i<response_data.length;i++){
                 for(let j=0;j<response_data[i].length;j++){
@@ -26,25 +27,23 @@ export const filemanageAbout={
                     if(`${element.fun_name}${element.ip}${element.port}${element.type}`===e ){
                         if(flag){
                             state.excute_text+='===============================================================================\n'
-                            state.excute_text+=`设备类型:${element.type}  设备登录IP:${element.ip}  设备登录端口:${element.port}\n`
-                            state.excute_text+=`时间:${state.response_date_time} 函数名:${element.fun_name}`
-                            state.excute_text+='\n===============================================================================\n'
-                            state.excute_text+=element.response
                             flag=false
                         }else{
                             state.excute_text+='\n===============================================================================\n'
-                            state.excute_text+=`设备类型:${element.type}  设备登录IP:${element.ip}  设备登录端口:${element.port}\n`
-                            state.excute_text+=`时间:${state.response_date_time} 函数名:${element.fun_name}`
-                            state.excute_text+='\n===============================================================================\n'
-                            state.excute_text+=element.response
                         }
-                       
+                        state.excute_text+=`设备类型:${element.type}  设备登录IP:${element.ip}  设备登录端口:${element.port}\n`
+                        state.excute_text+=`时间:${state.response_date_time} 函数名:${element.fun_name}`
+                        state.excute_text+='\n===============================================================================\n'
+                        state.excute_text+=element.response                   
                     }
                 }) 
             });
         },
         SET_RESPONSE_DATE_TIME(state,time){
             state.response_date_time=time
+        },
+        SET_EXCUTE_RESPONSE_DATA(state,data){
+            state.excute_response_data=data
         }
     },
     state:{

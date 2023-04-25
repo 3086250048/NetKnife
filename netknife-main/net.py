@@ -9,6 +9,7 @@ from processing import NetProcessing
 from action import AppAction
 from pprint import pprint
 from jinja2 import Template
+from itertools import chain
 
 storage=AppStorage()
 ap=AppProcessing()
@@ -319,6 +320,10 @@ class AppNet():
                 return result
             
             ALL_RESULTS=[]
+            CHAIN_ALL_LOGIN_LIS=list(chain.from_iterable(ALL_LOGIN_INFO_LIS))
+            CHAIN_ALL_CMDS_LIS=list(chain.from_iterable(ALL_CMDS_LIS))
+            print(CHAIN_ALL_LOGIN_LIS)
+            print(CHAIN_ALL_CMDS_LIS)
             for index,each_device_lis in enumerate(ALL_LOGIN_INFO_LIS):
                 results = []
                 with ThreadPoolExecutor(max_workers=len(each_device_lis)) as executor:
@@ -333,6 +338,7 @@ class AppNet():
         except Exception as e:
             print(e)
             return False
+
 
 if __name__ == '__main__':
     net =AppNet()

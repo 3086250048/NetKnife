@@ -73,7 +73,8 @@ export default{
       SET_TITLE:'SET_TITLE',
       HANDLER_RESPONSE_DATA:'HANDLER_RESPONSE_DATA',
       SET_EXCUTE_TEXT:'SET_EXCUTE_TEXT',
-      SET_RESPONSE_DATE_TIME:'SET_RESPONSE_DATE_TIME'}),
+      SET_RESPONSE_DATE_TIME:'SET_RESPONSE_DATE_TIME',
+      SET_EXCUTE_RESPONSE_DATA:'SET_EXCUTE_RESPONSE_DATA'}),
 
     record_index(tab){
       this.activename=tab.name
@@ -118,7 +119,7 @@ export default{
   watch:{
     check_list(new_value){
       this.SET_EXCUTE_TEXT(new_value)
-    }
+    },
   },
   computed:{
     excute_response_data(){
@@ -220,7 +221,6 @@ export default{
         this.$bus.$emit('add')
       }
       this.$bus.$on('excute',(file_name)=>{
-        
         send_post('/excute_netknife_file',{'file_name':file_name},response=>{
             if(response.data==='FILE_NOT_EXIST'){
               this.$message({
@@ -284,6 +284,12 @@ export default{
       this.$bus.$on('show_excute_result',()=>{
         this.pop_able=true
       })
+      this.$bus.$on('clear_check_list',()=>{
+        this.check_list=[]
+      })
+      this.$bus.$on('clear_excute_response_data',()=>{
+        this.SET_EXCUTE_RESPONSE_DATA([])
+      })
   },
   beforeDestroy(){
       this.$bus.$off('add')
@@ -291,6 +297,8 @@ export default{
       this.$bus.$off('change_code')
       this.$bus.$off('excute')
       this.$bus.$off('show_excute_result')
+      this.$bus.$off('clear_check_list')
+      this.$bus.$off('clear_excute_response_data')
   }
 }
 </script>
