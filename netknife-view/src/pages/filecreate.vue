@@ -12,7 +12,7 @@
     <el-button type="primary" class="empty_add" @click="add_empty" icon="el-icon-view" size="small">
       新窗口+
     </el-button>
-    <el-button type="danger" class="excute" @click="excute_file" icon="el-icon-video-play" size="small">
+    <el-button type="danger" class="excute" @click="excute_file" :icon="excute_icon" size="small">
       运行
     </el-button>
     <el-button type="danger" class="excute" @click="show_excute_result" icon="el-icon-warning-outline" size="small">
@@ -50,11 +50,12 @@ export default {
         lineWrapping: true,
         theme: "monokai",
        
-       
       },
       delete_able:false,
       update_able:false,
-      excute_flag:false
+      excute_flag:false,
+      excute_icon:'el-icon-video-play'
+      
     };
   },
   methods: {
@@ -120,10 +121,15 @@ export default {
       this.$bus.$emit('create_tabs')
   
     },1)
+    
+    this.$bus.$on('change_excute_icon',(icon)=>{
+      this.excute_icon=icon
+    })
 
   },
   beforeDestroy(){
     console.log('Destory')
+    this.$bus.$off('change_excute_icon')
   }
 };
 </script>

@@ -200,8 +200,6 @@ class AppNet():
             DEVICE_TYPE_MAP['linuxssh']='linux'
 
             ori_cmd_lis=[v[0] for v in cmd_login_list]
-            print('=======================ORI_CMD_LIS=================================')
-            print(ori_cmd_lis)
 
             all_cmd_login_info_lis=[v[1:][0] for v in cmd_login_list]
         
@@ -215,7 +213,7 @@ class AppNet():
 
             where_dict={'FILE_NAME':file_name}
             translation_result= storage.get_database_data('TRANSLATION',['TYPE','BEFORE_CMD','AFTER_CMD'],where_dict)
-            print('==========================================TRANSLATION_RESULT===============================')
+          
             MATCH_TYPE_MAP={}
             MATCH_TYPE_MAP['huawei_telnet']='huawei'
             MATCH_TYPE_MAP['huawei']='huawei'
@@ -225,22 +223,14 @@ class AppNet():
             MATCH_TYPE_MAP['hp_comware_telnet']='h3c'
             
             all_device_type_cmd=[]
-            print(ori_cmd_lis)
+
             for index,cmds in enumerate(ori_cmd_lis):
                 each_device_type_cmd=[]
                 for each_device_type in all_cmd_device_type_lis[index]: 
                     _cmds=[v for v in cmds]
                     for _index,cmd in enumerate(_cmds): 
-                        for each_translation_result in translation_result:
-                            print(each_translation_result)
-                            # print(each_device_type)
-                            # print(cmd)
-                            print('======================================TYPE=======================================')
-                            print(MATCH_TYPE_MAP[each_device_type])
-                            print('======================================CMD=======================================')
-                            print(cmd)
+                        for each_translation_result in translation_result:   
                             if MATCH_TYPE_MAP[each_device_type]==each_translation_result[0] and cmd.replace(" ", "") == each_translation_result[1].replace(" ", ""):
-                                print('1111111111111111111111111111111111111111111111111111111111111111111111111111111111')
                                 _cmds[_index]=each_translation_result[2] 
                     each_device_type_cmd.append(_cmds)
                 all_device_type_cmd.append(each_device_type_cmd)
@@ -252,7 +242,6 @@ class AppNet():
                     _lis='$'.join(cmds).split('$')
                     device_type_cmd_lis.append(_lis)
                 _all_device_type_cmd_lis.append(device_type_cmd_lis)
-            print(_all_device_type_cmd_lis)
 
             excute_parameter_result=storage.get_database_data('EXCUTE',['PARAMETER'],where_dict,'ORDER BY SORT_ID')
             excute_parameter_lis=[ v[0].replace(" ","") for v in excute_parameter_result]
@@ -269,17 +258,11 @@ class AppNet():
         
             jinja2_all_cmds_lis=[]
             for index,cmds_lis in  enumerate(_all_device_type_cmd_lis):
-                print('==================CMDS_LIST=====================')
-                print(cmds_lis)
                 jinja2_cmds_lis=[]
                 for cmds in cmds_lis:
                     jinja2_str='\n'.join(cmds)
-                    print('==================JINJA2_STR=====================')
-                    print(jinja2_str)
                     template=Template(jinja2_str)
                     result=template.render(excute_parameter_dict_lis[index])
-                    print('==================RESULT=====================')
-                    print(result)
                     jinja2_cmds_lis.append([ v for v in result.split('\n') if v])
                 jinja2_all_cmds_lis.append(jinja2_cmds_lis)
             

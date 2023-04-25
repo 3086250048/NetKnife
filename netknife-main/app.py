@@ -428,6 +428,8 @@ def excute_netknife_file():
           return 'IMPORT_FUN_NOT_EXIST'
     
     jinja2_command_result=np.processing_jinja2_command(excute_result,file_name)
+    print('========================jinja2_command_result========================')
+    print(jinja2_command_result)
     if jinja2_command_result=='NOT_CHOOSE_EFFECT_RANGE':
         return 'NOT_CHOOSE_EFFECT_RANGE'
     if jinja2_command_result=='MIXUNIT_NOT_EXIST':

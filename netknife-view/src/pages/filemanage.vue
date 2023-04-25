@@ -111,6 +111,7 @@ export default{
        
     },
     handler_response_data(response_data){
+      this.$bus.$emit('change_excute_icon','el-icon-video-play')
       this.pop_able=true
       this.SET_RESPONSE_DATE_TIME(get_time())
       this.HANDLER_RESPONSE_DATA(response_data)
@@ -221,6 +222,7 @@ export default{
         this.$bus.$emit('add')
       }
       this.$bus.$on('excute',(file_name)=>{
+        this.$bus.$emit('change_excute_icon','el-icon-video-pause')
         send_post('/excute_netknife_file',{'file_name':file_name},response=>{
             if(response.data==='FILE_NOT_EXIST'){
               this.$message({
