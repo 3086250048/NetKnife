@@ -288,7 +288,10 @@ class AppNet():
             ALL_LOGIN_INFO_LIS=all_full_login_info_lis
             pprint(ALL_CMDS_LIS)
             pprint(ALL_LOGIN_INFO_LIS)
-            
+            multipilication_lis=[len(v) for v in ALL_CMDS_LIS]
+            full_excute_fun_name_lis=[]
+            for index,fun_name in enumerate(excute_fun_name_lis):
+                full_excute_fun_name_lis+=[fun_name]*multipilication_lis[index]
             def send_commands_handler(connect,commands):
                 out=''
                 out += connect.send_config_set(commands)
@@ -322,19 +325,15 @@ class AppNet():
             ALL_RESULTS=[]
             CHAIN_ALL_LOGIN_LIS=list(chain.from_iterable(ALL_LOGIN_INFO_LIS))
             CHAIN_ALL_CMDS_LIS=list(chain.from_iterable(ALL_CMDS_LIS))
-            print(CHAIN_ALL_LOGIN_LIS)
-            print(CHAIN_ALL_CMDS_LIS)
-            for index,each_device_lis in enumerate(ALL_LOGIN_INFO_LIS):
-                results = []
-                with ThreadPoolExecutor(max_workers=len(each_device_lis)) as executor:
-                    futures = []
-                    for _index,device_info in  enumerate(each_device_lis):
-                        futures.append(executor.submit(process_device, device_info, ALL_CMDS_LIS[index][_index],excute_fun_name_lis[index]))
-                    for future in futures:
-                        result = future.result()
-                        results.append(result)
-                ALL_RESULTS.append(results)
-            return ALL_RESULTS
+
+            with ThreadPoolExecutor(max_workers=len(CHAIN_ALL_LOGIN_LIS)) as executor:
+                futures = []
+                for index,device_info in  enumerate(CHAIN_ALL_LOGIN_LIS):
+                    futures.append(executor.submit(process_device, device_info, CHAIN_ALL_CMDS_LIS[index],full_excute_fun_name_lis[index]))
+                for future in futures:
+                    result = future.result()
+                    ALL_RESULTS.append(result)
+                return ALL_RESULTS
         except Exception as e:
             print(e)
             return False

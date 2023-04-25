@@ -12,10 +12,8 @@ export const filemanageAbout={
            
             state.excute_response_data=[]
             for(let i=0;i<response_data.length;i++){
-                for(let j=0;j<response_data[i].length;j++){
-                    console.log(response_data[i][j])
-                    state.excute_response_data.push(response_data[i][j])
-                }
+                console.log(response_data[i])
+                state.excute_response_data.push(response_data[i])
             }
             console.log(state.excute_response_data)
         },
