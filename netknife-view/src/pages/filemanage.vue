@@ -230,6 +230,7 @@ export default{
                 message: '请保存后运行',
                 type: 'error'
               });
+              this.$bus.$emit('change_excute_icon','el-icon-video-play')
               return
             }
             if(response.data==='EXCUTE_NOT_EXIST'){
@@ -238,6 +239,7 @@ export default{
                 message: 'Excute中没有等待执行的语句',
                 type: 'warning'
               });
+              this.$bus.$emit('change_excute_icon','el-icon-video-play')
               return
             }
             if(response.data==='LOCAL_FUN_NOT_EXIST'){
@@ -246,6 +248,7 @@ export default{
                 message: 'Excute中存在本地Jinja2中不存在的函数',
                 type: 'warning'
               });
+              this.$bus.$emit('change_excute_icon','el-icon-video-play')
               return
             }
             if(response.data==='IMPORT_FUN_NOT_EXIST'){
@@ -254,6 +257,7 @@ export default{
                 message: 'Excute中导入的Jinja2函数不存在',
                 type: 'warning'
               });
+              this.$bus.$emit('change_excute_icon','el-icon-video-play')
               return
             }
             if(response.data==='EXCUTE_FAULT'){
@@ -262,6 +266,7 @@ export default{
                 message: '执行失败',
                 type: 'error'
               });
+              this.$bus.$emit('change_excute_icon','el-icon-video-play')
               return
             }
             if(response.data==='NOT_CHOOSE_EFFECT_RANGE'){
@@ -270,6 +275,7 @@ export default{
                 message: 'Excute中存在无指定范围的指令',
                 type: 'warning'
               });
+              this.$bus.$emit('change_excute_icon','el-icon-video-play')
               return
             }
             if(response.data==='MIXUNIT_NOT_EXIST'){
@@ -278,6 +284,7 @@ export default{
                 message: 'Excute中存在指定范围无效的指令',
                 type: 'warning'
               });
+              this.$bus.$emit('change_excute_icon','el-icon-video-play')
               return
             }
             this.handler_response_data(response.data)

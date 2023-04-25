@@ -317,7 +317,17 @@ class NetProcessing():
                 login_where_dict={'mode':'global','command':f'where {item[2]}'}
                 login_dict=self.__ap.processing_effect_login_data(login_where_dict)
                 if login_dict :
-                    login_dict_and_cmd_lis.append(([ v[0] for v in self.__storage.get_database_data('JINJA2',['JINJA2_CMD'],where_dict)],login_dict))
+                    def chain_jinja2_str(where_dict={}):
+                        result_list=[]
+                        for v in self.__storage.get_database_data('JINJA2',['JINJA2_CMD'],where_dict):
+                            if '.' in v[0]:
+                                result_list+=chain_jinja2_str({'FILE_NAME':v[0].split('.')[0],'FUN_NAME':v[0].split('.')[1]})
+                            else:
+                                result_list+=[v[0]]
+                        return result_list
+                    result_list=chain_jinja2_str(where_dict)
+                    print(result_list)
+                    login_dict_and_cmd_lis.append((result_list,login_dict))
                 else:
                     return 'MIXUNIT_NOT_EXIST'
             else:

@@ -212,8 +212,19 @@ class AppNet():
                 all_cmd_device_type_lis.append([v['device_type'] for v in device_info ] )
 
             where_dict={'FILE_NAME':file_name}
-            translation_result= storage.get_database_data('TRANSLATION',['TYPE','BEFORE_CMD','AFTER_CMD'],where_dict)
-          
+           
+            def chain_translation_result(where_dict):
+                translation_result=[]
+                for v in storage.get_database_data('TRANSLATION',['TYPE','BEFORE_CMD','AFTER_CMD'],where_dict):
+                    if '.' in  v[1]:
+                        translation_result+=chain_translation_result({'FILE_NAME':v[1].split('.')[0],'TYPE':v[1].split('.')[1]})
+                    else:
+                        translation_result+=[v]
+                return translation_result
+            chain_translation_result_list=chain_translation_result(where_dict)
+            print('==========================translation_result========================')
+            print(chain_translation_result_list)
+
             MATCH_TYPE_MAP={}
             MATCH_TYPE_MAP['huawei_telnet']='huawei'
             MATCH_TYPE_MAP['huawei']='huawei'
@@ -229,7 +240,7 @@ class AppNet():
                 for each_device_type in all_cmd_device_type_lis[index]: 
                     _cmds=[v for v in cmds]
                     for _index,cmd in enumerate(_cmds): 
-                        for each_translation_result in translation_result:   
+                        for each_translation_result in chain_translation_result_list:   
                             if MATCH_TYPE_MAP[each_device_type]==each_translation_result[0] and cmd.replace(" ", "") == each_translation_result[1].replace(" ", ""):
                                 _cmds[_index]=each_translation_result[2] 
                     each_device_type_cmd.append(_cmds)
