@@ -320,10 +320,10 @@ class NetProcessing():
                     use_file_name_lis=[]
                     def chain_jinja2_str(where_dict={}):
                         result_list=[]
-                        if where_dict['FILE_NAME'] in use_file_name_lis:
+                        if f"{where_dict['FILE_NAME']}{where_dict['FUN_NAME']}" in use_file_name_lis:
                             return ['REPEAT']
                         else:
-                            use_file_name_lis.append(where_dict['FILE_NAME'])
+                            use_file_name_lis.append(f"{where_dict['FILE_NAME']}{where_dict['FUN_NAME']}")
                         for v in self.__storage.get_database_data('JINJA2',['JINJA2_CMD'],where_dict):
                             if '.' in v[0]:
                                 result_list+=chain_jinja2_str({'FILE_NAME':v[0].split('.')[0],'FUN_NAME':v[0].split('.')[1]})

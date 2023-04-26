@@ -57,7 +57,7 @@ export default{
   name:"FileManage",
   data(){
     return {
-        base_code:`name:\npriority:\n\nconfig:{\n\n  send:{\n  strip_prompt:False\n  strip_command:False\n  read_timeout:10.0\n   }\n\n}\n\ntranslation:{\n\n\n}\n\njinja2:{\n\n\n}\n\nexcute:{\n\n}\n\n`,
+        base_code:`name:\npriority:\n\nconfig:{\n\n  send:{\n  read_timeout:10.0\n   }\n\n}\n\ntranslation:{\n\n\n}\n\njinja2:{\n\n\n}\n\nexcute:{\n\n}\n\n`,
         activename:'0',
         tabs:[
         ],

@@ -312,7 +312,6 @@ class AppNet():
             ########向每个设备发送命令
             def send_commands_handler(connect,commands):
                 out=''
-                
                 out += connect.send_config_set(commands,**send_parameter_dict)
                 out += connect.save_config()
                 return out
