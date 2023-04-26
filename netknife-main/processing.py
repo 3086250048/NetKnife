@@ -317,8 +317,13 @@ class NetProcessing():
                 login_where_dict={'mode':'global','command':f'where {item[2]}'}
                 login_dict=self.__ap.processing_effect_login_data(login_where_dict)
                 if login_dict :
+                    use_file_name_lis=[]
                     def chain_jinja2_str(where_dict={}):
                         result_list=[]
+                        if where_dict['FILE_NAME'] in use_file_name_lis:
+                            return ['REPEAT']
+                        else:
+                            use_file_name_lis.append(where_dict['FILE_NAME'])
                         for v in self.__storage.get_database_data('JINJA2',['JINJA2_CMD'],where_dict):
                             if '.' in v[0]:
                                 result_list+=chain_jinja2_str({'FILE_NAME':v[0].split('.')[0],'FUN_NAME':v[0].split('.')[1]})
@@ -326,6 +331,8 @@ class NetProcessing():
                                 result_list+=[v[0]]
                         return result_list
                     result_list=chain_jinja2_str(where_dict)
+                    if 'REPEAT' in result_list:
+                        return 'JINJA2_REPEAT_IMPORT'
                     print(result_list)
                     login_dict_and_cmd_lis.append((result_list,login_dict))
                 else:

@@ -9,7 +9,6 @@ export const filemanageAbout={
             state.title=title
         },
         HANDLER_RESPONSE_DATA(state,response_data){
-           
             state.excute_response_data=[]
             for(let i=0;i<response_data.length;i++){
                 console.log(response_data[i])

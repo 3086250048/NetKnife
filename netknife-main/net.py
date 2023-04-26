@@ -190,6 +190,7 @@ class AppNet():
 
     def netknife_send_command(self,cmd_login_list,file_name,excute_fun_name_lis):
         try:
+            # 将管理设备中的设备类型转为netmiko中的设备类型
             DEVICE_TYPE_MAP={}
             DEVICE_TYPE_MAP['huaweissh']='huawei'
             DEVICE_TYPE_MAP['huaweitelnet']='huawei_telnet'
@@ -198,23 +199,26 @@ class AppNet():
             DEVICE_TYPE_MAP['h3cssh']='hp_comware'
             DEVICE_TYPE_MAP['h3ctelnet']='hp_comware_telnet'
             DEVICE_TYPE_MAP['linuxssh']='linux'
+            ####################################################################
 
             ori_cmd_lis=[v[0] for v in cmd_login_list]
-
             all_cmd_login_info_lis=[v[1:][0] for v in cmd_login_list]
-        
             all_full_login_info_lis=[]
             for each_login_info in all_cmd_login_info_lis:
                 all_full_login_info_lis.append(np.get_device_list(each_login_info,DEVICE_TYPE_MAP))
-            
             all_cmd_device_type_lis=[]
             for device_info in all_full_login_info_lis:
                 all_cmd_device_type_lis.append([v['device_type'] for v in device_info ] )
-
             where_dict={'FILE_NAME':file_name}
            
+        #  待提取到processing############################################################
+            use_file_name_list=[]
             def chain_translation_result(where_dict):
                 translation_result=[]
+                if where_dict['FILE_NAME'] in use_file_name_list:
+                    return ['REPEAT']
+                else:
+                    use_file_name_list.append(where_dict['FILE_NAME'])
                 for v in storage.get_database_data('TRANSLATION',['TYPE','BEFORE_CMD','AFTER_CMD'],where_dict):
                     if '.' in  v[1]:
                         translation_result+=chain_translation_result({'FILE_NAME':v[1].split('.')[0],'TYPE':v[1].split('.')[1]})
@@ -222,9 +226,23 @@ class AppNet():
                         translation_result+=[v]
                 return translation_result
             chain_translation_result_list=chain_translation_result(where_dict)
+            if  'REPEAT' in chain_translation_result_list:
+                 return 'TRANSLATION_REPEAT_IMPORT'
             print('==========================translation_result========================')
             print(chain_translation_result_list)
-
+        ##################################################################################
+           
+        #    获取发送命令的参数
+            send_parameter_result=storage.get_database_data('CONFIG',['PARAMETER_KEY','PARAMETER_VALUE'],
+            {'FILE_NAME':file_name,'PARAMETER_CLASS':'send'})
+            print(send_parameter_result)
+           
+            send_parameter_dict={}
+            for v in send_parameter_result:
+                print(type(eval(v[1])))
+                send_parameter_dict[v[0]]=eval(v[1])
+            print(send_parameter_dict)
+        # 将login_info中的设备类型字符串转换为translation的设备类型
             MATCH_TYPE_MAP={}
             MATCH_TYPE_MAP['huawei_telnet']='huawei'
             MATCH_TYPE_MAP['huawei']='huawei'
@@ -233,8 +251,8 @@ class AppNet():
             MATCH_TYPE_MAP['hp_comware']='h3c'
             MATCH_TYPE_MAP['hp_comware_telnet']='h3c'
             
+            # 获取每个设备的登录列表和每个设备需要执行的命令
             all_device_type_cmd=[]
-
             for index,cmds in enumerate(ori_cmd_lis):
                 each_device_type_cmd=[]
                 for each_device_type in all_cmd_device_type_lis[index]: 
@@ -282,19 +300,27 @@ class AppNet():
             ALL_LOGIN_INFO_LIS=all_full_login_info_lis
             pprint(ALL_CMDS_LIS)
             pprint(ALL_LOGIN_INFO_LIS)
+            # ###########################################################################################
+
+            # 获取每个设备执行的函数列表
             multipilication_lis=[len(v) for v in ALL_CMDS_LIS]
             full_excute_fun_name_lis=[]
             for index,fun_name in enumerate(excute_fun_name_lis):
                 full_excute_fun_name_lis+=[fun_name]*multipilication_lis[index]
+            ############################################################################################
+
+            ########向每个设备发送命令
             def send_commands_handler(connect,commands):
                 out=''
-                out += connect.send_config_set(commands)
-                connect.save_config()
+                
+                out += connect.send_config_set(commands,**send_parameter_dict)
+                out += connect.save_config()
                 return out
         
             def send_commands(device_info, commands,excute_fun_name):
                 try:
                     with ConnectHandler(**device_info) as connect:
+                        connect.send_config_set()
                         result=send_commands_handler(connect,commands)
                         return {
                             'ip':device_info['ip'],
@@ -328,6 +354,7 @@ class AppNet():
                     result = future.result()
                     ALL_RESULTS.append(result)
                 return ALL_RESULTS
+            ##############################################################################################
         except Exception as e:
             print(e)
             return False

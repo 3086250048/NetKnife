@@ -57,7 +57,7 @@ export default{
   name:"FileManage",
   data(){
     return {
-        base_code:`name:\npriority:\n\nconfig:{\n\n}\n\ntranslation:{\n\n\n}\n\njinja2:{\n\n\n}\n\nexcute:{\n\n}\n\n`,
+        base_code:`name:\npriority:\n\nconfig:{\n\n  send:{\n  strip_prompt:False\n  strip_command:False\n  read_timeout:10.0\n   }\n\n}\n\ntranslation:{\n\n\n}\n\njinja2:{\n\n\n}\n\nexcute:{\n\n}\n\n`,
         activename:'0',
         tabs:[
         ],
@@ -282,6 +282,25 @@ export default{
               this.$message({
                 showClose: true,
                 message: 'Excute中存在指定范围无效的指令',
+                type: 'warning'
+              });
+              this.$bus.$emit('change_excute_icon','el-icon-video-play')
+              return
+            }
+            console.log(response.data)
+            if(response.data==='JINJA2_REPEAT_IMPORT'){
+              this.$message({
+                showClose: true,
+                message: 'JINJA2函数中存在循环引用',
+                type: 'warning'
+              });
+              this.$bus.$emit('change_excute_icon','el-icon-video-play')
+              return
+            }
+            if(response.data==='TRANSLATION_REPEAT_IMPORT'){
+              this.$message({
+                showClose: true,
+                message: 'TRANSLATION函数中存在循环引用',
                 type: 'warning'
               });
               this.$bus.$emit('change_excute_icon','el-icon-video-play')
