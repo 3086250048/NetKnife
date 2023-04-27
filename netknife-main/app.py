@@ -449,6 +449,14 @@ def excute_netknife_file():
     else:
         return 'EXCUTE_FAULT'
 
+@netknife.route('/get_netknife_code',methods=['POST'])
+def get_netknife_code():
+    file_name=json.loads(request.get_data(as_text=True))['file_name']
+    if file_name=='空窗口':
+        return 'NOT_EXIST'
+    result=storage.get_database_data('CODE',['CODE'],{'FILE_NAME':file_name})[0][0]
+    return result
+   
 
 
 if __name__ == '__main__':

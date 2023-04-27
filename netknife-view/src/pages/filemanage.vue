@@ -3,16 +3,14 @@
         <el-main style="margin-left: -30px;margin-top: -40px;">
             <el-tabs v-model="activename" type="card" closable @tab-remove="remove" @tab-click="record_index" >
               <el-tab-pane
-           
                 style="width: 940px;"
                 v-for="(item, index) in tabs"
                 :key='item.name'
                 :label="item.title"
-                :name="item.name"
-                
+                :name="item.name" 
               >
               <div style="margin-top: 15px;" >
-                  <Filecreate :title="item.title" :name="item.name" :code="item.code" ></Filecreate>
+                  <Filecreate :title="item.title" :name="item.name" :code="item.code"  :del_able="item.title==='空窗口'"></Filecreate>
               </div>
               </el-tab-pane>
             </el-tabs>
@@ -112,6 +110,7 @@ export default{
     },
     handler_response_data(response_data){
       this.$bus.$emit('change_excute_icon','el-icon-video-play')
+      this.$bus.$emit('change_excute_style','primary')
       this.pop_able=true
       this.SET_RESPONSE_DATE_TIME(get_time())
       this.HANDLER_RESPONSE_DATA(response_data)
@@ -223,6 +222,7 @@ export default{
       }
       this.$bus.$on('excute',(file_name)=>{
         this.$bus.$emit('change_excute_icon','el-icon-video-pause')
+        this.$bus.$emit('change_excute_style','warning')
         send_post('/excute_netknife_file',{'file_name':file_name},response=>{
             if(response.data==='FILE_NOT_EXIST'){
               this.$message({
@@ -231,6 +231,7 @@ export default{
                 type: 'error'
               });
               this.$bus.$emit('change_excute_icon','el-icon-video-play')
+              this.$bus.$emit('change_excute_style','primary')
               return
             }
             if(response.data==='EXCUTE_NOT_EXIST'){
@@ -240,6 +241,7 @@ export default{
                 type: 'warning'
               });
               this.$bus.$emit('change_excute_icon','el-icon-video-play')
+              this.$bus.$emit('change_excute_style','primary')
               return
             }
             if(response.data==='LOCAL_FUN_NOT_EXIST'){
@@ -249,6 +251,7 @@ export default{
                 type: 'warning'
               });
               this.$bus.$emit('change_excute_icon','el-icon-video-play')
+              this.$bus.$emit('change_excute_style','primary')
               return
             }
             if(response.data==='IMPORT_FUN_NOT_EXIST'){
@@ -258,6 +261,7 @@ export default{
                 type: 'warning'
               });
               this.$bus.$emit('change_excute_icon','el-icon-video-play')
+              this.$bus.$emit('change_excute_style','primary')
               return
             }
             if(response.data==='EXCUTE_FAULT'){
@@ -267,6 +271,7 @@ export default{
                 type: 'error'
               });
               this.$bus.$emit('change_excute_icon','el-icon-video-play')
+              this.$bus.$emit('change_excute_style','primary')
               return
             }
             if(response.data==='NOT_CHOOSE_EFFECT_RANGE'){
@@ -276,6 +281,7 @@ export default{
                 type: 'warning'
               });
               this.$bus.$emit('change_excute_icon','el-icon-video-play')
+              this.$bus.$emit('change_excute_style','primary')
               return
             }
             if(response.data==='MIXUNIT_NOT_EXIST'){
@@ -285,6 +291,7 @@ export default{
                 type: 'warning'
               });
               this.$bus.$emit('change_excute_icon','el-icon-video-play')
+              this.$bus.$emit('change_excute_style','primary')
               return
             }
             console.log(response.data)
@@ -295,6 +302,7 @@ export default{
                 type: 'warning'
               });
               this.$bus.$emit('change_excute_icon','el-icon-video-play')
+              this.$bus.$emit('change_excute_style','primary')
               return
             }
             if(response.data==='TRANSLATION_REPEAT_IMPORT'){
@@ -304,6 +312,7 @@ export default{
                 type: 'warning'
               });
               this.$bus.$emit('change_excute_icon','el-icon-video-play')
+              this.$bus.$emit('change_excute_style','primary')
               return
             }
             this.handler_response_data(response.data)

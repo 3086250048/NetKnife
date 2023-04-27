@@ -47,7 +47,7 @@ class AppNet():
         DEVICE_TYPE_MAP['ruijietelnet']='ruijie_os_telnet'
         DEVICE_TYPE_MAP['h3cssh']='hp_comware'
         DEVICE_TYPE_MAP['h3ctelnet']='hp_comware_telnet'
-        DEVICE_TYPE_MAP['linuxssh']='linux'
+        
 
         def h3c_send_commands(connect,device_info,command_data):
             select_out,config_out,upload_out,download_out= '','','',''

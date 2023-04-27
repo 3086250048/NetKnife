@@ -81,13 +81,7 @@ export default new VueRouter({
                     name:'filemanage',
                     path:'filemanage',
                     component:filemanage,
-                    // children:[
-                    //      {
-                    //          name:'filecreate',
-                    //          path:'filecreate',
-                    //         component:filecreate
-                    //     }
-                    // ]
+                    meta:{ keepAlive:true }
                 },{
                     name:'pageempty',
                     path:'pageempty',

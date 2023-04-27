@@ -75,14 +75,24 @@ export const filecreateAbout={
                 state.file_name=response.data           
                 state.vm.$bus.$emit('change_title',state.file_name+'')
                 if(!state.vm.excute_flag){
+                    state.vm.save_bt_style='primary'
+                    send_post('/get_netknife_code',{'file_name':state.vm.title},response=>{
+                        state.vm.storage_code=response.data
+                    })
                     state.vm.$message({
                         showClose: true,
                         message: '创建成功',
                         type: 'success'
                         });
+                  
                 }else{
                     state.vm.excute_flag=false
+                    state.vm.save_bt_style='primary'
+                    send_post('/get_netknife_code',{'file_name':state.vm.title},response=>{
+                        state.vm.storage_code=response.data
+                    })
                     state.vm.$bus.$emit('excute',state.file_name)
+                
                 }      
             })
         },
@@ -104,7 +114,7 @@ export const filecreateAbout={
                             type: 'success'
                           });
                         state.vm.$bus.$emit('change_title','空窗口')
-                        state.vm.$bus.$emit('change_code',name,`name:\npriority:\n\n\ntranslation:{\n\n\n}\n\njinja2:{\n\n\n}\n\nexcute:{\n\n}\n\n`)
+                        state.vm.$bus.$emit('change_code',name,`name:\npriority:\n\nconfig:{\n\n  send:{\n  read_timeout:10.0\n   }\n\n}\n\ntranslation:{\n\n\n}\n\njinja2:{\n\n\n}\n\nexcute:{\n\n}\n\n`)
                     }
                 })
         },
@@ -132,7 +142,10 @@ export const filecreateAbout={
                     state.vm.$bus.$emit('change_title',state.file_name+'')
                     console.log(state.vm.excute_flag)
                     if(!state.vm.excute_flag){
-                       
+                        state.vm.save_bt_style='primary'
+                        send_post('/get_netknife_code',{'file_name':state.vm.title},response=>{
+                            state.vm.storage_code=response.data
+                        })
                         state.vm.$message({
                             showClose: true,
                             message: '更新成功',
@@ -140,6 +153,10 @@ export const filecreateAbout={
                             });
                     }else{  
                         state.vm.excute_flag=false
+                        state.vm.save_bt_style='primary'
+                        send_post('/get_netknife_code',{'file_name':state.vm.title},response=>{
+                            state.vm.storage_code=response.data
+                        })
                         state.vm.$bus.$emit('excute',state.file_name)
                     }
                 })
