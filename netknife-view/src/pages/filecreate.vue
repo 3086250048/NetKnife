@@ -50,7 +50,7 @@ export default{
         mode: 'text/javascript',
         lineWrapping: true,
         theme: "monokai",
-        
+     
       },
       delete_able:false,
       update_able:false,
@@ -87,12 +87,12 @@ export default{
       this.$bus.$emit('add')
     },
     open_file(){
-        this.SET_VM(this)
+        
         this.$bus.$emit('switch_activeIndex','three')
     },
     change_text(){
       localStorage[this.name]=JSON.stringify({name:this.name,title:this.title,code:this.codemirror.getValue()})
- 
+
       if(this.storage_code==='NOT_EXIST'){
         if (this.codemirror.getValue()!==this.base_code){
           this.save_bt_style='warning'
@@ -101,7 +101,6 @@ export default{
         }
         return
       }
-      console.log('触发了')
       if(this.codemirror.getValue()!==this.storage_code){
         this.save_bt_style='warning'
       }else{
@@ -131,12 +130,13 @@ export default{
     },
   },
   mounted(){
+    
     // 由于没有使用路由切换，组件不会销毁，这里的SET_VM需要多次调用，防止vuex中直接调用this的数据停留在最后一次加载的页面上
     this.SET_VM(this)
-    console.log('创建了')
+
     setTimeout(()=>{
       this.$bus.$emit('create_tabs')
-  
+     
     },1)
     
     this.$bus.$on('change_excute_icon',(icon)=>{
@@ -148,10 +148,7 @@ export default{
     this.$bus.$on('change_save_style',(style)=>{
       this.save_bt_style=style
     })
-
-
-
-
+   console.log(`title是:${this.title}`)
     send_post('/get_netknife_code',{'file_name':this.title},response=>{
       this.storage_code=response.data
       if(this.storage_code==='NOT_EXIST'){
@@ -168,6 +165,9 @@ export default{
         this.save_bt_style='primary'
       }
     })
+  },
+  created(){
+    console.log( `create时的title${this.title}`)
   },
   beforeDestroy(){
     console.log('Destory')

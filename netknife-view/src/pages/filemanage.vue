@@ -10,6 +10,7 @@
                 :name="item.name" 
               >
               <div style="margin-top: 15px;" >
+                
                   <Filecreate :title="item.title" :name="item.name" :code="item.code"  :del_able="item.title==='空窗口'"></Filecreate>
               </div>
               </el-tab-pane>
@@ -138,13 +139,18 @@ export default{
           this.storage_tabs.push(JSON.parse(value))
         }
       })
+      //排序索引列表保证创建页面的顺序
+      this.index_list.sort(function(a,b){
+      return b-a
+      })
+      console.log(this.tabs)
       // 向编辑页面添加新窗口
       this.$bus.$on('add',()=>{
         let newTabName = ++this.tabindex+ '';
         let tab_obj={
           name: newTabName,
           title: `空窗口`,
-          code:this.base_code
+          code:this.base_code,
         }
         this.tabs.push(tab_obj);
         this.activename = newTabName;
@@ -173,35 +179,15 @@ export default{
             }
         })
       })
-      //排序索引列表保证创建页面的顺序
-      this.index_list.sort(function(a,b){
-        return b-a
-      })
+     
       //判断是否是第一次打开页面
       let open_file_flag=true
       //迭代创建Tab
       this.$bus.$on('create_tabs',()=>{
-        if(this.index_list.length===0){
-            if(typeof(localStorage['last_key'])!=='undefined'){
+            if(typeof(localStorage['last_key'])!=='undefined' && this.index_list.length===0){
               this.activename=localStorage['last_key']
+              return
             }
-            //判断是否从文件状态的“打开文件”按钮跳转来,open_file_flag防止新建窗口时依然用打开文件时的文件名
-            if(this.$route.params.item && open_file_flag){
-               let item=this.$route.params.item 
-                open_file_flag=false
-                this.tabs.forEach(e=>{
-                  if(e['name']===localStorage['last_key']){
-                    e['title']=this.$route.params.item['netknife'][0]
-                    send_post('/get_raw_code',{'file_name':e['title']},response=>{
-                      e['code']=response.data
-                      localStorage[e['name']]=JSON.stringify(e)
-                    })
-                    
-                  }
-                })
-            }
-            return
-          }
           const tab= JSON.parse(localStorage[this.index_list.pop()+''])
           let newTabName =tab['name']
           let tab_obj={
@@ -209,8 +195,21 @@ export default{
             title:tab['title'],
             code:tab['code']
           }
-          this.tabs.push(tab_obj);
-          this.activename = newTabName;
+          //判断是否从文件状态的“打开文件”按钮跳转来,open_file_flag防止新建窗口时依然用打开文件时的文件名
+          if (tab_obj.name===localStorage['last_key'] && this.$route.params.item && open_file_flag){
+            open_file_flag=false
+            tab_obj.title=this.$route.params.item['netknife'][0]
+            send_post('/get_raw_code',{'file_name':tab_obj.title},response=>{
+                      tab_obj.code=response.data
+                      localStorage[tab_obj.name]=JSON.stringify(tab_obj)
+                      this.tabs.push(tab_obj);
+                      this.activename = newTabName;
+                    })
+          }else{
+            this.tabs.push(tab_obj);
+            this.activename = newTabName;
+          }
+          
       })
       //延迟1毫秒，防止子节点先于父节点加载
       setTimeout(()=>{
@@ -218,7 +217,26 @@ export default{
       },1)
       //当localstorage中没有数据时，删除last_key
       if(localStorage.length===0){
-        this.$bus.$emit('add')
+        if(this.$route.params.item){
+            console.log(this.$route.params.item)
+            
+          let newTabName = ++this.tabindex+ '';
+          let tab_obj={
+            name: newTabName,
+            title:this.$route.params.item['netknife'][0],
+            code:'',
+          }
+          send_post('/get_raw_code',{'file_name':tab_obj.title},response=>{
+            tab_obj.code=response.data
+            localStorage[tab_obj.name]=JSON.stringify(tab_obj)
+            this.tabs.push(tab_obj);
+            this.activename = newTabName;
+          })
+          localStorage['last_key']=newTabName
+        }else{
+          this.$bus.$emit('add')
+        }
+         
       }
       this.$bus.$on('excute',(file_name)=>{
         this.$bus.$emit('change_excute_icon','el-icon-video-pause')

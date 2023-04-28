@@ -74,6 +74,7 @@ export const filecreateAbout={
                 }
                 state.file_name=response.data           
                 state.vm.$bus.$emit('change_title',state.file_name+'')
+                state.vm.$bus.$emit('change_code',state.vm.name,state.code)
                 if(!state.vm.excute_flag){
                     state.vm.save_bt_style='primary'
                     send_post('/get_netknife_code',{'file_name':state.vm.title},response=>{
@@ -115,6 +116,7 @@ export const filecreateAbout={
                           });
                         state.vm.$bus.$emit('change_title','空窗口')
                         state.vm.$bus.$emit('change_code',name,`name:\npriority:\n\nconfig:{\n\n  send:{\n  read_timeout:10.0\n   }\n\n}\n\ntranslation:{\n\n\n}\n\njinja2:{\n\n\n}\n\nexcute:{\n\n}\n\n`)
+                        state.vm.storage_code=`NOT_EXIST`
                     }
                 })
         },
@@ -140,6 +142,7 @@ export const filecreateAbout={
                     }
                     state.file_name=response.data
                     state.vm.$bus.$emit('change_title',state.file_name+'')
+                    state.vm.$bus.$emit('change_code',state.vm.name,state.code)
                     console.log(state.vm.excute_flag)
                     if(!state.vm.excute_flag){
                         state.vm.save_bt_style='primary'
@@ -163,6 +166,7 @@ export const filecreateAbout={
         },
         SET_VM(state,vm){
             state.vm=vm
+            console.log(vm.title)
         }
         
     },
