@@ -1,16 +1,15 @@
 <template>
-  <el-container class="crud_div">
+    <div>
         <el-main style="margin-left: -30px;margin-top: -40px;">
             <el-tabs v-model="activename" type="card" closable @tab-remove="remove" @tab-click="record_index" >
               <el-tab-pane
-                style="width: 940px;"
+                style="width: 958px;;"
                 v-for="(item, index) in tabs"
                 :key='item.name'
                 :label="item.title"
                 :name="item.name" 
               >
-              <div style="margin-top: 15px;" >
-                
+              <div style="margin-top: 15px;margin-left: 6px;" >
                   <Filecreate :title="item.title" :name="item.name" :code="item.code"  :del_able="item.title==='空窗口'"></Filecreate>
               </div>
               </el-tab-pane>
@@ -40,7 +39,7 @@
                 </el-checkbox-group>
             </ul>
         </el-drawer>
-    </el-container>
+      </div>
 </template>
 
 <script>

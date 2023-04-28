@@ -16,15 +16,15 @@
         <ul>
             <li v-for="item,index in netknife_data" :key="index">
               <el-card class="box-card card">
-                  <el-tag >文件名:{{ item['netknife'][0].length>30?item['netknife'][0].slice(0,30)+'...':item['netknife'][0] }}</el-tag>
+                  <el-tag style="position: relative;top:-20px;left: -20px;height: 60px;font-size: 20px;fon" > <div style="line-height: 60px;">{{ item['netknife'][0].length>20?item['netknife'][0].slice(0,20)+'...':item['netknife'][0] }}</div></el-tag>
                   &nbsp;
-                  <el-tag type="danger" >优先级:{{ item['netknife'][1]}}</el-tag>
+                  <el-tag style="position: relative;top:-20px;left: -35px;height: 60px;font-size: 20px;" type="danger" ><div style="line-height: 60px;">{{ item['netknife'][1]}}</div></el-tag>
                   <el-button style="float: right; padding: 3px 0" type="text" @click="open_file(item)">打开文件</el-button>
                   <el-button-group class="button_group">
-                  <el-button size="small" :disabled="!item['config'].length>0"  @click="show_config(item['config'])"  :class="item['config_class']">Config</el-button>
-                  <el-button size="small" :disabled="!item['translation'].length>0"  @click="show_translation(item['translation'])"  :class="item['translation_class']">Translation</el-button>
-                  <el-button size="small" :disabled="!item['jinja2'].length>0"  @click="show_jinja2(item['jinja2'])"  :class="item['jinja2_class']">Jinja2</el-button>
-                  <el-button size="small" :disabled="!item['excute'].length>0"  @click="show_excute(item['excute'])"  :class="item['excute_class']">Excute</el-button>
+                  <el-button  style="height: 60PX;margin-top: -20px;" :disabled="!item['config'].length>0"  @click="show_config(item['config'])"  :class="item['config_class']">配置</el-button>
+                  <el-button style="height: 60PX;margin-top: -20px;" :disabled="!item['translation'].length>0"  @click="show_translation(item['translation'])"  :class="item['translation_class']">转换</el-button>
+                  <el-button style="height: 60PX;margin-top: -20px;" :disabled="!item['jinja2'].length>0"  @click="show_jinja2(item['jinja2'])"  :class="item['jinja2_class']">函数</el-button>
+                  <el-button style="height: 60PX;margin-top: -20px;" :disabled="!item['excute'].length>0"  @click="show_excute(item['excute'])"  :class="item['excute_class']">执行</el-button>
                   </el-button-group>
               </el-card>
             </li>

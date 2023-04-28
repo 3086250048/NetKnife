@@ -37,6 +37,13 @@ import { send_post } from "@/store/tools";
 import codemirror from "codemirror";
 import "codemirror/mode/meta";
 import { mapMutations,mapActions } from 'vuex'
+// 折叠
+import 'codemirror/addon/fold/foldgutter.css'
+import 'codemirror/addon/fold/foldcode'
+import 'codemirror/addon/fold/foldgutter'
+import 'codemirror/addon/fold/brace-fold'
+import 'codemirror/addon/fold/comment-fold'
+
 export default{
   name: "FileCreate",
   props:['title','name','code','del_able'],
@@ -50,7 +57,8 @@ export default{
         mode: 'text/javascript',
         lineWrapping: true,
         theme: "monokai",
-     
+        foldGutter: true,
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
       },
       delete_able:false,
       update_able:false,
@@ -180,35 +188,39 @@ export default{
 
 <style>
 .editor .CodeMirror {
-  height: 800px;
+  height: 500px;
   display: flex;
-  max-height: 500px;
 }
 .create {
   position: relative;
-  top:-10px
+  top:-10px;
+  left: -6px;
   
 }
 .delete{
   position: relative;
-  top:-10px
+  top:-10px;
+  left: -6px;
 }
 .update{
   position: relative;
-  top:-10px
+  top:-10px;
+  left: -6px;
 }
 .open{
   position: relative;
-  top:-10px
+  top:-10px;
+  left: -6px;
 }
 .empty_add{
   position: relative;
   top:-10px;
-
+  left: -6px;
 }
 .excute{
   position: relative;
   top:-10px;
+  left: -6px;
   
 }
 
