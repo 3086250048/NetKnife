@@ -7,8 +7,6 @@ netknife-view/package.json
 netknife-view/README.md
 __pycache__
 *.db
-static/
-templates/
 package-lock.json
 package.json
 Pipfile
