@@ -1,25 +1,17 @@
 <template>
-    <el-container>
-        <el-menu  :style="{'margin-left':'-18px',
-                            // height:screen_height,
-                            width:'109px',
-                            display: 'flex',
-                            'min-height':'100vh',
-                            'flex-direction':'column',
-                            'margin-left':'-20px',
-                            'margin-top':'-5px' 
-                            }"
-                           
-                            :default-active="activeIndex" class="el-menu-vertical-demo"  @select="handleSelect">
-                <el-menu-item index="first">设备状态</el-menu-item>
-                <el-menu-item index="second">管理设备</el-menu-item>
-                <el-menu-item index="three">文件状态</el-menu-item>
-                <el-menu-item index="four">管理文件</el-menu-item>
-        </el-menu>
-        <el-main>
-            <router-view></router-view>
-        </el-main>
-    </el-container>
+    <el-row type="flex" >
+        <el-col  :span="2" >
+            <el-menu :default-active="activeIndex"  @select="handleSelect" style="height:100vh">
+                <el-menu-item index="first"><span>设备状态</span> </el-menu-item>
+                <el-menu-item index="second"><span>管理设备</span> </el-menu-item>
+                <el-menu-item index="three"><span>文件状态</span> </el-menu-item>
+                <el-menu-item index="four"><span>管理文件</span> </el-menu-item>
+            </el-menu>
+        </el-col>
+        <el-col >
+            <router-view ></router-view>
+        </el-col>
+    </el-row>
 </template>
 
 <script>
@@ -157,3 +149,9 @@ export default{
     }
 }
 </script>
+
+<style scoped>
+        span{
+            text-align: center;
+        }
+</style>

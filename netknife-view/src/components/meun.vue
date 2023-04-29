@@ -1,16 +1,19 @@
 <template>
-    <el-container >
-        <el-header height="45px">
-            <el-menu :style="{width:screen_width,'margin-left':'-20px'}" 
-                 :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
-                <el-menu-item index="first">CONNECT</el-menu-item>
-                <el-menu-item index="second">CONSOL</el-menu-item>
-            </el-menu>
-        </el-header>
-        <el-main >
-            <router-view></router-view>
-        </el-main>
-    </el-container>
+    <div>
+        <el-row :gutter="10">
+            <el-col>
+                <el-menu 
+                    style="display: flex;flex-flow: row nowrap;justify-content: space-around;"
+                    :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
+                    <div>FUN NET</div>
+                    <el-menu-item  index="first">CONNECT</el-menu-item>
+                    <el-menu-item index="second">CONSOL</el-menu-item>
+                </el-menu>
+            </el-col>
+        </el-row>    
+        <router-view></router-view>
+    </div>
+           
 </template>
 <script>
 

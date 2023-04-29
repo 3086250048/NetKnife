@@ -1,45 +1,59 @@
 <template>
-    <el-container class="el_container"  >
-        <el-header v-if="project_view_able" style="margin-top: -20px;" height="30px">
+    <div >
+    <el-row type="flex" v-if="project_view_able" >
+        <el-col push="5" >
             <el-autocomplete
             prefix-icon="el-icon-search"
-            style="width: 500px;margin-left: 200px;"
+            style="width: 60%;margin-top: 20px;"
             v-model="input"
             :fetch-suggestions="querySearchAsync"
             placeholder="输入项目名称进行搜索"
             @select="handleSelect"
             ></el-autocomplete>
-        </el-header>
-        <el-main v-if="project_view_able">
-            <ul>
-                <li  v-for="(project,i) in select_project_unit_list " :key="i" > 
-                    <el-card class="box-card  head_card ">
-                        <div style="margin-top: -8px;">
-                            <el-tag> {{  project[0].length>39 ? project[0].slice(0,30)+'...':project[0] }}</el-tag>
-                            <el-button type="primary" class="head_button" @click="show_mix_unit_page(project[0]),set_choose_project(project)">显示最小操作单元</el-button>
-                            <el-button type="primary" class="head_button" @click="show_oprate_page(),set_choose_project(project)">操作</el-button>
-                             <!-- <el-badge :value="1" :max="999" class="warning" type="warning">
-                                <el-button size="small">检测失败</el-button>
-                            </el-badge>
-                            <el-badge :value="10" :max="999" class="error" >
-                                <el-button size="small">检测异常</el-button>
-                            </el-badge> -->
-                            <el-badge  :value="101" :max="99" class="success" type="primary">
-                                <el-button>挂载文件</el-button>
-                            </el-badge> 
-                        </div>
-                    </el-card>   
-                    <el-card class="box-card" >
-                                区域:{{ project[1].length>=150?project[1].slice(0,150)+'...':project[1] }}<br>
-                                协议:{{ project[2].length>=150?project[2].slice(0,150)+'...':project[2] }}<br>
-                                端口:{{ project[3].length>=140?project[3].slice(0,140)+'...':project[3] }}<br>
-                                IP表达式:{{ project[4].length>=150?project[4].slice(0,150)+'...':project[4] }}
-                    </el-card>
-                </li>
-            </ul>
-        </el-main>
+        </el-col>
+    </el-row>
+       <el-row v-if="project_view_able">
+            <el-col :span="22" push="1">
+                <ul style="margin-top: 20px;" >
+                    <li  v-for="(project,i) in select_project_unit_list " :key="i" > 
+                        <el-card class="box-card  head_card ">
+                            <el-row type="flex" justify="end" style="margin-top: -8px;">
+                                <el-col>
+                                    <el-tag>
+                                         {{  project[0].length>39 ? project[0].slice(0,30)+'...':project[0] }}
+                                    </el-tag>
+                                </el-col>
+                                <el-col push="7">
+                                    <el-badge  :value="101" :max="99"  type="primary">
+                                        <el-button>挂载文件</el-button>
+                                    </el-badge>
+                                </el-col>
+                                <el-col push="5">
+                                    <el-button type="primary" class="head_button" @click="show_mix_unit_page(project[0]),set_choose_project(project)">
+                                        显示最小操作单元
+                                    </el-button>
+                                </el-col>
+
+                                <el-col push="4">
+                                    <el-button type="primary" class="head_button" @click="show_oprate_page(),set_choose_project(project)">
+                                    操作
+                                    </el-button>
+                                </el-col>
+                            </el-row>
+                        </el-card>   
+                        <el-card class="box-card" >
+                                    区域:{{ project[1].length>=150?project[1].slice(0,150)+'...':project[1] }}<br>
+                                    协议:{{ project[2].length>=150?project[2].slice(0,150)+'...':project[2] }}<br>
+                                    端口:{{ project[3].length>=140?project[3].slice(0,140)+'...':project[3] }}<br>
+                                    IP表达式:{{ project[4].length>=150?project[4].slice(0,150)+'...':project[4] }}
+                        </el-card>
+                    </li>
+                </ul>
+                </el-col>
+            </el-row>
+           
         <router-view></router-view>
-    </el-container>    
+    </div>   
 </template>
 
 <script>
@@ -147,18 +161,14 @@ li:not(:first-child){
 }
 .head_button{
     height: 40px;
-    float: right;
-    margin-left: 10px;
-    margin-top: -6px;
+
 }
 .el_container{
     height:"490px"
 }
 
 .success{
-    float: right;
-    margin-top: -1px;
-    margin-right: 25px;
+    
 }
 .error{
     float: right;

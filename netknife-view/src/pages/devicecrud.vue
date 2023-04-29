@@ -1,14 +1,12 @@
 <template>
-    <el-container class="crud_div">
-        <el-main style="margin-left: -30px;margin-top: -40px;">
+        <div style="margin-top: -4px;width: 95%;height: 95%;">
             <el-tabs type="border-card" v-model="activename" @tab-click="handleClick">
             <el-tab-pane label="新建项目" name="first"></el-tab-pane>
             <el-tab-pane label="更新项目" name="second"></el-tab-pane>
             <el-tab-pane label="删除项目" name="third"></el-tab-pane>
             <router-view></router-view>
             </el-tabs>
-        </el-main>
-    </el-container>
+        </div>
 </template>
 
 <script>
