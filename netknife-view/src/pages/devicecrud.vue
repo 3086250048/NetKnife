@@ -1,12 +1,10 @@
 <template>
-        <div style="margin-top: -4px;width: 95%;height: 95%;">
-            <el-tabs type="border-card" v-model="activename" @tab-click="handleClick">
+    <el-tabs type="border-card" v-model="activename" @tab-click="handleClick">
             <el-tab-pane label="新建项目" name="first"></el-tab-pane>
             <el-tab-pane label="更新项目" name="second"></el-tab-pane>
-            <el-tab-pane label="删除项目" name="third"></el-tab-pane>
-            <router-view></router-view>
-            </el-tabs>
-        </div>
+            <el-tab-pane label="删除项目" name="third"></el-tab-pane> 
+        <router-view></router-view>
+    </el-tabs>
 </template>
 
 <script>
@@ -51,10 +49,22 @@ export default{
     }
 }
 </script>
-<style scoped>
-   .curd_div{
-    background-color: #DCDFE6;
-   }
+<style lang="scss" scoped>
+    ::v-deep .el-tabs__item {
+    padding: 0 20px;
+    height: 5vh;
+    width: 57vh;
+    box-sizing: border-box;
+    text-align: center;
+    line-height: 5vh;
+    display: inline-block;
+    list-style: none;
+    font-size: 2vh;
+    font-weight: 900;
+    color: #303133;
+    position: relative;
+  
+}
 </style>
 
 
