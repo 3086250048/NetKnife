@@ -17,25 +17,25 @@
                 <ul style="margin-top: 20px;" >
                     <li  v-for="(project,i) in select_project_unit_list " :key="i" > 
                         <el-card class="box-card  head_card ">
-                            <el-row type="flex" justify="end" style="margin-top: -8px;">
-                                <el-col>
-                                    <el-tag>
+                            <el-row type="flex" justify="start" style="margin-top: -8px;">
+                                <el-col :span="4" >
+                                    <el-tag style="min-width: 100%; text-align: center;">
                                          {{  project[0].length>39 ? project[0].slice(0,30)+'...':project[0] }}
                                     </el-tag>
                                 </el-col>
-                                <el-col push="7">
-                                    <el-badge  :value="101" :max="99"  type="primary">
-                                        <el-button>挂载文件</el-button>
+                                <el-col  :span="4" :offset="10" pull="2">
+                                    <el-badge style="width: 100%;" :value="101" :max="99"  type="primary">
+                                        <el-button style="width: 100%;">挂载文件</el-button>
                                     </el-badge>
                                 </el-col>
-                                <el-col push="5">
-                                    <el-button type="primary" class="head_button" @click="show_mix_unit_page(project[0]),set_choose_project(project)">
+                                <el-col :span="4" pull="1" >
+                                    <el-button type="primary" style="width: 100%;" class="head_button" @click="show_mix_unit_page(project[0]),set_choose_project(project)">
                                         显示最小操作单元
                                     </el-button>
                                 </el-col>
 
-                                <el-col push="4">
-                                    <el-button type="primary" class="head_button" @click="show_oprate_page(),set_choose_project(project)">
+                                <el-col :span="3">
+                                    <el-button type="primary" style="width: 100%;" class="head_button" @click="show_oprate_page(),set_choose_project(project)">
                                     操作
                                     </el-button>
                                 </el-col>

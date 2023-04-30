@@ -2,10 +2,10 @@
     <el-row type="flex" >
         <el-col  :span="2" >
             <el-menu :default-active="activeIndex"  @select="handleSelect" style="height:100vh">
-                <el-menu-item index="first"><span>设备状态</span> </el-menu-item>
-                <el-menu-item index="second"><span>管理设备</span> </el-menu-item>
-                <el-menu-item index="three"><span>文件状态</span> </el-menu-item>
-                <el-menu-item index="four"><span>管理文件</span> </el-menu-item>
+                <el-menu-item index="first" class="auto" ><span >设备状态</span> </el-menu-item>
+                <el-menu-item index="second"  class="auto"><span>管理设备</span> </el-menu-item>
+                <el-menu-item index="three"  class="auto"><span>文件状态</span> </el-menu-item>
+                <el-menu-item index="four"  class="auto"><span>管理文件</span> </el-menu-item>
             </el-menu>
         </el-col>
         <el-col >
@@ -153,5 +153,12 @@ export default{
 <style scoped>
         span{
             text-align: center;
+        }
+        .auto{
+            width: 100%;
+            height: 6vh;
+            text-align: center;
+            font-size: 2vh;
+            line-height: 6vh;
         }
 </style>
