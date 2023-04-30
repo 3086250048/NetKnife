@@ -1,7 +1,7 @@
 <template>
     <div >
     <el-row type="flex" v-if="project_view_able" >
-        <el-col push="5" >
+        <el-col :push="5" :span="24"  >
             <el-autocomplete
             prefix-icon="el-icon-search"
             style="width: 60%;margin-top: 20px;"
@@ -12,45 +12,50 @@
             ></el-autocomplete>
         </el-col>
     </el-row>
-       <el-row v-if="project_view_able">
-            <el-col :span="22" push="1">
+    <el-row  v-if="project_view_able">
+        <el-col :span="22" :push="1">
                 <ul style="margin-top: 20px;" >
                     <li  v-for="(project,i) in select_project_unit_list " :key="i" > 
-                        <el-card class="box-card  head_card ">
-                            <el-row type="flex" justify="start" style="margin-top: -8px;">
-                                <el-col :span="4" >
-                                    <el-tag style="min-width: 100%; text-align: center;">
-                                         {{  project[0].length>39 ? project[0].slice(0,30)+'...':project[0] }}
-                                    </el-tag>
-                                </el-col>
-                                <el-col  :span="4" :offset="10" pull="2">
-                                    <el-badge style="width: 100%;" :value="101" :max="99"  type="primary">
-                                        <el-button style="width: 100%;">挂载文件</el-button>
-                                    </el-badge>
-                                </el-col>
-                                <el-col :span="4" pull="1" >
-                                    <el-button type="primary" style="width: 100%;" class="head_button" @click="show_mix_unit_page(project[0]),set_choose_project(project)">
-                                        显示最小操作单元
-                                    </el-button>
-                                </el-col>
-
-                                <el-col :span="3">
-                                    <el-button type="primary" style="width: 100%;" class="head_button" @click="show_oprate_page(),set_choose_project(project)">
-                                    操作
-                                    </el-button>
-                                </el-col>
-                            </el-row>
-                        </el-card>   
-                        <el-card class="box-card" >
+                        <el-row style="display: flex;flex-direction: column;">
+                            <el-col>
+                                <el-card style="height: 8vh;" >
+                                    <el-row type="flex" justify="start" >
+                                        <el-col :span="4" >
+                                            <el-tag class="screen_change" style="min-width: 100%;height:5vh; text-align: center;font-size: 2vh;line-height: 5vh;">
+                                                {{  project[0].length>39 ? project[0].slice(0,30)+'...':project[0] }}
+                                            </el-tag>
+                                        </el-col>
+                                        <el-col  :span="3" :offset="10" :pull="2">
+                                            <el-badge style="width:100%" :value="101" :max="99"  type="primary" class="screen_change">
+                                                <el-button style="width: 100%;height:5vh; text-align: center;font-size: 2vh;line-height: 2vh;">挂载文件</el-button>
+                                            </el-badge>
+                                        </el-col>
+                                        <el-col :span="4" :pull="1" >
+                                            <el-button class="screen_change" type="primary" style="width: 100%;height:5vh; text-align:center;font-size: 2vh;line-height: 2vh;"  @click="show_mix_unit_page(project[0]),set_choose_project(project)">
+                                                显示最小操作单元
+                                            </el-button>
+                                        </el-col>
+                                        <el-col :span="3">
+                                            <el-button class="screen_change" type="primary" style="width: 100%;height:5vh; text-align: center;font-size: 2vh;line-height: 2vh;"  @click="show_oprate_page(),set_choose_project(project)">
+                                            操作
+                                            </el-button>
+                                        </el-col>
+                                    </el-row>
+                                </el-card>   
+                            </el-col>
+                            <el-col>
+                                <el-card class="box-card" style="height: 20vh;font-size: 3vh;" >
                                     区域:{{ project[1].length>=150?project[1].slice(0,150)+'...':project[1] }}<br>
                                     协议:{{ project[2].length>=150?project[2].slice(0,150)+'...':project[2] }}<br>
                                     端口:{{ project[3].length>=140?project[3].slice(0,140)+'...':project[3] }}<br>
                                     IP表达式:{{ project[4].length>=150?project[4].slice(0,150)+'...':project[4] }}
-                        </el-card>
+                                </el-card>
+                            </el-col>
+                        </el-row>
                     </li>
                 </ul>
-                </el-col>
-            </el-row>
+         </el-col>
+    </el-row>
            
         <router-view></router-view>
     </div>   
@@ -153,33 +158,49 @@ export default{
 li{
     list-style-type: none;
 }
-li:not(:first-child){
-    margin-top: 8px;
+
+
+
+@media (min-width:600px) { 
+    .screen_change{
+        margin-top: -6px;
+    }
 } 
-.head_card{
-    height: 40px;
-}
-.head_button{
-    height: 40px;
+@media (min-width:900px) { 
+    .screen_change{
+        margin-top: 0px;
+    }
+} 
+@media (min-width:1200px) { 
+    .screen_change{
+        margin-top: 5px;
+    }
+ }
+ 
 
-}
-.el_container{
-    height:"490px"
-}
+@media (min-width:1500px) { 
+    .screen_change{
+        margin-top: 8px;
+    }
 
-.success{
-    
-}
-.error{
-    float: right;
-    margin-top: 5px;
-    margin-right: 34px;
-}
+ }
+ @media (min-width:1800px) { 
+    .screen_change{
+        margin-top: 20px;
+    }
 
-.warning{
-    float: right;
-    margin-top: 5px;
-    margin-right: 28px;
-}
+ }
+ @media (min-width:1900px) { 
+    .screen_change{
+        margin-top: 30px;
+    }
+
+ }
+ @media (min-width:2500px) { 
+    .screen_change{
+        margin-top: 50px;
+    }
+
+ }
 
 </style>
