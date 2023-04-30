@@ -8,6 +8,7 @@
             style="width: 60%;margin-top: 20px;"
             v-model="input"
             :fetch-suggestions="querySearchAsync"
+            :popper-append-to-body="false"
             placeholder="输入项目名称进行搜索"
             @select="handleSelect"
             ></el-autocomplete>
@@ -27,8 +28,8 @@
                                             </el-tag>
                                         </el-col>
                                         <el-col  :span="3" :offset="10" :pull="2">
-                                            <el-badge style="width:100%" :value="101" :max="99"  type="primary" class="screen_change">
-                                                <el-button style="width: 100%;height:5vh; text-align: center;font-size: 2vh;line-height: 2vh;">挂载文件</el-button>
+                                            <el-badge class="bt_tag_change" style="width:100%" :value="101" :max="99"  type="primary" >
+                                                <el-button class="screen_change" style="width: 100%;height:5vh; text-align: center;font-size: 2vh;line-height: 2vh;">挂载文件</el-button>
                                             </el-badge>
                                         </el-col>
                                         <el-col :span="4" :pull="1" >
@@ -175,7 +176,33 @@ li{
         
       
 }
-
+ ::v-deep .el-badge__content {
+    border-radius: 1vh;
+    color: #FFF;
+    display: inline-block;
+    font-size: 2vh;
+    height: 3vh;
+    line-height: 3vh;
+    padding: 0 6px;
+    text-align: center;
+    white-space: nowrap;
+    border: 1px solid #FFF;
+    margin-top: 0.5vw;
+    margin-right: 2vh;
+}
+::v-deep .el-autocomplete-suggestion li{
+    padding: 0 1vh;
+    margin: 0;
+    line-height: 4vh;
+    cursor: pointer;
+    color: #606266;
+    font-size: 2vh;
+    list-style: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+   
+}
 
 @media (min-width:600px) { 
     .screen_change{
@@ -191,6 +218,7 @@ li{
     .screen_change{
         margin-top: 5px;
     }
+    
  }
  
 
@@ -210,13 +238,40 @@ li{
     .screen_change{
         margin-top: 30px;
     }
+    ::v-deep .el-badge__content {
+    border-radius: 1vh;
+    color: #FFF;
+    display: inline-block;
+    font-size: 2vh;
+    height: 3vh;
+    line-height: 3vh;
+    padding: 0 6px;
+    text-align: center;
+    white-space: nowrap;
+    border: 1px solid #FFF;
+    margin-top: 1.5vw;
+    margin-right: 2vh;
+    }
 
  }
  @media (min-width:2500px) { 
     .screen_change{
         margin-top: 55px;
     }
-
+    ::v-deep .el-badge__content {
+    border-radius: 1vh;
+    color: #FFF;
+    display: inline-block;
+    font-size: 2vh;
+    height: 3vh;
+    line-height: 3vh;
+    padding: 0 6px;
+    text-align: center;
+    white-space: nowrap;
+    border: 1px solid #FFF;
+    margin-top: 1.5vw;
+    margin-right: 2vh;
+    }
  }
 
 </style>
