@@ -159,6 +159,7 @@ export default{
             height: 6vh;
             text-align: center;
             font-size: 2vh;
+            overflow: hidden;
             line-height: 6vh;
         }
 </style>

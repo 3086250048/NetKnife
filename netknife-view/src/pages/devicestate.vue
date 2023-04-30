@@ -1,8 +1,9 @@
 <template>
     <div >
     <el-row type="flex" v-if="project_view_able" >
-        <el-col :push="5" :span="24"  >
+        <el-col :offset="5" :span="24"  >
             <el-autocomplete
+            class="search_input"
             prefix-icon="el-icon-search"
             style="width: 60%;margin-top: 20px;"
             v-model="input"
@@ -154,11 +155,26 @@ export default{
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 li{
     list-style-type: none;
 }
 
+.search_input ::v-deep .el-input__inner {
+        height: 5vh;
+        font-size: 2vh;
+        padding-left: 4vh;
+       
+}
+.search_input ::v-deep .el-input__icon {
+        height: 100%;
+        width: 3vh;
+        font-size: 2vh;
+        line-height: 100%;
+        padding-top: 0.3vh;
+        
+      
+}
 
 
 @media (min-width:600px) { 
@@ -198,7 +214,7 @@ li{
  }
  @media (min-width:2500px) { 
     .screen_change{
-        margin-top: 50px;
+        margin-top: 55px;
     }
 
  }
