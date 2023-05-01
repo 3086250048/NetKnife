@@ -1,10 +1,10 @@
 <template>
-    <div>
+    <div style="height: 100vh;">
         <el-divider content-position="left">刪除数据</el-divider>
         <div class="popinfo">
             <DeviceDeletePopInfo></DeviceDeletePopInfo>
         </div>
-        <el-form :inline=true ref="delete_info" :mode="delete_info" label-width="80px" label-position="rigth">
+        <el-form :inline=true ref="delete_info" :mode="delete_info" label-width="6vw" label-position="rigth">
             <el-form-item label="项目名称">
                 <el-input class="project_input" v-model="delete_info.project" placeholder="请输入项目名称">
                     <template slot="prepend">项目名称</template>
@@ -12,7 +12,7 @@
             </el-form-item><br>
             <el-form-item label="设备信息" >
                 <el-input class="input-with-select input" placeholder="自定义设备类型" v-model="delete_info.device_class">
-                    <el-select class="select" v-model="delete_info.device_class" placeholder="类型" slot="prepend">
+                    <el-select :popper-append-to-body="false" class="select" v-model="delete_info.device_class" placeholder="类型" slot="prepend">
                         <el-option label="Huawei" value="huawei"></el-option>
                         <el-option label="Ruijie" value="ruijie"></el-option>
                         <el-option label="Cisco" value="cisco"></el-option>
@@ -22,7 +22,7 @@
             </el-form-item>
             <el-form-item>
                 <el-input class="input-with-select input" placeholder="自定义设备层级" v-model="delete_info.area" >
-                    <el-select  class="select" placeholder="层级"  v-model="delete_info.area" slot="prepend" >
+                    <el-select :popper-append-to-body="false" class="select" placeholder="层级"  v-model="delete_info.area" slot="prepend" >
                         <el-option label="出口区" value="outlet"></el-option>
                         <el-option label="安全区" value="security"></el-option>
                         <el-option label="核心区" value="core"></el-option>
@@ -38,7 +38,7 @@
             </el-form-item><br>
             <el-form-item label="连接信息"> 
                 <el-input class="input-with-select input" placeholder="请输入端口号" v-model="delete_info.port" >
-                    <el-select  class="select" placeholder="协议"  v-model="delete_info.protocol" slot="prepend" >
+                    <el-select :popper-append-to-body="false" class="select" placeholder="协议"  v-model="delete_info.protocol" slot="prepend" >
                         <el-option label="SSH" value="ssh"></el-option>
                         <el-option label="TELNET" value="telnet"></el-option>
                         <el-option label="FTP" value="ftp"></el-option>
@@ -62,13 +62,14 @@
                         <template slot="prepend">密码</template>
                     </el-input>
             </el-form-item>
-            <el-form-item  v-show="delete_info.device_class == 'cisco' | delete_info.device_class == 'ruijie'">
+            <el-form-item label="特权密码" v-show="delete_info.device_class == 'cisco' | delete_info.device_class == 'ruijie'">
                     <el-input :show-password=true class="secret_input" placeholder="请输入特权密码" v-model="delete_info.secret">
                         <template slot="prepend">Secret</template>
                     </el-input>
             </el-form-item><br>
+            <el-button class="button" @click="remove">删除</el-button>
         </el-form><br>
-        <el-button class="button" @click="remove">删除</el-button>
+        
     </div>
 </template>
 
@@ -95,31 +96,247 @@ export default{
     }
 }
 </script>
-<style scoped>
-    .select{
-        width: 100px;
+<style scoped> 
+
+.popinfo{
+    height: 3vh;
+    margin-bottom:2vh;
     }
-    .input{
-        width: 400px;
-    }
-    .project_input{
-        width: 810px;
-    }
-    .secret_input{
-        width: 400px;
-        margin-left: 80px;
-    }
-    .button{
-        width: 100px;
-        margin-left: 80px;
-    }
-    .checkbutton{
-        width: 60px;
-    }
-    .checkselect{
-        width: 105px
-    }   
-    .popinfo{
-        height: 40px;
-    }
+.input{
+    width: 40vw;
+    height: 5.5vh;
+    margin-top: 3vh;
+    
+}
+
+.ip_input{
+   
+    width: 40vw;
+    height: 5.5vh;
+    margin-top: 3vh;
+  
+}
+.project_input{
+    margin-top: 3vh;
+    width:80vw;
+    height: 5.5vh;
+
+}
+.secret_input{
+    width: 40vw;
+    height: 5.5vh;
+    margin-top: 3vh;
+
+}
+.button{
+    width: 10vw;
+    height: 7vh;
+    border-radius: 1vh;
+    
+    line-height: 1vh;
+    font-size: 2vh;
+    margin-left: 11vh;
+    margin-top: 3vh;
+}
+
+
+
+
+::v-deep .el-divider__text{
+    font-size: 2vh;
+    font-weight: 600;
+    padding:2vh
+}
+.input ::v-deep .el-input__inner {
+    -webkit-appearance: none;
+    background-color: #FFF;
+    background-image: none;
+    border-radius: 0 1vh 1vh 0;
+    border: 0.15vh solid #DCDFE6;
+    box-sizing: border-box;
+    color: #606266;
+    display: inline-block;
+    height: 40px;
+    line-height: 40px;
+    outline: 0;
+    padding: 0 3vh;
+    transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+    height: 7vh;
+    width: 30vw;
+    font-size: 2vh; 
+}
+.project_input ::v-deep .el-input__inner {
+    -webkit-appearance: none;
+    background-color: #FFF;
+    background-image: none;
+    border-radius: 0 1vh 1vh 0;
+    border: 0.15vh solid #DCDFE6;
+    box-sizing: border-box;
+    color: #606266;
+    display: inline-block;
+    outline: 0;
+    padding: 0 3vh;
+    transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+    height: 7vh;
+    line-height: 7vh;
+    width: 73vw;
+    font-size: 2vh;
+}
+
+.ip_input ::v-deep .el-input__inner{
+    -webkit-appearance: none;
+    background-color: #FFF;
+    background-image: none;
+    border: 0.15vh solid #DCDFE6;
+    box-sizing: border-box;
+    color: #606266;
+    display: inline-block;
+    outline: 0;
+    padding: 0 5vh;
+    transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+    height: 7vh;
+    line-height: 7vh;
+    width:23vw;
+    font-size: 2vh;
+    
+}
+.ip_select ::v-deep .el-input__inner{
+    -webkit-appearance: none;
+    background-color: #FFF;
+    background-image: none;
+    border: 0.15vh solid #DCDFE6;
+    box-sizing: border-box;
+    color: #606266;
+    display: inline-block;
+    outline: 0;
+    padding: 0 5vh;
+    transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+    height: 7vh;
+    line-height: 7vh;
+    width:8.4vw;
+    font-size: 2vh;
+}
+.secret_input ::v-deep .el-input__inner{
+    -webkit-appearance: none;
+    background-color: #FFF;
+    background-image: none;
+    border-radius: 0 1vh 1vh 0;
+    border: 0.15vh solid #DCDFE6;
+    box-sizing: border-box;
+    color: #606266;
+    display: inline-block;
+    height: 40px;
+    line-height: 40px;
+    outline: 0;
+    padding: 0 3vh;
+    transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+    height: 7vh;
+    width: 30vw;
+    font-size: 2vh; 
+    
+}
+.select ::v-deep .el-input__inner{
+    -webkit-appearance: none;
+    background-color: #FFF;
+    background-image: none;
+    border-radius: 1vh;
+    border: 0.15vh solid #DCDFE6;
+    box-sizing: border-box;
+    color: #606266;
+    display: inline-block;
+    outline: 0;
+    padding: 0  1vh;
+    transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+    height: 7vh;
+    line-height: 7vh;
+    width: 7.5vw;
+    font-size: 2vh;
+}
+.select ::v-deep .el-select__caret{
+    color: #C0C4CC;
+    font-size: 1.8vh;
+    margin-right: 0.48vh;
+    
+    transition: transform .3s;
+    transform: rotateZ(180deg);
+    cursor: pointer;
+}
+
+.ip_select ::v-deep .el-select__caret{
+    color: #C0C4CC;
+    font-size: 1.8vh;
+    margin-right: 0.48vh;
+    transition: transform .3s;
+    transform: rotateZ(180deg);
+    cursor: pointer;
+}
+::v-deep  .el-input-group__prepend{
+    background-color: #F5F7FA;
+    color: #909399;
+    vertical-align: middle;
+    display: table-cell;
+    position: relative;
+    border: 0.15vh solid #DCDFE6 ;
+    border-right: 0;
+    border-radius:1vh 0 0 1vh;
+    padding: 0 3vh;
+    width: 16vh;
+    white-space: nowrap;
+    font-size: 2vh;
+    text-align: center;
+
+}
+
+::v-deep .el-input-group__append{
+    background-color: #F5F7FA;
+    color: #909399;
+    vertical-align: middle;
+    display: table-cell;
+    position: relative;
+    border: 0.15vh solid #DCDFE6 ;
+    border-left: 0;
+    border-radius:0 1vh 1vh 0;
+    padding: 0 3vh;
+    width: 3vh;
+    white-space: nowrap;
+    font-size: 2vh;
+    text-align: center;
+}
+
+::v-deep .el-form-item__label{
+    text-align: center;
+    vertical-align: middle;
+    float: left;
+    font-size: 2vh;
+    color: #606266;
+    line-height: 6vh;
+    padding: 3.3vh 12px 0 0;
+    box-sizing: border-box;  
+
+}
+
+.el-select-dropdown__item {
+    font-size:2vh;
+    padding:2vh 0.5vh;
+    position: relative;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #606266;
+    height: 2vh;
+    line-height: 2vh;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+::v-deep .el-divider--horizontal {
+    display: block;
+    height: 1px;
+    width: 100%;
+    z-index: 0;
+    margin: 0;
+    margin-top: 1vh;
+    margin-bottom: 4vh;
+    
+   
+}
 </style>

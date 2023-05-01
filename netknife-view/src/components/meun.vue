@@ -59,3 +59,10 @@ export default{
     }
 }
 </script>
+<style lang="scss" scoped > 
+::v-deep .el-menu--horizontal>.el-menu-item.is-active{
+    border-bottom: 0.5vh solid #409EFF;
+}
+
+
+</style>

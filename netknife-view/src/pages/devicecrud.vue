@@ -1,5 +1,5 @@
 <template>
-    <el-tabs type="border-card" v-model="activename" @tab-click="handleClick">
+    <el-tabs style="border: 0 ;" type="border-card" v-model="activename" @tab-click="handleClick">
             <el-tab-pane label="新建项目" name="first"></el-tab-pane>
             <el-tab-pane label="更新项目" name="second"></el-tab-pane>
             <el-tab-pane label="删除项目" name="third"></el-tab-pane> 
@@ -65,6 +65,7 @@ export default{
     position: relative;
   
 }
+
 </style>
 
 

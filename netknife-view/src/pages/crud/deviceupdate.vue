@@ -1,7 +1,7 @@
 <template>
-    <div>
+    <div style="height: 105vh;">
         <el-divider content-position="left">更新条件</el-divider>
-        <el-form :inline=true ref="where_info" :mode="where_info" label-width="80px" label-position="rigth">
+        <el-form :inline=true ref="where_info" :mode="where_info" label-width="6vw" label-position="rigth">
             <el-form-item label="项目名称">
                 <el-input class="project_input" v-model="where_info.project" placeholder="请输入项目名称">
                     <template slot="prepend">项目名称</template>
@@ -59,17 +59,17 @@
                         <template slot="prepend">密码</template>
                     </el-input>
             </el-form-item>
-            <el-form-item  v-show="where_info.device_class == 'cisco' | where_info.device_class == 'ruijie'">
+            <el-form-item  label="特权密码" v-show="where_info.device_class == 'cisco' | where_info.device_class == 'ruijie'">
                     <el-input :show-password=true class="secret_input" placeholder="请输入特权密码" v-model="where_info.secret">
                         <template slot="prepend">Secret</template>
                     </el-input>
-            </el-form-item><br>
+            </el-form-item>
         </el-form>
         <el-divider content-position="left">更新数据</el-divider>
         <div class="popinfo">
             <DeviceUpdatePopInfo></DeviceUpdatePopInfo>
         </div>
-        <el-form :inline=true ref="update_info" :mode="update_info" label-width="80px" label-position="rigth">
+        <el-form :inline=true ref="update_info" :mode="update_info" label-width="6vw" label-position="rigth">
             <el-form-item label="项目名称">
                 <el-input class="project_input" v-model="update_info.project" placeholder="请输入项目名称">
                     <template slot="prepend">项目名称</template>
@@ -127,13 +127,13 @@
                         <template slot="prepend">密码</template>
                     </el-input>
             </el-form-item>
-            <el-form-item  v-show="update_info.device_class == 'cisco' | update_info.device_class == 'ruijie'">
+            <el-form-item label="特权密码" v-show="update_info.device_class == 'cisco' | update_info.device_class == 'ruijie'">
                     <el-input :show-password=true class="secret_input" placeholder="请输入特权密码" v-model="update_info.secret">
                         <template slot="prepend">Secret</template>
                     </el-input>
             </el-form-item><br>
+            <el-button class="button" @click="update">更新</el-button>
         </el-form><br>
-        <el-button class="button" @click="update">更新</el-button>
     </div>
 </template>
 <script>
@@ -177,31 +177,184 @@ export default{
     }
 }
 </script>
+
 <style scoped>
-    .select{
-        width: 100px;
+    .popinfo{
+    height: 2vh;
+    margin-bottom:5vh;
     }
     .input{
-        width: 400px;
+        width: 40vw;
+        height: 2.75vh;
+        
     }
     .project_input{
-        width: 810px;
+        width:80vw;
+        height: 2.75vh;
+        
     }
     .secret_input{
-        width: 400px;
-        margin-left: 80px;
+        width: 40vw;
+        height: 2.75vh
     }
     .button{
-        width: 100px;
-        margin-left: 80px;
+        width: 10vw;
+        height: 5vh;
+        border-radius: 1vh;
+        
+        line-height: 1vh;
+        font-size: 2vh;
+        margin-left: 11vh;
+        margin-top: 1.5vh;
     }
-    .checkbutton{
-        width: 60px;
+   
+    
+   
+
+    ::v-deep .el-divider__text{
+        font-size: 2vh;
+        font-weight: 600;
+        padding:2vh
     }
-    .checkselect{
-        width: 105px
-    }   
-    .popinfo{
-        height: 40px;
+    .input ::v-deep .el-input__inner {
+        -webkit-appearance: none;
+        background-color: #FFF;
+        background-image: none;
+        border-radius: 0 1vh 1vh 0;
+        border: 0.15vh solid #DCDFE6;
+        box-sizing: border-box;
+        color: #606266;
+        display: inline-block;
+        outline: 0;
+        padding: 0 3vh;
+        transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+        height: 5vh;
+        width: 30vw;
+        font-size: 2vh; 
     }
+    .project_input ::v-deep .el-input__inner {
+        -webkit-appearance: none;
+        background-color: #FFF;
+        background-image: none;
+        border-radius: 0 1vh 1vh 0;
+        border: 0.15vh solid #DCDFE6;
+        box-sizing: border-box;
+        color: #606266;
+        display: inline-block;
+        outline: 0;
+        padding: 0 3vh;
+        transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+        height: 5vh;
+        line-height: 3.5vh;
+        width: 73vw;
+        font-size: 2vh;
+    }
+
+    .secret_input ::v-deep .el-input__inner{
+        -webkit-appearance: none;
+        background-color: #FFF;
+        background-image: none;
+        border-radius: 0 1vh 1vh 0;
+        border: 0.15vh solid #DCDFE6;
+        box-sizing: border-box;
+        color: #606266;
+        display: inline-block;
+        outline: 0;
+        padding: 0 3vh;
+        transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+        height: 5vh;
+        width: 30vw;
+        font-size: 2vh; 
+        
+    }
+    .select ::v-deep .el-input__inner{
+        -webkit-appearance: none;
+        background-color: #FFF;
+        background-image: none;
+        border-radius: 1vh;
+        border: 0.15vh solid #DCDFE6;
+        box-sizing: border-box;
+        color: #606266;
+        display: inline-block;
+        outline: 0;
+        padding: 0  1vh;
+        transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+        height: 5vh;
+        line-height: 5vh;
+        width: 7.5vw;
+        font-size: 2vh;
+    }
+
+    ::v-deep  .el-input-group__prepend{
+        background-color: #F5F7FA;
+        color: #909399;
+        vertical-align: middle;
+        display: table-cell;
+        position: relative;
+        border: 0.15vh solid #DCDFE6 ;
+        border-right: 0;
+        border-radius:1vh 0 0 1vh;
+        padding: 0 3vh;
+        width: 16vh;
+        white-space: nowrap;
+        font-size: 2vh;
+        text-align: center;
+        z-index: 1;
+    }
+
+ 
+    
+    ::v-deep .el-form-item__label{
+        text-align: center;
+        vertical-align: middle;
+        float: left;
+        font-size: 2vh;
+        color: #606266;
+        line-height: 0.2vh;
+        padding: 2.6vh 12px 0 0;
+        box-sizing: border-box;  
+        z-index: 10000;
+    }
+
+   
+
+::v-deep .el-form-item__content{
+    line-height: 0px;
+}
+::v-deep .el-divider--horizontal {
+    display: block;
+    height: 1px;
+    width: 100%;
+    z-index: 0;
+    margin: 0;
+    margin-top: 1vh;
+    margin-bottom: 4vh;
+    
+   
+}
+
+
+.select ::v-deep .el-select__caret{
+    color: #C0C4CC;
+    font-size: 1.8vh;
+    margin-right: 0.48vh;
+    line-height: 2vh;
+    transition: transform .3s;
+    transform: rotateZ(180deg);
+    cursor: pointer;
+}
+
+.el-select-dropdown__item {
+    font-size:2vh;
+    padding:2vh 0.5vh;
+    position: relative;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #606266;
+    height: 2vh;
+    line-height: 2vh;
+    box-sizing: border-box;
+    cursor: pointer;
+}
 </style>
