@@ -9,9 +9,7 @@
 </template>
 
 <script>
-window.onresize = function(){
-    alert(document.documentElement.clientHeight);
-}
+
 export default{
     data(){
         return {

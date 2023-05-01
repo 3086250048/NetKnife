@@ -1,23 +1,32 @@
 <template>
-    <el-container class="el_container">
-        <el-header  height="0px"  >
-            <div class="title">
-                    <el-tag
-                    v-for="title,i in base_title"
-                    :key="i"
-                    effect="dark"
-                    size="mini"
-                    :type="title.type"
-                    >
-                    {{ title.label  }}
-                    </el-tag><br>
-            </div>     
-        </el-header>
-        <el-main class="el_main">
-            <el-input class="el_main-el_input" v-model="command" clearable placeholder="请输入命令"
+    <div>
+    <el-row>
+        <el-col  >
+            <el-tag v-for="title,i in base_title"
+                class="tag"
+                :key="i"
+                effect="dark"
+                size="mini"
+                :type="title.type"
+                >
+                {{ title.label  }}
+                </el-tag> <br>
+        </el-col>
+    </el-row>
+    <el-row>
+        <el-col>
+            <el-input 
+            class="cli"
+            v-model="command" :clearable="true" placeholder="请输入命令"
              @keyup.enter.native="commit_command"  @input="set_effect" >
             <template slot="prepend">CLI</template>
             </el-input><br>
+        </el-col>
+    </el-row>
+    
+     
+       
+             
             
             <!-- 影响链接百分比的进度条 -->
             <div class="el_main-div">
@@ -141,8 +150,7 @@
                     </li>
                 </el-checkbox-group>
             </ul>
-        </el-main>
-    </el-container> 
+        </div>
 </template>
 
 <script>
@@ -523,37 +531,117 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+    .tag:nth-child(1){
+        height: 4vh;
+        border-radius: 0.4vh;
+        font-size: 2vh;
+        line-height: 4vh;
+        text-align: center;
+        margin-top: 1vh;
+        margin-left: 1vh;
+    }
+    .tag{
+        height: 4vh;
+        border-radius: 0.4vh;
+        font-size: 2vh;
+        line-height: 4vh;
+        text-align: center;
+        margin-top: 1vh;
+    }
     
-    .el_container{
-        margin-left: -28px;
-        margin-top: -20px;
-        height: 500px;
-        width: 990px;
-       
+    .cli{
+        margin: 1vh;
     }
- 
-    .el_header-div-el_button{
-        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)
-    }
-    .el_header-div-div{
-        margin-left:80px;
-        margin-top: -40px;
-    }
-    .el_header-div-div-h1{
-        font-size:22px;
-        margin-top: 4px;
-    }
-    .el_main{
-        margin-top: 25px;  
-    }
-    .el_main-el_input  {
-        position: absolute;
-        width: 970px;
-        margin-top: -17px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04)
-    }
+    .cli ::v-deep .el-input__inner {
+        -webkit-appearance: none;
+        background-color: #FFF;
+        background-image: none;
+        border-radius: 0 1vh 1vh 0;
+        border: 0.2vh solid #DCDFE6;
+        box-sizing: border-box;
+        color: #606266;
+        display: inline-block;
+        outline: 0;
+        padding: 0 3vh;
+        transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+        height: 7vh;
+        width: 82vw;
+        font-size: 4vh; 
+        font-weight: 400;
+    } 
+    .cli ::v-deep  .el-input-group__prepend{
+        background-color: #F5F7FA;
+        color: #909399;
+        vertical-align: middle;
+        display: table-cell;
+        position: relative;
+        border: 0.2vh solid #DCDFE6 ;
+        border-right: 0;
+        border-radius:1vh 0 0 1vh;
+        padding: 0 3vh;
+        width: 10vh;
+        white-space: nowrap;
+        font-size: 3vh;
+        text-align: center;
 
+    }
+    
+   ::v-deep .el-input__suffix {
+        height: 4vh;
+        right: 5vh;
+        transition: all .3s;
+        pointer-events: none;
+    }
+    ::v-deep  .el-input__clear {
+    color: #C0C4CC;
+    font-size:3vh;
+    margin-top: 0.3vh;
+    cursor: pointer;
+    transition: color .2s cubic-bezier(.645,.045,.355,1);
+    }
+    @media (min-width:1200px) { 
+        ::v-deep  .el-input__clear {
+        color: #C0C4CC;
+        font-size:3vh;
+        margin-top: 1vh;
+        margin-right: 1vw;
+        cursor: pointer;
+        transition: color .2s cubic-bezier(.645,.045,.355,1);
+        }
+    }
+    @media (min-width:1500px) { 
+        ::v-deep  .el-input__clear {
+        color: #C0C4CC;
+        font-size:3vh;
+        margin-top: 1.6vh;
+        margin-right: 1vw;
+        cursor: pointer;
+        transition: color .2s cubic-bezier(.645,.045,.355,1);
+        }
+
+    }
+    @media (min-width:1800px) { 
+        ::v-deep  .el-input__clear {
+        color: #C0C4CC;
+        font-size:3vh;
+        margin-top: 2.2vh;
+        margin-right: 1vw;
+        cursor: pointer;
+        transition: color .2s cubic-bezier(.645,.045,.355,1);
+        }
+
+    }
+    @media (min-width:2300px) { 
+        ::v-deep  .el-input__clear {
+        color: #C0C4CC;
+        font-size:3vh;
+        margin-top: 2.6vh;
+        margin-right: 1vw;
+        cursor: pointer;
+        transition: color .2s cubic-bezier(.645,.045,.355,1);
+        }
+    }
     .el_main-div{
         position: absolute;
        
@@ -563,16 +651,6 @@ export default {
         margin-top: 30px;
         margin-left: 668px;
     }
-    .el_main--div{
-        margin-left: 330px;
-        margin-top: -20px;
-    }
-    /* .el_main--div-el_progress{
-        width: 200px;
-        margin-left: 110px;
-        margin-top: -20px; 
-       
-    } */
     .el_main--el_input{
         position: absolute;
         top: 168px;
@@ -625,10 +703,7 @@ export default {
     li:first-child{
         margin-top: 10px;
     }
-    .title{
-        font-size: 20px; 
-    }
-    
+   
     
     
 </style>
