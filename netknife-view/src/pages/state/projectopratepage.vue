@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div style="height: 100vh;">
     <el-row>
         <el-col  >
             <el-tag v-for="title,i in base_title"
@@ -23,134 +23,174 @@
             </el-input><br>
         </el-col>
     </el-row>
-    
-     
-       
-             
-            
+    <el-row type="flex" justify="space-between">
+        <el-col :span="8">
+            <el-button-group style="margin: 1vh;margin-top: 0;" >
+                <el-button style=" width: 12vh;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-back" size="mini"  @click="goBack">返回</el-button>
+                <el-button style="width: 8vh;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-setting" size="mini" @click="setting_dialog_able=true"></el-button>
+            </el-button-group>
+        </el-col>
+        <el-col :span="9">
+        </el-col>
+        <el-col :span="8" >
+            <el-button-group>
+            <el-button style=" width: 19vh;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-arrow-left" size="mini" @click="rollback_command" >上一条命令</el-button>
+            <el-button  style=" width: 19vh;height: 4.5vh;font-size: 2vh;" type="primary" size="mini" @click="next_command">下一条命令<i class="el-icon-arrow-right el-icon--right"></i></el-button>
+            <el-button style=" width: 8.5vh;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-document" size="mini" @click="export_textarea"></el-button>
+            <el-button style=" width: 8vh;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-search" size="mini" @click="search_command_handler" ></el-button>
+            </el-button-group>
             <!-- 影响链接百分比的进度条 -->
-            <div class="el_main-div">
-                <el-progress :text-inside="true" :stroke-width="5" :format="format" class="el_main-div-el_progress" :percentage="effect_connect_percent"></el-progress>
-            </div>
-            <!-- 文字按钮 -->
-            <el-dialog title="设置参数" :visible.sync="setting_dialog_able" width="700px">
-                <el-button  type="text" @click="send_dialog_able = true">设置命令参数</el-button>
-                <el-button  type="text" @click="path_dialog_able= true">设置文件路径参数</el-button>
-            </el-dialog>
-            <!-- 弹出框 -->
-            <el-dialog title="设置命令参数" :visible.sync="send_dialog_able" width="700px" >
-                <el-form :model="send_parameter">
-                    <el-form-item label="是否关闭显示命令" :label-width="'130px'" style="margin-left: -20px;">
+            <el-progress class="isolation" style="width: 54vh;" :text-inside="true" :stroke-width="progress_size" :format="format"  :percentage="effect_connect_percent"></el-progress>
+        </el-col>
+    </el-row>      
+    <!-- 文字按钮 -->
+    <el-dialog  title="设置参数" :visible.sync="setting_dialog_able" width="100vh">
+        <div style="height: 10vh;">
+        <el-button style=" width: 8vh;height: 4vh;font-size: 2vh;margin:0 4vh 0 1vh;"  type="text" @click="send_dialog_able = true">设置命令参数</el-button>
+        <el-button style=" width: 8vh;height: 4vh;font-size: 2vh;" type="text" @click="path_dialog_able= true">设置文件路径参数</el-button>
+        </div>
+    </el-dialog>
+    <!-- 弹出框 -->
+    <el-dialog title="设置命令参数" :visible.sync="send_dialog_able" width="100vh" >
+        
+        <el-form :model="send_parameter">
+            <el-row type="flex" >
+                <el-col :span="8">
+                    <el-form-item label="是否关闭显示命令" :label-width="'25vh'" >
                         <el-switch
+                            class='switch_size'
                             v-model="send_parameter.command_able"
                             active-color="#13ce66">
                         </el-switch>
                     </el-form-item>
-                    <el-form-item label="是否关闭设备提示符" :label-width="'140px'" style="position:absolute;left: 170px;top:84px">
+                </el-col>
+                <el-col :span="8">
+                    <el-form-item label="命令输出的超时时间" :label-width="'25vh'" style="font-size: 3vh;">
+                        <el-input-number  class='input_number_size' v-model="send_parameter.read_timeout" :min="0" :max="1000" label="读取回显的超时时间"></el-input-number>
+                    </el-form-item>
+                   
+                </el-col>
+            </el-row>
+            <el-row type="flex">
+                <el-col :span="8">
+                    <el-form-item label="是否关闭设备提示符" :label-width="'25vh'">
                         <el-switch
+                            class='switch_size'
                             v-model="send_parameter.device_title_able"
                             active-color="#13ce66">
                         </el-switch>
                     </el-form-item>
-                    <el-form-item label="命令输出的超时时间" :label-width="'140px'" style="position: absolute;top: 84px;left: 356px;">
-                        <el-input-number v-model="send_parameter.read_timeout" :min="0" :max="1000" label="读取回显的超时时间"></el-input-number>
+                </el-col>
+                <el-col :span="8">
+                    <el-form-item label="历史命令上限" :label-width="'25vh'">
+                        <el-input-number class='input_number_size' v-model="send_parameter.COMMAND_HISTORY_LIMIT" :min="1" :max="9999" label="历史命令上限"></el-input-number>
                     </el-form-item>
-                    <el-form-item label="历史命令上限" :label-width="'140px'" style="position: absolute;top: 134px;left: -38px;">
-                        <el-input-number v-model="send_parameter.COMMAND_HISTORY_LIMIT" :min="1" :max="9999" label="历史命令上限"></el-input-number>
-                    </el-form-item>
-                </el-form>
-                <div slot="footer" class="dialog-footer">
-                    <el-button @click="sendcommand_handler_cancel">取 消</el-button>
-                    <el-button type="primary" @click="sendcommand_handler_commit">确 定</el-button>
-                </div>
-            </el-dialog> 
-            <el-dialog title="设置文件路径参数" :visible.sync="path_dialog_able" width="700px" >
-                <el-form :model="path_parameter">
-                    <el-form-item label="TXT导出路径"  :label-width="'130px'">
-                        <el-input  placeholder="TXT文件导出路径" v-model="path_parameter.txt_export_path">
-                            <template slot="prepend">PATH</template>
-                        </el-input>
-                    </el-form-item>
-                    <el-form-item label="FTP根路径"  :label-width="'130px'">
-                        <el-input  placeholder="FTP根路径" v-model="path_parameter.ftp_root_path">
-                            <template slot="prepend">PATH</template>
-                        </el-input>
-                    </el-form-item>
-                    <el-form-item label="FTP上传文件路径"  :label-width="'130px'">
-                        <el-input  placeholder="FTP上传文件路径" v-model="path_parameter.ftp_upload_path">
-                            <template slot="prepend">PATH</template>
-                        </el-input>
-                    </el-form-item>
-                    <el-form-item label="FTP下载文件路径"  :label-width="'130px'">
-                        <el-input  placeholder="FTP下载文件路径" v-model="path_parameter.ftp_download_path">
-                            <template slot="prepend">PATH</template>
-                        </el-input>
-                    </el-form-item>
-                </el-form>
-                <div slot="footer" class="dialog-footer">
-                    <el-button @click="filepath_handler_cancel">取 消</el-button>
-                    <el-button type="primary" @click="filepath_handler_commit">确 定</el-button>
-                </div>
-            </el-dialog>
-            <!-- 搜索历史命令 -->
-            <el-dialog title="搜索历史命令" :visible.sync="search_command_history_able" width="800px" >
+                </el-col>
+            </el-row>    
+        </el-form>
+        <el-row type="flex"  justify="center">
+            <el-col :span="4">
+                <el-button @click="sendcommand_handler_cancel" class="bt"  >取 消</el-button>
+            </el-col>
+            <el-col :span="4">
+                <el-button type="primary" @click="sendcommand_handler_commit" class="bt">确 定</el-button>
+            </el-col>
+        </el-row>
+    </el-dialog> 
+    <el-dialog title="设置文件路径参数" :visible.sync="path_dialog_able" width="100vh" >
+        <el-form :model="path_parameter">
+            <el-form-item label="TXT导出路径"  :label-width="'25vh'">
+                <el-input class="input_size"  placeholder="TXT文件导出路径" v-model="path_parameter.txt_export_path">
+                    <template slot="prepend">PATH</template>
+                </el-input>
+            </el-form-item>
+            <el-form-item label="FTP根路径"  :label-width="'25vh'">
+                <el-input class="input_size"   placeholder="FTP根路径" v-model="path_parameter.ftp_root_path">
+                    <template slot="prepend">PATH</template>
+                </el-input>
+            </el-form-item>
+            <el-form-item label="FTP上传文件路径"  :label-width="'25vh'">
+                <el-input class="input_size"  placeholder="FTP上传文件路径" v-model="path_parameter.ftp_upload_path">
+                    <template slot="prepend">PATH</template>
+                </el-input>
+            </el-form-item>
+            <el-form-item label="FTP下载文件路径"  :label-width="'25vh'">
+                <el-input class="input_size"  placeholder="FTP下载文件路径" v-model="path_parameter.ftp_download_path">
+                    <template slot="prepend">PATH</template>
+                </el-input>
+            </el-form-item>
+        </el-form>
+        <el-row type="flex"  justify="center">
+            <el-col :span="4">
+                <el-button @click="filepath_handler_cancel" class="bt"  >取 消</el-button>
+            </el-col>
+            <el-col :span="4">
+                <el-button type="primary" @click="filepath_handler_commit" class="bt">确 定</el-button>
+            </el-col>
+        </el-row>
+    </el-dialog>
+    <!-- 搜索历史命令 -->
+    <el-dialog  title="搜索历史命令" :visible.sync="search_command_history_able" width="120vh" >
+        <el-row>
+            <el-col :span="24">
                 <el-autocomplete
-                prefix-icon="el-icon-search"
-                class="search"
-                v-model="input"
-                :fetch-suggestions="querySearchAsync"
-                placeholder="输入命令或执行时间进行检索"
-                @select="handleSelect"
-                ></el-autocomplete>
-                <div style="height: 350px;overflow: scroll;">
-                    <ul>
-                        <li v-for="(item,i) in all_command_time_list " :key="i" > 
-                            <el-card class="box-card" >
-                                <el-button-group style="float: right;margin-top: -20px;margin-right:-20px;" >
-                                    <el-button type="primary" size="mini" @click="show_history_command(item[0],item[1],i)" >查看</el-button>
-                                    <el-button type="primary" size="mini" @click="delete_history_command(item[0],item[1],item[2],i)">删除</el-button>
-                                </el-button-group>
-                                命令:{{ item[0] }}<br>
-                                执行时间:{{ item[1] }} <br>
-                            </el-card>
-                        </li>
-                    </ul>
-                </div>
-            </el-dialog>
-            <!--输出框  -->
+                    class="search"
+                    style="width: 100%;height: 4vh;z-index: 1;"
+                    prefix-icon="el-icon-search"
+                    v-model="input"
+                    :popper-append-to-body="false"
+                    :fetch-suggestions="querySearchAsync"
+                    placeholder="输入命令或执行时间进行检索"
+                    @select="handleSelect"
+                    ></el-autocomplete>
+            </el-col>
+        </el-row>
+        <div style="height:66vh;overflow: scroll;">
+            <ul class="his_ul">
+                <li  v-for="(item,i) in all_command_time_list " :key="i" > 
+                    <el-card class="cmd_his_about" style="height: 10vh;width: 115vh;font-size: 2vh;" >
+                        <el-button-group style="float: right;margin-top: -20px;margin-right:-20px;" >
+                            <el-button style="width: 12vh;height: 4.5vh;font-size: 2vh;line-height: 1vh;" type="primary"  @click="show_history_command(item[0],item[1],i)" >查看</el-button>
+                            <el-button style="width: 12vh;height: 4.5vh;font-size: 2vh;line-height: 1vh;" type="primary"  @click="delete_history_command(item[0],item[1],item[2],i)">删除</el-button>
+                        </el-button-group>
+                        命令:{{ item[0] }}<br>
+                        执行时间:{{ item[1] }} <br>
+                    </el-card>
+                </li>
+            </ul>
+        </div>
+    </el-dialog>
+   
+    <!-- 加载动画loading_able -->
+    <div  class="el_main-loading_div" element-loading-text="等待响应中...." v-loading="loading_able"></div> 
+    <!-- 输出选择列表框 -->
+    <el-row type="flex" >
+        <el-col >
+             <!--输出框  -->
             <el-input
+            style="margin-left: 1vh;width: 62vw;font-size: 2.5vh;"
             type="textarea"
-            :rows="18"
+            :rows="30"
             v-model="textarea"
             resize="none"
             class="el_main--el_input"
             >
             </el-input>
-            <!-- 加载动画 -->
-            <div class="el_main-loading_div" element-loading-text="等待响应中...." v-loading="loading_able"></div>
-            <!-- 历史命令按钮组 -->
-            <el-button-group class="el_main-el_button_group">
-            <el-button type="primary" icon="el-icon-arrow-left" size="mini" @click="rollback_command" >上一条命令</el-button>
-            <el-button type="primary" size="mini" @click="next_command">下一条命令<i class="el-icon-arrow-right el-icon--right"></i></el-button>
-            <el-button type="primary" icon="el-icon-document" size="mini" @click="export_textarea"></el-button>
-            <el-button type="primary" icon="el-icon-search" size="mini" @click="search_command_handler" ></el-button>
-            </el-button-group>
-            <!-- 设置按钮组 -->
-            <el-button-group class="el_main--el_button_group">
-                <el-button type="primary" icon="el-icon-back" size="mini" @click="goBack">返回</el-button>
-                <el-button type="primary" icon="el-icon-setting" size="mini" @click="setting_dialog_able=true"></el-button>
-            </el-button-group>
-            <!-- 输出选择列表框 -->
-            <ul class="el_main-ul">
+        </el-col>
+        <el-col>
+            <ul   class="el_main-ul" style="padding-left: 2vh;">
                 <el-checkbox-group v-model="check_list" >
-                    <li  v-for="item,index in response_data_list" :key="index" class="el_main-ul-li">
-                        <el-checkbox :checked="true" :label="item.type+item.ip+':'+item.port" class="el_main-ul-li-el_checkbox" :border="true">
+                    <li v-for="item,index in response_data_list" :key="index" class="el_main-ul-li">
+                        <el-checkbox  :style="check_cls_obj" :checked="true"  :label="item.type+item.ip+':'+item.port"  >   
                         {{ item.type }} {{item.ip}} {{ item.port }}
                         </el-checkbox>
                     </li>
                 </el-checkbox-group>
             </ul>
-        </div>
+        </el-col>
+    </el-row>
+    
+    </div>
 </template>
 
 <script>
@@ -180,7 +220,12 @@ export default {
             },
             setting_dialog_able:false,
             search_command_history_able:false,
-            input:''
+            input:'',
+            progress_size:document.documentElement.clientHeight/150,
+            check_cls_obj:{
+                zoom:document.documentElement.clientHeight/600,
+            }
+            
         }
     },
     methods:{
@@ -268,7 +313,7 @@ export default {
             },response=>{
                 console.log(response.data)
                 this.send_dialog_able=false
-            },reason=>{})
+            })
         },
         filepath_handler_cancel(){
             this.path_dialog_able=false
@@ -291,7 +336,7 @@ export default {
             },response=>{
                 console.log(response.data)
                 this.path_dialog_able=false
-            },reason=>{})
+            })
         },
         rollback_command(){
             if(this.command_index>=this.history_command_count-1){
@@ -378,7 +423,7 @@ export default {
             return this.$store.state.devicestateAbout.able
         },
         textarea(){
-            return this.$store.state.projectoprateAbout.textarea
+             return this.$store.state.projectoprateAbout.textarea
         },
         project_name(){
             return this.$store.state.projectoprateAbout.choose_project[0]
@@ -394,6 +439,7 @@ export default {
         },
         response_data_list(){
             return this.$store.state.projectoprateAbout.response_data_list
+          
         },
         loading_able(){
             return this.$store.state.projectoprateAbout.loading_able
@@ -524,14 +570,98 @@ export default {
             }
             this.send_parameter.read_timeout=response.data[0][2]
             this.send_parameter.COMMAND_HISTORY_LIMIT=response.data[0][3]
-        },reason=>{})
+        })
         this.SET_HISTORY_COMMAND_COUNT()
+        const _this = this;
+        window.onresize = ()=>{
+            return (() => {
+            _this.progress_size =document.documentElement.clientHeight/150;
+            _this.check_cls_obj.zoom=document.documentElement.clientHeight/600;
+            })();
+        };
     },
 
 }
 </script>
 
 <style lang="scss" scoped>
+
+//历史命令搜索框
+.search ::v-deep .el-input__inner {
+        height: 5vh;
+        font-size: 2vh;
+        padding-left: 4vh;
+        border-radius: 0.8vh;
+       
+}
+.search ::v-deep .el-input__icon {
+        height: 100%;
+        width: 3vh;
+        font-size: 2vh;
+        line-height: 100%;
+        padding-top: 0.3vh;
+        
+      
+}
+ ::v-deep .el-autocomplete-suggestion li{
+    padding: 0 1vh;
+    margin: 0;
+    line-height: 4vh;
+    cursor: pointer;
+    color: #606266;
+    font-size: 2vh;
+    list-style: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+   
+}
+::v-deep .el-autocomplete-suggestion__wrap {
+    max-height: 20vh;
+    padding: 1vh 0;
+    box-sizing: border-box;
+}
+// 
+::v-deep .el-form-item__label {
+    text-align: center;
+    vertical-align: middle;
+    float: left;
+    font-size: 2vh;
+    color: #606266;
+    line-height: 4.3vh;
+    padding: 0 12px 0 0;
+    box-sizing: border-box;
+}
+ ::v-deep .el-dialog__title {
+    line-height: 2vh;
+    font-size:2vh;
+    color: #303133;
+    margin: 1vh;
+}
+
+  ::v-deep .el-dialog__header {
+    padding: 2vh 2vh 1vh;
+}
+
+  ::v-deep .el-dialog__body {
+    padding: 3vh 2.2vh;
+    color: #606266;
+    font-size: 1vh;
+    word-break: break-all;
+}
+
+ ::v-deep .el-dialog__headerbtn {
+    position: absolute;
+    top: 2vh;
+    right: 2vh;
+    padding: 0;
+    background: 0 0;
+    border: none;
+    outline: 0;
+    cursor: pointer;
+    font-size: 2vh;
+}
+
     .tag:nth-child(1){
         height: 4vh;
         border-radius: 0.4vh;
@@ -600,48 +730,10 @@ export default {
     cursor: pointer;
     transition: color .2s cubic-bezier(.645,.045,.355,1);
     }
-    @media (min-width:1200px) { 
-        ::v-deep  .el-input__clear {
-        color: #C0C4CC;
-        font-size:3vh;
-        margin-top: 1vh;
-        margin-right: 1vw;
-        cursor: pointer;
-        transition: color .2s cubic-bezier(.645,.045,.355,1);
-        }
+    .isolation{
+        margin-top: -1vh;
     }
-    @media (min-width:1500px) { 
-        ::v-deep  .el-input__clear {
-        color: #C0C4CC;
-        font-size:3vh;
-        margin-top: 1.6vh;
-        margin-right: 1vw;
-        cursor: pointer;
-        transition: color .2s cubic-bezier(.645,.045,.355,1);
-        }
-
-    }
-    @media (min-width:1800px) { 
-        ::v-deep  .el-input__clear {
-        color: #C0C4CC;
-        font-size:3vh;
-        margin-top: 2.2vh;
-        margin-right: 1vw;
-        cursor: pointer;
-        transition: color .2s cubic-bezier(.645,.045,.355,1);
-        }
-
-    }
-    @media (min-width:2300px) { 
-        ::v-deep  .el-input__clear {
-        color: #C0C4CC;
-        font-size:3vh;
-        margin-top: 2.6vh;
-        margin-right: 1vw;
-        cursor: pointer;
-        transition: color .2s cubic-bezier(.645,.045,.355,1);
-        }
-    }
+    
     .el_main-div{
         position: absolute;
        
@@ -651,36 +743,67 @@ export default {
         margin-top: 30px;
         margin-left: 668px;
     }
+    // 输出框
     .el_main--el_input{
-        position: absolute;
-        top: 168px;
         font-size: larger;
-        width: 660px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
-        
+        margin-top: 0.2vh;
+    }
+
+    ::v-deep .el-textarea__inner {
+        display: block;
+        resize: vertical;
+        padding: 0px 0px;
+        line-height: 1;
+        box-sizing: border-box;
+        width: 100%;
+        font-size: inherit;
+        font-weight: 900;
+        color: #F8F8F2;
+        background-color: #272822;
+        background-image: none;
+        border: 1px solid #DCDFE6;
+        transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+    }
+
+    //
+
+    // 选择框
+    ::v-deep .el-checkbox__input.is-checked+.el-checkbox__label {
+    color: #ffffff;
+        }
+    ::v-deep .el-checkbox__input.is-checked .el-checkbox__inner, .el-checkbox__input.is-indeterminate .el-checkbox__inner {
+    background-color: #272822;
+    border-color: #272822;
     }
     .el_main-ul{
-        position: absolute;
-        left: 789px;
-        top:170px;
-        width: 300px;
-        height: 430px;
+        margin-top: 0.2vh;
+        margin-left: 0.5vh;
+        width:52vh;
+        height: 75vh;
         overflow-y:scroll;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
+        background-color: #272822;
+        box-shadow: 0 1vh 4vh rgba(0, 0, 0, .12), 0 0 1vh rgba(0, 0, 0, .04);
     }
-    .el_main-ul-li{
-        list-style: none;
-        margin-bottom: 3px;
+    ::v-deep .el-checkbox.is-bordered {
+
+        padding: 9px 20vh 9px 12vh;
+
     }
-    .el_main-ul-li-el_checkbox{
-        width: 300px;
-    }
+    // 进度加载圈
     .el_main-loading_div{
-        position: absolute;
-        left: 840px;
-        top:340px;
-        width:200px
+        
+        width:40vw;
     }
+    .el_main-loading_div ::v-deep .el-loading-spinner {
+    top: 50%;
+    margin-top: 32vh;
+    margin-left: 22vh;
+    width: 40vw;
+    text-align: center;
+    position: absolute;
+    }
+    // 
     .el_main-el_button_group{
         position: absolute;
         top: 136px;
@@ -691,11 +814,7 @@ export default {
         top: 136px;
         left: 122px;
     }
-    .search{
-        width: 760px;
-        position: absolute;
-        top: 45px;
-    }
+
     li{
     list-style-type: none;
     margin-top: 2px;
@@ -704,6 +823,157 @@ export default {
         margin-top: 10px;
     }
    
-    
+    @media (min-width:900px) { 
+           .switch_size{
+            margin-top: -3vh;
+            margin-left: -1vh;
+            }
+            .cmd_his_about {
+                line-height: 2.5vh;
+            }
+          
+    }
+    @media (min-width:1200px) { 
+        ::v-deep  .el-input__clear {
+        color: #C0C4CC;
+        font-size:3vh;
+        margin-top: 1vh;
+        margin-right: 1vw;
+        cursor: pointer;
+        transition: color .2s cubic-bezier(.645,.045,.355,1);
+        }
+        .isolation{
+            margin-top: -0.4vh;
+        }
+        .switch_size{
+            zoom:1.2;
+            margin-top: -0.5vh;
+        }
+        .input_number_size{
+          
+            zoom:1.2;
+            margin-top: -1vh;
+        }
+        .bt{
+            zoom:1.2
+        }
+        .input_size{
+            zoom: 1.2;
+            margin-left: -1.2vh;
+           
+        }
+     
+    }
+    @media (min-width:1500px) { 
+        ::v-deep  .el-input__clear {
+        color: #C0C4CC;
+        font-size:3vh;
+        margin-top: 1.6vh;
+        margin-right: 1vw;
+        cursor: pointer;
+        transition: color .2s cubic-bezier(.645,.045,.355,1);
+        }
+        .isolation{
+            margin-top: -0.3vh;
+        }
+        .input_number_size{
+            zoom:1.3;
+            margin-top: -0.3vh;
+        }
+        .bt{
+            zoom:1.4
+        }
+        .input_size{
+            zoom: 1.4;
+        }
+    }
+    @media (min-width:1800px) { 
+        ::v-deep  .el-input__clear {
+        color: #C0C4CC;
+        font-size:3vh;
+        margin-top: 2.2vh;
+        margin-right: 1vw;
+        cursor: pointer;
+        transition: color .2s cubic-bezier(.645,.045,.355,1);
+        }
+        .isolation{
+            margin-top: 0.15vh;
+        }
+        .switch_size{
+            zoom:2;
+            margin-top: 0.3vh;
+        }
+        .input_number_size{
+            zoom:2;
+            margin-top:-0.3vh;
+          
+        }
+        .bt{
+            zoom:2
+        }
+        .input_size{
+            zoom: 2;
+        }
+        .cmd_his_about {
+                line-height: 3vh;
+            }
+    }
+    @media (min-width:2200px) { 
+        ::v-deep  .el-input__clear {
+        color: #C0C4CC;
+        font-size:3vh;
+        margin-top: 2.6vh;
+        margin-right: 1vw;
+        cursor: pointer;
+        transition: color .2s cubic-bezier(.645,.045,.355,1);
+        }
+        .isolation{
+            margin-top: 0.4vh;
+        }
+        .switch_size{
+            zoom:2;
+            margin-top:0.3vh;
+        }
+        .input_number_size{
+            zoom:2;
+           
+        }
+        .bt{
+            zoom:2
+        }
+        .input_size{
+            zoom: 2;
+        }
+        .cmd_his_about {
+                line-height: 3.5vh;
+            }
+    }
+    @media (min-width:2400px) { 
+        ::v-deep  .el-input__clear {
+        color: #C0C4CC;
+        font-size:3vh;
+        margin-top: 2.6vh;
+        margin-right: 1vw;
+        cursor: pointer;
+        transition: color .2s cubic-bezier(.645,.045,.355,1);
+        }
+        .isolation{
+            margin-top: 0.4vh;
+        }
+        .switch_size{
+            zoom:2.5;
+            margin-top: 0.3vh;
+        }
+        .input_number_size{
+            zoom:2.5;
+           
+        }
+        .bt{
+            zoom:2.5
+        }
+        .input_size{
+            zoom: 2.5;
+        }
+    }
     
 </style>

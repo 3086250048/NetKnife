@@ -103,10 +103,18 @@ export const  projectoprateAbout={
                 check_list.forEach(e=>{
                     if(item.type+item.ip+':'+item.port===e ){
                         if(flag){
-                            state.textarea+=`===============================================================================\n设备类型:${item.type}  设备登录IP:${item.ip}  设备登录端口:${item.port}\n时间:${state.response_date_time}\n===============================================================================`+'\n'+item.response
+                         
+                            state.textarea+=`\n设备类型:${item.type}  设备登录IP:${item.ip}  设备登录端口:${item.port}`
+                            state.textarea+=`\n时间:${state.response_date_time}\n`
+
+                            state.textarea+=`\n${item.response}`
                             flag=false
                         }else{
-                            state.textarea+=`\n===============================================================================\n设备类型:${item.type}  设备登录IP:${item.ip}  设备登录端口:${item.port}\n时间:${state.response_date_time}\n===============================================================================`+'\n'+item.response
+                           
+                            state.textarea+=`\n设备类型:${item.type}  设备登录IP:${item.ip}  设备登录端口:${item.port}`
+                            state.textarea+=`\n时间:${state.response_date_time}\n`
+                        
+                            state.textarea+=`\n${item.response}`
                         }
                        
                     }

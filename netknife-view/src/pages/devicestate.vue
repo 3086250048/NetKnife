@@ -203,7 +203,11 @@ li{
     text-overflow: ellipsis;
    
 }
-
+::v-deep .el-autocomplete-suggestion__wrap {
+    max-height: 20vh;
+    padding: 1vh 0;
+    box-sizing: border-box;
+}
 @media (min-width:600px) { 
     .screen_change{
         margin-top: -6px;
