@@ -1,20 +1,30 @@
 <template>
-    <div style="height: 100vh;">
-    <el-row>
-        <el-col  >
-            <el-tag v-for="title,i in base_title"
-                class="tag"
-                :key="i"
-                effect="dark"
-                size="mini"
-                :type="title.type"
-                >
-                {{ title.label  }}
-                </el-tag> <br>
+    <div style="height: 92vh;width: 98%;margin-left: 1vh;margin-top: 1vh;overflow: hidden;">
+    <el-row type="flex">
+        <el-col :span="3">
+            <el-button-group style=";width: 100%" >
+                <el-button style="width: 60%;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-back" size="mini"  @click="goBack">返回</el-button>
+                <el-button style="width: 40%;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-setting" size="mini" @click="setting_dialog_able=true"></el-button>
+            </el-button-group>
+        </el-col>
+        <el-col :span="13">
+            <el-button-group style=";width: 100%" >
+                <el-button v-for="title,i in base_title" :key="i" style=";height: 4.5vh;font-size: 2vh;" :type="title.type" size="mini"  @click="goBack"> {{ title.label }}</el-button>
+            </el-button-group>
+        </el-col>
+        <el-col  :span="8 "  >
+            <el-button-group style="width: 100%;">
+            <el-button style=" width: 35%;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-arrow-left" size="mini" @click="rollback_command" >上一条命令</el-button>
+            <el-button  style=" width: 35%;height: 4.5vh;font-size: 2vh;" type="primary" size="mini" @click="next_command">下一条命令<i class="el-icon-arrow-right el-icon--right"></i></el-button>
+            <el-button style=" width: 15%;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-document" size="mini" @click="export_textarea"></el-button>
+            <el-button style=" width: 15%;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-search" size="mini" @click="search_command_handler" ></el-button>
+            </el-button-group>
+            <!-- 影响链接百分比的进度条 -->
+            <el-progress class="isolation" style="width: 99%;" :text-inside="true" :stroke-width="progress_size" :format="format"  :percentage="effect_connect_percent"></el-progress>
         </el-col>
     </el-row>
-    <el-row>
-        <el-col>
+    <el-row type="flex" >
+        <el-col :span="24">
             <el-input 
             class="cli"
             v-model="command" :clearable="true" placeholder="请输入命令"
@@ -22,27 +32,7 @@
             <template slot="prepend">CLI</template>
             </el-input><br>
         </el-col>
-    </el-row>
-    <el-row type="flex" justify="space-between">
-        <el-col :span="8">
-            <el-button-group style="margin: 1vh;margin-top: 0;" >
-                <el-button style=" width: 12vh;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-back" size="mini"  @click="goBack">返回</el-button>
-                <el-button style="width: 8vh;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-setting" size="mini" @click="setting_dialog_able=true"></el-button>
-            </el-button-group>
-        </el-col>
-        <el-col :span="9">
-        </el-col>
-        <el-col :span="8" >
-            <el-button-group>
-            <el-button style=" width: 19vh;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-arrow-left" size="mini" @click="rollback_command" >上一条命令</el-button>
-            <el-button  style=" width: 19vh;height: 4.5vh;font-size: 2vh;" type="primary" size="mini" @click="next_command">下一条命令<i class="el-icon-arrow-right el-icon--right"></i></el-button>
-            <el-button style=" width: 8.5vh;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-document" size="mini" @click="export_textarea"></el-button>
-            <el-button style=" width: 8vh;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-search" size="mini" @click="search_command_handler" ></el-button>
-            </el-button-group>
-            <!-- 影响链接百分比的进度条 -->
-            <el-progress class="isolation" style="width: 54vh;" :text-inside="true" :stroke-width="progress_size" :format="format"  :percentage="effect_connect_percent"></el-progress>
-        </el-col>
-    </el-row>      
+    </el-row>     
     <!-- 文字按钮 -->
     <el-dialog  title="设置参数" :visible.sync="setting_dialog_able" width="100vh">
         <div style="height: 10vh;">
@@ -162,13 +152,13 @@
     </el-dialog>
    
     <!-- 加载动画loading_able -->
-    <div  class="el_main-loading_div" element-loading-text="等待响应中...." v-loading="loading_able"></div> 
-    <!-- 输出选择列表框 -->
+    <div  element-loading-text="等待响应中...." v-loading="loading_able"></div> 
+   
     <el-row type="flex" >
-        <el-col >
+        <el-col :span="16">
              <!--输出框  -->
             <el-input
-            style="margin-left: 1vh;width: 62vw;font-size: 2.5vh;"
+            style="width: 100%;font-size: 2.5vh;"
             type="textarea"
             :rows="30"
             v-model="textarea"
@@ -177,10 +167,11 @@
             >
             </el-input>
         </el-col>
-        <el-col>
-            <ul   class="el_main-ul" style="padding-left: 2vh;">
+        <el-col :span="8">
+             <!-- 输出选择列表框 -->
+            <ul   class="el_main-ul" >
                 <el-checkbox-group v-model="check_list" >
-                    <li v-for="item,index in response_data_list" :key="index" class="el_main-ul-li">
+                    <li style="margin-left: 1vh;" v-for="item,index in response_data_list" :key="index" class="el_main-ul-li">
                         <el-checkbox  :style="check_cls_obj" :checked="true"  :label="item.type+item.ip+':'+item.port"  >   
                         {{ item.type }} {{item.ip}} {{ item.port }}
                         </el-checkbox>
@@ -189,7 +180,11 @@
             </ul>
         </el-col>
     </el-row>
-    
+    <el-row type="flex">
+        <el-col :span=24>
+            <div style="position: relative;top:-1vh; width: 100%;height: 1vh;background-color:#272822;" ></div>
+        </el-col>
+    </el-row>
     </div>
 </template>
 
@@ -446,9 +441,9 @@ export default {
         },
         base_title(){
             if(this.choose_mixunit.length===0 ){
-                return [{type:'',label:this.choose_project[0].slice(0,42)}]
+                return [{type:'primary',label:this.choose_project[0].slice(0,42)}]
             }else{
-                return [{type:'',label:this.choose_project[0].slice(0,42)},
+                return [{type:'primary',label:this.choose_project[0].slice(0,42)},
                         {type:'success',label:this.choose_mixunit[3]},
                         {type:'danger',label:`${this.choose_mixunit[4]}://${this.choose_mixunit[9]}:${this.choose_mixunit[5]}`}
                     ]
@@ -663,54 +658,63 @@ export default {
 }
 
     .tag:nth-child(1){
-        height: 4vh;
-        border-radius: 0.4vh;
+        height: 4.5vh;
+        border-radius: 0.5vh 0 0 0.5vh;
         font-size: 2vh;
         line-height: 4vh;
         text-align: center;
-        margin-top: 1vh;
-        margin-left: 1vh;
+        // margin-top: 1vh;
+        // margin-left: 1vh;
+    }
+     .tag:nth-child(3){
+        height: 4.5vh;
+        border-radius: 0 0.5vh 0.5vh 0;
+        font-size: 2vh;
+        line-height: 4vh;
+        text-align: center;
+        // margin-top: 1vh;
+        // margin-left: 1vh;
     }
     .tag{
-        height: 4vh;
-        border-radius: 0.4vh;
+        height: 4.5vh;
+        border-radius: 0;
         font-size: 2vh;
         line-height: 4vh;
         text-align: center;
-        margin-top: 1vh;
+      
     }
     
     .cli{
-        margin: 1vh;
+        // margin: 1vh;
     }
     .cli ::v-deep .el-input__inner {
         -webkit-appearance: none;
-        background-color: #FFF;
+        background-color: #272822;
         background-image: none;
-        border-radius: 0 1vh 1vh 0;
-        border: 0.2vh solid #DCDFE6;
+        border-radius: 0;
+        border: 0.2vh solid #272822;
         box-sizing: border-box;
-        color: #606266;
+        color: #ffffff;
         display: inline-block;
         outline: 0;
         padding: 0 3vh;
         transition: border-color .2s cubic-bezier(.645,.045,.355,1);
         height: 7vh;
-        width: 82vw;
+        width: 100%;
         font-size: 4vh; 
         font-weight: 400;
     } 
     .cli ::v-deep  .el-input-group__prepend{
-        background-color: #F5F7FA;
+        background-color: #272822;
         color: #909399;
         vertical-align: middle;
         display: table-cell;
         position: relative;
-        border: 0.2vh solid #DCDFE6 ;
+        border: 0.2vh solid #272822;
         border-right: 0;
-        border-radius:1vh 0 0 1vh;
-        padding: 0 3vh;
-        width: 10vh;
+        border-radius: 0;
+       
+        width: 5%;
         white-space: nowrap;
         font-size: 3vh;
         text-align: center;
@@ -747,7 +751,7 @@ export default {
     .el_main--el_input{
         font-size: larger;
         box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
-        margin-top: 0.2vh;
+
     }
 
     ::v-deep .el-textarea__inner {
@@ -759,10 +763,11 @@ export default {
         width: 100%;
         font-size: inherit;
         font-weight: 900;
-        color: #F8F8F2;
+        color: #ffffff;
         background-color: #272822;
         background-image: none;
-        border: 1px solid #DCDFE6;
+        border: 1px solid #272822;
+        border-radius: 0;
         transition: border-color .2s cubic-bezier(.645,.045,.355,1);
     }
 
@@ -777,9 +782,8 @@ export default {
     border-color: #272822;
     }
     .el_main-ul{
-        margin-top: 0.2vh;
-        margin-left: 0.5vh;
-        width:52vh;
+       border-bottom:0.3vh solid #272822;
+        width:100%;
         height: 75vh;
         overflow-y:scroll;
         background-color: #272822;
@@ -791,19 +795,25 @@ export default {
 
     }
     // 进度加载圈
-    .el_main-loading_div{
-        
-        width:40vw;
-    }
-    .el_main-loading_div ::v-deep .el-loading-spinner {
+   ::v-deep .el-loading-spinner {
     top: 50%;
-    margin-top: 32vh;
-    margin-left: 22vh;
-    width: 40vw;
+    margin-top: 25vh;
+    margin-left: -28vh;
+    width: 100%;
     text-align: center;
     position: absolute;
     }
-    // 
+   ::v-deep  .el-loading-spinner .el-loading-text {
+    color: #ffffff;
+    margin: 0.5vh 0;
+    font-size: 2vh;
+    }
+   ::v-deep .el-loading-spinner .circular {
+    height: 10vh;
+    width: 10vh;
+    animation: loading-rotate 2s linear infinite;
+    }
+    // /////////////////////////////////////
     .el_main-el_button_group{
         position: absolute;
         top: 136px;
