@@ -18,8 +18,8 @@
             </el-col>
         </el-row>
         <el-row v-if="mixunit_view_able">
-            <el-col>     
-                <ul>
+            <el-col :span="24">     
+                <ul style="margin-top: 1vh;">
                     <li v-for="(mixunit,i) in mixunit_list" :key="i"> 
                         <el-card class="head_card">
                             <el-badge :value="0" :max="99" class="success" type="primary">

@@ -357,4 +357,86 @@ export default{
     box-sizing: border-box;
     cursor: pointer;
 }
+
+/* 密码框眼睛 */
+::v-deep .el-input .el-input__clear {
+    color: #C0C4CC;
+    font-size: 2.2vh;
+    margin-top: -0.8vh;
+    cursor: pointer;
+    transition: color .2s cubic-bezier(.645,.045,.355,1);
+    }
+
+@media (min-width:1100px) { 
+   
+}
+      
+
+@media (min-width:1200px) { 
+          /* 密码框眼睛 */
+        ::v-deep .el-input .el-input__clear {
+        color: #C0C4CC;
+        font-size: 2.2vh;
+        margin-top: -0.02vh;
+        cursor: pointer;
+        transition: color .2s cubic-bezier(.645,.045,.355,1);
+        }
+}
+@media (min-width:1400px) { 
+       /* 密码框眼睛 */
+       ::v-deep .el-input .el-input__clear {
+        color: #C0C4CC;
+        cursor: pointer;
+        font-size: 2.2vh;
+        margin-top: -0.1vh;
+        transition: color .2s cubic-bezier(.645,.045,.355,1);
+        }
+}
+@media (min-width:1500px) { 
+ /* 密码框眼睛 */
+ ::v-deep .el-input .el-input__clear {
+        color: #C0C4CC;
+        cursor: pointer;
+        font-size: 2.2vh;
+        margin-right: 1vh;
+        margin-top: 0.3vh;
+        transition: color .2s cubic-bezier(.645,.045,.355,1);
+        }
+}
+@media (min-width:1700px) { 
+    /* 密码框眼睛 */
+    ::v-deep .el-input .el-input__clear {
+        color: #C0C4CC;
+        cursor: pointer;
+        font-size: 2.2vh;
+        margin-right: 1.5vh;
+        margin-top: 0.6vh;
+        transition: color .2s cubic-bezier(.645,.045,.355,1);
+        }
+}
+@media (min-width:2200px) { 
+      /* 密码框眼睛 */
+      ::v-deep .el-input .el-input__clear {
+        color: #C0C4CC;
+        cursor: pointer;
+        font-size: 2.2vh;
+        margin-right:1.8vh ;
+        margin-top:1.2vh;
+        transition: color .2s cubic-bezier(.645,.045,.355,1);
+        }
+}
+@media (min-width:3400px) { 
+      /* 密码框眼睛 */
+      ::v-deep .el-input .el-input__clear {
+        color: #C0C4CC;
+        cursor: pointer;
+        font-size: 2.2vh;
+        margin-right: 2.2vh;
+        margin-top: 1.8vh;
+        transition: color .2s cubic-bezier(.645,.045,.355,1);
+        }
+}
+@media (min-width:4500px) { 
+    
+}
 </style>

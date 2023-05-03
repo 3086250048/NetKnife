@@ -41,6 +41,7 @@ export const filestateAbout={
                     state.netknife_data.push(state.full_netknife_data[i])
                 }
             }
+            console.log(state.netknife)
         },
         ROLLBACK_NETKNIFE_DATA(state){
             state.netknife_data=state.full_netknife_data

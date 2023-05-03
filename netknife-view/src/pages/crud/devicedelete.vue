@@ -339,4 +339,79 @@ export default{
     
    
 }
+
+
+ /* 密码框眼睛 */
+ ::v-deep .el-input .el-input__clear {
+    color: #C0C4CC;
+    font-size: 3vh;
+    cursor: pointer;
+    transition: color .2s cubic-bezier(.645,.045,.355,1);
+    }
+
+@media (min-width:1100px) { 
+   
+}
+      
+
+@media (min-width:1200px) { 
+          /* 密码框眼睛 */
+        ::v-deep .el-input .el-input__clear {
+        color: #C0C4CC;
+        font-size: 3vh;
+        cursor: pointer;
+        margin-top: 0.1vh;
+        transition: color .2s cubic-bezier(.645,.045,.355,1);
+        }
+}
+@media (min-width:1400px) { 
+       /* 密码框眼睛 */
+       ::v-deep .el-input .el-input__clear {
+        color: #C0C4CC;
+        font-size: 3vh;
+        cursor: pointer;
+        margin-top: 0.2vh;
+        margin-right: 0.5vh;
+        transition: color .2s cubic-bezier(.645,.045,.355,1);
+        }
+}
+@media (min-width:1500px) { 
+
+}
+@media (min-width:1700px) { 
+    /* 密码框眼睛 */
+    ::v-deep .el-input .el-input__clear {
+        color: #C0C4CC;
+        font-size: 3vh;
+        cursor: pointer;
+        margin-top: 1vh;
+        margin-right: 1vh;
+        transition: color .2s cubic-bezier(.645,.045,.355,1);
+        }
+}
+@media (min-width:2200px) { 
+      /* 密码框眼睛 */
+      ::v-deep .el-input .el-input__clear {
+        color: #C0C4CC;
+        font-size: 3vh;
+        cursor: pointer;
+        margin-top: 2vh;
+        margin-right: 2vh;
+        transition: color .2s cubic-bezier(.645,.045,.355,1);
+        }
+}
+@media (min-width:3400px) { 
+      /* 密码框眼睛 */
+      ::v-deep .el-input .el-input__clear {
+        color: #C0C4CC;
+        font-size: 3vh;
+        cursor: pointer;
+        margin-top: 2.5vh;
+        margin-right: 2.5vh;
+        transition: color .2s cubic-bezier(.645,.045,.355,1);
+        }
+}
+@media (min-width:4500px) { 
+    
+}
 </style>

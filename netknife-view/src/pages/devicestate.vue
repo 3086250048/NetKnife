@@ -15,8 +15,8 @@
         </el-col>
     </el-row>
     <el-row  v-if="project_view_able">
-        <el-col :span="22" :push="1">
-                <ul style="margin-top: 20px;" >
+        <el-col :span="24" >
+                <ul style="margin-top: 1vh;" >
                     <li  v-for="(project,i) in select_project_unit_list " :key="i" > 
                         <el-row style="display: flex;flex-direction: column;">
                             <el-col>
