@@ -130,8 +130,13 @@ def get_all_project_data():
 # 需要传入一个字典{'base_effect_range':'项目名称','command':'where 语句'}
 @netknife.route('/get_effect_data',methods=['POST'])
 def get_effect_data():
+    # 防止再CLI界面刷新时候报错
+    if 'base_effect_range' not in json.loads(request.get_data(as_text=True)):
+        return 'RELOAD_PAGE'
     result=ap.processing_effect_command(json.loads(request.get_data(as_text=True)))
     return result
+  
+       
 
 #获取批量执行命令的回显
 @netknife.route('/commit_command',methods=['POST'])
@@ -158,6 +163,7 @@ def change_filepath_parameter():
         return 'CHANGE_FAULT'
 @netknife.route('/get_filepath_parameter',methods=['POST'])
 def get_filepath_parameter():
+    if 'project' not in json.loads(request.get_data(as_text=True)):return 'RELOAD_PAGE'
     result=storage.get_filepath_parameter(json.loads(request.get_data(as_text=True)))
     if result:
         print(result)
@@ -193,7 +199,8 @@ def change_sendcommand_parameter():
 def get_sendcommand_parameter():
 
     print('get_sendcommand_parameter')  
-
+    print(json.loads(request.get_data(as_text=True)))
+    if 'project' not in json.loads(request.get_data(as_text=True)):return 'RELOAD_PAGE'
     result=storage.get_sendcommand_parameter(json.loads(request.get_data(as_text=True)))
     
     if result:
@@ -245,6 +252,11 @@ def get_command_history():
     return result
 @netknife.route('/get_command_history_count',methods=['POST'])
 def get_command_history_count():
+    print('get_command_history_count')
+    print(json.loads(request.get_data(as_text=True)))
+      # 防止再CLI界面刷新时候报错
+    if 'project' not in json.loads(request.get_data(as_text=True)):
+        return 'RELOAD_PAGE'
     result=storage.get_command_history_count(json.loads(request.get_data(as_text=True)))
     return result
 

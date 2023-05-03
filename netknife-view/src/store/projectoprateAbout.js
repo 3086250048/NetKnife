@@ -64,6 +64,9 @@ export const  projectoprateAbout={
                         'ip_expression':payload.choose_mixunit[9],
                         'mode':state.oprate_mode,
                     },response=>{
+                        // 刷新
+                        if(response.data==='RELOAD_PAGE') return
+                        // 正常
                         state.history_command_count=response.data
                     })
                 },reason=>{
@@ -91,6 +94,9 @@ export const  projectoprateAbout={
                     'command':command,
                     'mode':state.oprate_mode
                 },response=>{
+                    // 刷新页面
+                    if(response.data==='RELOAD_PAGE'){return}
+                    // 正常进入
                     state.effect_connect_percent=response.data['effect_connect_percent']
                 },reason=>{  
                 })
@@ -179,6 +185,9 @@ export const  projectoprateAbout={
                 'mode':state.oprate_mode,
             },response=>{
                 console.log(response.data)
+                // 刷新
+                if(response.data==='RELOAD_PAGE') return
+                // 正常
                 state.history_command_count=response.data
                
             })
@@ -313,6 +322,9 @@ export const  projectoprateAbout={
                         'ip_expression':state.choose_mixunit[9],
                         'mode':state.oprate_mode,
                     },response=>{
+                        // 刷新
+                        if(response.data==='RELOAD_PAGE') return
+                        // 正常
                         state.history_command_count=response.data    
                     })
                     

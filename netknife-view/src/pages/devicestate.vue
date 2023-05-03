@@ -1,11 +1,11 @@
 <template>
-    <div >
+    <div style="margin: 1vh;">
     <el-row type="flex" v-if="project_view_able" >
         <el-col :offset="5" :span="24"  >
             <el-autocomplete
             class="search_input"
             prefix-icon="el-icon-search"
-            style="width: 60%;margin-top: 20px;"
+            style="width: 70%;"
             v-model="input"
             :fetch-suggestions="querySearchAsync"
             :popper-append-to-body="false"
@@ -162,7 +162,7 @@ li{
 }
 
 .search_input ::v-deep .el-input__inner {
-        height: 5vh;
+        height: 6.6vh;
         font-size: 2vh;
         padding-left: 4vh;
        

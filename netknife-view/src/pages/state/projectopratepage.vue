@@ -3,13 +3,13 @@
     <el-row type="flex">
         <el-col :span="3">
             <el-button-group style=";width: 100%" >
-                <el-button style="width: 60%;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-back" size="mini"  @click="goBack">返回</el-button>
+                <el-button style="width: 60%;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-back" size="mini"  @click="goBack($event)">返回</el-button>
                 <el-button style="width: 40%;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-setting" size="mini" @click="setting_dialog_able=true"></el-button>
             </el-button-group>
         </el-col>
         <el-col :span="13">
             <el-button-group style=";width: 100%" >
-                <el-button v-for="title,i in base_title" :key="i" style=";height: 4.5vh;font-size: 2vh;" :type="title.type" size="mini"  @click="goBack"> {{ title.label }}</el-button>
+                <el-button v-for="title,i in base_title" :key="i" style=";height: 4.5vh;font-size: 2vh;" :type="title.type" size="mini"  @click="goBack($event,title.type)"> {{ title.label }}</el-button>
             </el-button-group>
         </el-col>
         <el-col  :span="8 "  >
@@ -19,10 +19,16 @@
             <el-button style=" width: 15%;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-document" size="mini" @click="export_textarea"></el-button>
             <el-button style=" width: 15%;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-search" size="mini" @click="search_command_handler" ></el-button>
             </el-button-group>
-            <!-- 影响链接百分比的进度条 -->
-            <el-progress class="isolation" style="width: 99%;" :text-inside="true" :stroke-width="progress_size" :format="format"  :percentage="effect_connect_percent"></el-progress>
         </el-col>
     </el-row>
+
+    <el-row type="flex">
+        <el-col :span="24">
+              <!-- 影响链接百分比的进度条 -->
+              <el-progress class="isolation" style="width: 99.8%;" :text-inside="true" :stroke-width="progress_size" :format="format"  :percentage="effect_connect_percent"></el-progress>
+        </el-col>
+    </el-row>
+
     <el-row type="flex" >
         <el-col :span="24">
             <el-input 
@@ -248,7 +254,32 @@ export default {
             SET_VM:'SET_VM'
         }),
         ...mapMutations('mixunitpageAbout',{SET_MIXUNIT_VIEW_ABLE:'SET_MIXUNIT_VIEW_ABLE'}),
-        goBack(){
+        ...mapMutations('projectoprateAbout',{SET_OPRATE_MODE:'SET_OPRATE_MODE'}),
+        goBack(event,title_type){
+            // 通过菜单界面跳转
+            if(!(title_type===undefined)){
+                if(title_type==='primary'){
+                    console.log('primary界面')
+                    this.SET_OPRATE_MODE('project')
+                    this.SET_PROJECT_VIEW_ABLE(true)
+                    this.$router.push({
+                    name:'state',
+                    })
+                    return
+                }else{
+                    console.log('mixunit界面')
+                    this.SET_PROJECT_VIEW_ABLE(false)
+                    this.SET_MIXUNIT_VIEW_ABLE(true)
+                    this.$router.push({
+                    name:'mixunit',
+                    params:{
+                        'project':this.choose_project[0]
+                    }
+                    })
+                    return
+                }
+            }
+            // 通过返回按钮跳转
             if(this.choose_mixunit.length>0){
                 this.SET_PROJECT_VIEW_ABLE(false)
                 this.SET_MIXUNIT_VIEW_ABLE(true)
@@ -441,8 +472,10 @@ export default {
         },
         base_title(){
             if(this.choose_mixunit.length===0 ){
+                if(this.choose_project[0]===undefined) return ['NULL']
                 return [{type:'primary',label:this.choose_project[0].slice(0,42)}]
             }else{
+                if(this.choose_project[0]===undefined) return ['NULL','NULL','NULL']
                 return [{type:'primary',label:this.choose_project[0].slice(0,42)},
                         {type:'success',label:this.choose_mixunit[3]},
                         {type:'danger',label:`${this.choose_mixunit[4]}://${this.choose_mixunit[9]}:${this.choose_mixunit[5]}`}
@@ -489,6 +522,10 @@ export default {
                     'mode':this.oprate_mode,
                     'area':this.choose_mixunit[3],
                 },response=>{
+                    console.log(response.data)
+                    // 刷新页面
+                    if (response.data==='RELOAD_PAGE') return
+                    //正常
                     if(response.data[0][0]=='False'){
                         this.send_parameter.device_title_able=false
                     }else{
@@ -501,7 +538,7 @@ export default {
                     }
                     this.send_parameter.read_timeout=response.data[0][2]
                     this.send_parameter.COMMAND_HISTORY_LIMIT=response.data[0][3]
-                },reason=>{})
+                })
             // }
             console.log(this.send_parameter)
         },
@@ -513,6 +550,9 @@ export default {
                     'mode':this.oprate_mode,
                     'area':this.choose_mixunit[3],
                 },response=>{
+                    // 刷新页面
+                    if (response.data==='RELOAD_PAGE') return
+                    // 正常
                     this.path_parameter.txt_export_path=response.data[0][0]
                     this.path_parameter.ftp_root_path=response.data[0][1]
                     this.path_parameter.ftp_upload_path=response.data[0][2]
@@ -541,18 +581,24 @@ export default {
             'area':this.choose_mixunit[3],
         },response=>{
             console.log(response.data)
+            // 刷新页面
+            if (response.data==='RELOAD_PAGE') return
+            // 正常
             this.path_parameter.txt_export_path=response.data[0][0]
             this.path_parameter.ftp_root_path=response.data[0][1]
             this.path_parameter.ftp_upload_path=response.data[0][2]
             this.path_parameter.ftp_download_path=response.data[0][3]
             send_post('/start_ftp_server',{'ftp_root_path':this.path_parameter.ftp_root_path})
-        },reason=>{})
+        })
         send_post('/get_sendcommand_parameter',{
             'project':this.choose_project[0],
             // 'area':'None'
             'mode':this.oprate_mode,
             'area':this.choose_mixunit[3],
         },response=>{
+            console.log(response.data)
+            // 刷新页面
+            if (response.data==='RELOAD_PAGE') return
             if(response.data[0][0]=='False'){
                 this.send_parameter.device_title_able=false
             }else{
@@ -570,6 +616,7 @@ export default {
         const _this = this;
         window.onresize = ()=>{
             return (() => {
+           
             _this.progress_size =document.documentElement.clientHeight/150;
             _this.check_cls_obj.zoom=document.documentElement.clientHeight/600;
             })();
@@ -578,6 +625,8 @@ export default {
 
 }
 </script>
+
+
 
 <style lang="scss" scoped>
 
@@ -987,3 +1036,6 @@ export default {
     }
     
 </style>
+
+
+
