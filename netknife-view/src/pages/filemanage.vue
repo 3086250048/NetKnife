@@ -1,20 +1,23 @@
 <template>
-    <div>
-        <el-main style="margin-left: -30px;margin-top: -40px;">
-            <el-tabs v-model="activename" type="card" closable @tab-remove="remove" @tab-click="record_index" >
+    <div style="margin: 1vh;">
+      <el-row type="flex">
+        <el-col :span="24">
+          <el-tabs class="size-icon" style="width: 100%;" v-model="activename" type="card" closable @tab-remove="remove" @tab-click="record_index" >
               <el-tab-pane
-                style="width: 958px;;"
+                style="width: 100%;"
                 v-for="(item, index) in tabs"
                 :key='item.name'
                 :label="item.title"
                 :name="item.name" 
               >
-              <div style="margin-top: 15px;margin-left: 6px;" >
-                  <Filecreate :title="item.title" :name="item.name" :code="item.code"  :del_able="item.title==='空窗口'"></Filecreate>
-              </div>
+              <Filecreate :title="item.title" :name="item.name" :code="item.code"  :del_able="item.title==='空窗口'"></Filecreate>
               </el-tab-pane>
+               
+            
             </el-tabs>
-        </el-main>
+        </el-col>
+      </el-row>
+            
         <el-drawer
           title="执行结果"
           :visible.sync="pop_able"
@@ -344,6 +347,13 @@ export default{
       this.$bus.$on('clear_excute_response_data',()=>{
         this.SET_EXCUTE_RESPONSE_DATA([])
       })
+      // window.onresize = ()=>{
+      //       return (() => {
+      //       let _this=this
+      //       alert(1)
+      //       _this.auto_size = `${document.documentElement.clientHeight}`;
+      //       })();
+      //   };
   },
   beforeDestroy(){
       this.$bus.$off('add')
@@ -357,7 +367,64 @@ export default{
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+// tabs标签页头
+::v-deep .el-tabs__header {
+    padding: 0.1vh 1vh;
+    position: relative;
+    margin: 0 0 0 0;
+}
+//标签体
+::v-deep .el-tabs__item {
+    text-align: center;
+   
+    height: 5vh;
+    box-sizing: border-box;
+    line-height: 5vh;
+    display: inline-block;
+    list-style: none;
+    font-size: 2vh;
+    font-weight: 600;
+    color: #303133;
+    position: relative;
+}
+::v-deep .el-tabs__item.is-active {
+    color: #409EFF;
+}
+::v-deep .el-tabs__item:hover {
+    color: #409EFF;
+}
+::v-deep .el-tabs--card>.el-tabs__header .el-tabs__item.is-closable:hover {
+    padding-left: 4vh;
+    padding-right: 4vh;
+    
+}
+::v-deep .el-tabs--card>.el-tabs__header .el-tabs__item .el-icon-close {
+    position: relative;
+    font-size: 2vh;
+    width: 0;
+    height: 14px;
+    vertical-align: middle;
+    line-height: 15px;
+    overflow: hidden;
+    top: -1px;
+    left: -2px;
+    transform-origin: 100% 50%;
+}
+
+::v-deep .el-tabs--card>.el-tabs__header .el-tabs__item.is-active.is-closable{
+
+  height: 5vh;
+  line-height: 5vh;
+}
+
+::v-deep .el-tabs--card>.el-tabs__header .el-tabs__item.is-closable:hover .el-icon-close{
+  width: 2vh;
+  height: 2vh;
+  line-height: 2vh;
+}
+
+// 
    .el_main--el_input{
       float: left;
       margin-left: 20px;

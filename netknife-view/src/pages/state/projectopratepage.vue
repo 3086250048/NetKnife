@@ -762,10 +762,9 @@ export default {
         border: 0.2vh solid #272822;
         border-right: 0;
         border-radius: 0;
-       
-        width: 5%;
+        padding-left: 5VH;
         white-space: nowrap;
-        font-size: 3vh;
+        font-size: 4vh;
         text-align: center;
 
     }

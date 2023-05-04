@@ -20,26 +20,29 @@
                     <li  v-for="(project,i) in select_project_unit_list " :key="i" > 
                         <el-row style="display: flex;flex-direction: column;">
                             <el-col>
-                                <el-card style="height: 8vh;" >
-                                    <el-row type="flex" justify="start" >
-                                        <el-col :span="4" >
-                                            <el-tag class="screen_change" style="min-width: 100%;height:5vh; text-align: center;font-size: 2vh;line-height: 5vh;">
+                                <el-card style="height: 6vh;"  class="head_card">
+                                    <el-row type="flex" justify="end" >
+                                        <el-col :span="4" :pull="9">
+                                            <el-tag class="screen_change" style="min-width: 100%;height:6vh; text-align: center;font-size: 2vh;line-height: 6vh;font-weight: 900;">
                                                 {{  project[0].length>39 ? project[0].slice(0,30)+'...':project[0] }}
                                             </el-tag>
                                         </el-col>
-                                        <el-col  :span="3" :offset="10" :pull="2">
-                                            <el-badge class="bt_tag_change" style="width:100%" :value="101" :max="99"  type="primary" >
-                                                <el-button class="screen_change" style="width: 100%;height:5vh; text-align: center;font-size: 2vh;line-height: 2vh;">挂载文件</el-button>
-                                            </el-badge>
-                                        </el-col>
-                                        <el-col :span="4" :pull="1" >
-                                            <el-button class="screen_change" type="primary" style="width: 100%;height:5vh; text-align:center;font-size: 2vh;line-height: 2vh;"  @click="show_mix_unit_page(project[0]),set_choose_project(project)">
-                                                显示最小操作单元
-                                            </el-button>
+                                        <el-col :span="8">
+                                            <el-button-group style="width: 100%;">
+                                                <el-button style="height: 6vh;width: 33%;font-size: 2vh;font-weight: 600;">
+                                                    文件状态
+                                                </el-button>
+                                                <el-button style="height: 6vh;width: 33%;font-size: 2vh;font-weight: 600">
+                                                    挂载文件
+                                                </el-button>
+                                                <el-button style="height: 6vh;width: 34%;font-size: 2vh;;font-weight: 600" @click="show_mix_unit_page(project[0]),set_choose_project(project)">
+                                                    最小单元
+                                                </el-button>
+                                            </el-button-group>
                                         </el-col>
                                         <el-col :span="3">
-                                            <el-button class="screen_change" type="primary" style="width: 100%;height:5vh; text-align: center;font-size: 2vh;line-height: 2vh;"  @click="show_oprate_page(),set_choose_project(project)">
-                                            操作
+                                            <el-button type="text" style="width: 100%;height:6vh; text-align: center;font-size: 2vh;line-height: 2vh;font-weight: 600"  @click="show_oprate_page(),set_choose_project(project)">
+                                                CLI
                                             </el-button>
                                         </el-col>
                                     </el-row>
@@ -157,6 +160,11 @@ export default{
 </script>
 
 <style lang="scss" scoped>
+// 头部卡片
+.head_card ::v-deep .el-card__body{
+    padding: 0px;
+}
+// 
 li{
     list-style-type: none;
 }
@@ -209,39 +217,26 @@ li{
     box-sizing: border-box;
 }
 @media (min-width:600px) { 
-    .screen_change{
-        margin-top: -6px;
-    }
 } 
 @media (min-width:900px) { 
-    .screen_change{
-        margin-top: 0px;
-    }
+ 
 } 
 @media (min-width:1200px) { 
-    .screen_change{
-        margin-top: 5px;
-    }
+ 
     
  }
  
 
 @media (min-width:1500px) { 
-    .screen_change{
-        margin-top: 8px;
-    }
+  
 
  }
  @media (min-width:1800px) { 
-    .screen_change{
-        margin-top: 20px;
-    }
+  
 
  }
  @media (min-width:1900px) { 
-    .screen_change{
-        margin-top: 30px;
-    }
+  
     ::v-deep .el-badge__content {
     border-radius: 1vh;
     color: #FFF;
@@ -259,9 +254,7 @@ li{
 
  }
  @media (min-width:2500px) { 
-    .screen_change{
-        margin-top: 55px;
-    }
+  
     ::v-deep .el-badge__content {
     border-radius: 1vh;
     color: #FFF;

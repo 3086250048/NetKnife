@@ -463,11 +463,18 @@ def excute_netknife_file():
 
 @netknife.route('/get_netknife_code',methods=['POST'])
 def get_netknife_code():
+    print('GET_NETKNIFE_CODE')
+    print(json.loads(request.get_data(as_text=True))['file_name'])
     file_name=json.loads(request.get_data(as_text=True))['file_name']
     if file_name=='空窗口':
         return 'NOT_EXIST'
-    result=storage.get_database_data('CODE',['CODE'],{'FILE_NAME':file_name})[0][0]
-    return result
+    
+    result=storage.get_database_data('CODE',['CODE'],{'FILE_NAME':file_name})
+    
+    if result[0][0] != []:
+        return result[0][0]
+    else:
+        return 'CODE_NOT_EXIST'
    
 
 

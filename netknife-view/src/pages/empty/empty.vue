@@ -24,6 +24,7 @@ export default{
         const _this = this;
         window.onresize = ()=>{
             return (() => {
+            let _this=this
             _this.auto_size = `${document.documentElement.clientHeight}`;
             })();
         };

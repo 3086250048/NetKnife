@@ -1,27 +1,10 @@
 <template>
-  <div>
-    <el-button :type="save_bt_style" class="create" @click="save_file" icon="el-icon-folder-add" size="small">
-      保存
-    </el-button>
-    <el-button type="primary" class="delete" @click="delete_file" icon="el-icon-folder-delete" :disabled="del_able" size="small">
-      删除
-    </el-button>
-    <el-button type="primary" class="open" @click="open_file" icon="el-icon-folder-opened" size="small">
-      打开文件
-    </el-button>
-    <el-button type="primary" class="empty_add" @click="add_empty" icon="el-icon-view" size="small">
-      新窗口+
-    </el-button>
-    <el-button :type="excute_bt_style" class="excute" @click="excute_file" :icon="excute_icon" size="small">
-      运行
-    </el-button>
-    <el-button  type="info" class="excute" @click="show_excute_result" icon="el-icon-warning-outline" size="small">
-      执行结果
-    </el-button>
-    <codemirror
+  <div style="margin-left: 1vh;">
+ 
+    <el-row >
+      <el-col >
+        <codemirror
       id="codemirror"
-      style="margin-left:-15px;
-      margin-top: -15px;"  
       ref="myCm" 
       :value="code"
       :options="cmOptions"
@@ -29,6 +12,42 @@
       @input="change_text"
     >
     </codemirror>
+
+      </el-col>
+    </el-row>
+   
+
+  <el-row type="flex" justify="start">
+    <el-col :span="16">
+    <el-button-group style="width: 100%;" >
+      <el-button style="height: 5vh;width: 23%;font-size: 2vh;font-weight: 600;text-align: center;" :type="save_bt_style" class="create" @click="save_file" icon="el-icon-folder-add" size="small">
+      保存
+    </el-button>
+      <el-button style="height: 5vh;width: 23%;font-size: 2vh;font-weight: 600;text-align: center" type="primary" class="delete" @click="delete_file" icon="el-icon-folder-delete" :disabled="del_able" size="small">
+      删除
+    </el-button>
+      <el-button style="height: 5vh;width: 27%;font-size: 2vh;font-weight: 600;text-align: center" type="primary" class="open" @click="open_file" icon="el-icon-folder-opened" size="small">
+      打开文件
+    </el-button>
+    <el-button style="height: 5vh;width: 27%;font-size: 2vh;font-weight: 600;text-align: center" type="primary" class="empty_add" @click="add_empty" icon="el-icon-view" size="small">
+      新窗口+
+    </el-button>
+    </el-button-group>
+    </el-col>
+
+    <el-col :span="8">
+      <el-button-group style="width: 100%;">
+        <el-button style="height: 5vh;width: 50%;font-size: 2vh;font-weight: 600;text-align: center" :type="excute_bt_style" class="excute" @click="excute_file" :icon="excute_icon" size="small">
+          运行
+        </el-button>
+        <el-button style="height: 5vh;width: 50%;font-size: 2vh;font-weight: 600;text-align: center"  type="info" class="excute" @click="show_excute_result" icon="el-icon-warning-outline" size="small">
+          执行结果
+        </el-button>
+      </el-button-group>
+     
+    </el-col>
+  </el-row>
+    
   </div>
 </template>
 
@@ -188,39 +207,39 @@ export default{
 
 <style>
 .editor .CodeMirror {
-  height: 500px;
-  display: flex;
+  height: 80vh;
+  
 }
+</style>
+
+<style lang="scss" scoped>
+
+
+// 按钮
+::v-deep .el-button{
+  border-radius: 0;
+}
+
+//
+
 .create {
-  position: relative;
-  top:-10px;
-  left: -6px;
+
   
 }
 .delete{
-  position: relative;
-  top:-10px;
-  left: -6px;
+
 }
 .update{
-  position: relative;
-  top:-10px;
-  left: -6px;
+
 }
 .open{
-  position: relative;
-  top:-10px;
-  left: -6px;
+
 }
 .empty_add{
-  position: relative;
-  top:-10px;
-  left: -6px;
+ 
 }
 .excute{
-  position: relative;
-  top:-10px;
-  left: -6px;
+
   
 }
 

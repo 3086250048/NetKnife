@@ -22,18 +22,23 @@
                 <ul style="margin-top: 1vh;">
                     <li v-for="(mixunit,i) in mixunit_list" :key="i"> 
                         <el-card class="head_card">
-                            <el-badge :value="0" :max="99" class="success" type="primary">
-                                <el-button size="small">检测正常</el-button>
-                            </el-badge>
-                            <el-badge :value="0" :max="99" class="error" >
-                            <el-button size="small">检测异常</el-button>
-                            </el-badge>
-                            <el-badge :value="0" :max="99" class="warning" type="warning">
-                                <el-button size="small">检测失败</el-button>
-                            </el-badge>
-                            <el-button type="primary" class="head_button" @click="show_oprate_page(),set_choose_mixunit(mixunit)">操作</el-button>
+                            <el-row type="flex"  justify="end">
+                                <el-col :span="6">
+                                    <el-button-group style="width: 100%;" >
+                                        <el-button style="height: 6vh;width: 50%;font-size: 2vh;;font-weight: 600">
+                                            文件状态
+                                        </el-button>
+                                        <el-button style="height: 6vh;width: 50%;font-size: 2vh;;font-weight: 600">
+                                            挂载文件
+                                        </el-button>
+                                    </el-button-group>
+                                </el-col>
+                                <el-col :span="3">
+                                    <el-button type="text"   style="height: 6vh;width: 100%;font-size: 2vh;;font-weight: 600"  @click="show_oprate_page(),set_choose_mixunit(mixunit)">CLI</el-button>
+                                </el-col>
+                            </el-row>
                         </el-card>   
-                        <el-card class="body_card">
+                        <el-card class="body_card" style="height: 25vh;font-size: 2.3vh;">
                             <span>区域名称:{{ mixunit[3] }}</span><br>
                             <span>设备类型:{{ mixunit[2]}}</span><br>
                             <span>协议类型:{{ mixunit[4] }}</span><br> 
@@ -153,10 +158,14 @@ li:not(:first-child){
     margin-top: -14px;
     margin-left: 10px;
 }
+// 头部卡片
 .head_card{
-    height: 40px;
+    height:6vh;
 }
-
+.head_card ::v-deep .el-card__body{
+    padding: 0px;
+}
+// 
 
 //  搜索框 
 .search  ::v-deep .el-input__inner {
