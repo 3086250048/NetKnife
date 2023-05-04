@@ -29,13 +29,13 @@
                                         </el-col>
                                         <el-col :span="8">
                                             <el-button-group style="width: 100%;">
-                                                <el-button style="height: 6vh;width: 33%;font-size: 2vh;font-weight: 600;">
+                                                <el-button style="height: 6vh;width: 33%;font-size: 2vh;font-weight: 600;border-radius: 0">
                                                     文件状态
                                                 </el-button>
-                                                <el-button style="height: 6vh;width: 33%;font-size: 2vh;font-weight: 600">
+                                                <el-button style="height: 6vh;width: 33%;font-size: 2vh;font-weight: 600;border-radius: 0">
                                                     挂载文件
                                                 </el-button>
-                                                <el-button style="height: 6vh;width: 34%;font-size: 2vh;;font-weight: 600" @click="show_mix_unit_page(project[0]),set_choose_project(project)">
+                                                <el-button style="height: 6vh;width: 34%;font-size: 2vh;;font-weight: 600;border-radius: 0" @click="show_mix_unit_page(project[0]),set_choose_project(project)">
                                                     最小单元
                                                 </el-button>
                                             </el-button-group>

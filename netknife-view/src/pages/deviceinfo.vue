@@ -150,16 +150,22 @@ export default{
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
         span{
             text-align: center;
         }
         .auto{
             width: 100%;
-            height: 6vh;
+            height: 10vh;
+            font-weight: 600;
             text-align: center;
             font-size: 2vh;
             overflow: hidden;
-            line-height: 6vh;
+            line-height: 10vh;
+        }
+
+        ::v-deep .el-drawer__header{
+            padding: 2vh;
+            font-size: 3vh;
         }
 </style>

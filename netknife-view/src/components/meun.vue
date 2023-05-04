@@ -6,8 +6,8 @@
                     style="display: flex;flex-flow: row nowrap;justify-content: space-around;height: 8vh;"
                     :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
                     <div style="width: 10%;height: 8vh;font-size: 2vh;line-height: 8vh;text-align: center;">Netknife</div>
-                    <el-menu-item style="width: 45%;text-align: center;height: 8vh;font-size: 2vh;line-height: 8vh;" index="first">CONNECT</el-menu-item>
-                    <el-menu-item style="width: 45%;text-align: center;height: 8vh;font-size: 2vh;line-height: 8vh;" index="second">CONSOL</el-menu-item>
+                    <el-menu-item style="width: 45%;text-align: center;height: 8vh;font-size: 2vh;line-height: 8vh;font-weight: 600;" index="first">CONNECT</el-menu-item>
+                    <el-menu-item style="width: 45%;text-align: center;height: 8vh;font-size: 2vh;line-height: 8vh;font-weight:600;" index="second">CONSOL</el-menu-item>
                 </el-menu>
             </el-col>
         </el-row>    

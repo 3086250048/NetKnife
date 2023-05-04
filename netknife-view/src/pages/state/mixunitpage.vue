@@ -24,11 +24,11 @@
                         <el-card class="head_card">
                             <el-row type="flex"  justify="end">
                                 <el-col :span="6">
-                                    <el-button-group style="width: 100%;" >
-                                        <el-button style="height: 6vh;width: 50%;font-size: 2vh;;font-weight: 600">
+                                    <el-button-group style="width: 100%;border-radius: 0;" >
+                                        <el-button style="height: 6vh;width: 50%;font-size: 2vh;font-weight: 600;border-radius: 0">
                                             文件状态
                                         </el-button>
-                                        <el-button style="height: 6vh;width: 50%;font-size: 2vh;;font-weight: 600">
+                                        <el-button style="height: 6vh;width: 50%;font-size: 2vh;;font-weight: 600;border-radius: 0">
                                             挂载文件
                                         </el-button>
                                     </el-button-group>
