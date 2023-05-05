@@ -12,37 +12,79 @@
               >
               <Filecreate :title="item.title" :name="item.name" :code="item.code"  :del_able="item.title==='空窗口'"></Filecreate>
               </el-tab-pane>
-               
-            
             </el-tabs>
-        </el-col>
-      </el-row>
-            
-        <el-drawer
-          title="执行结果"
-          :visible.sync="pop_able"
-          direction="btt"
-          size="90%"
-          >
-          <el-input
-            type="textarea"
-            :rows="18"
-            v-model="excute_text"
-            resize="none"
-            class="el_main--el_input"
-            >
-            </el-input>
-            <ul class="el_main-ul">
-                <el-checkbox-group v-model="check_list" >
-                    <li  v-for="item,index in excute_response_data" :key="index" class="el_main-ul-li">
-                        <el-checkbox :checked="true" :label="item.fun_name+item.ip+item.port+item.type" class="el_main-ul-li-el_checkbox" :border="true">
-                          函数:{{item.fun_name}} IP:{{item.ip}} 设备类型:{{item.type}} 
-                        </el-checkbox>
-                    </li>
-                </el-checkbox-group>
-            </ul>
-        </el-drawer>
-      </div>
+          </el-col>
+        </el-row>
+      <!-- 执行结果 -->
+      <el-drawer
+        title="执行结果"
+        :visible.sync="pop_able"
+        direction="btt"
+        size="90%"
+        >
+        <el-row type="flex">
+            <el-col  :span="24"  >
+              <el-button-group style="width: 100%;">
+              <el-button style=" width: 20%;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-arrow-left" size="mini" @click="rollback_command" >上一条命令</el-button>
+              <el-button  style=" width: 20%;height: 4.5vh;font-size: 2vh;" type="primary" size="mini" @click="next_command">下一条命令<i class="el-icon-arrow-right el-icon--right"></i></el-button>
+              <el-button style=" width: 20%;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-document" size="mini" @click="export_textarea"></el-button>
+              <el-button style=" width: 20%;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-search" size="mini" @click="search_command_handler" ></el-button>
+              <el-button style="width: 20%;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-setting" size="mini" @click="setting_dialog_able=true"></el-button>
+              </el-button-group>
+            </el-col>
+        </el-row>
+        
+        <el-row type="flex" >
+          <el-col :span="16">
+                <!--输出框  -->
+              <el-input
+              style="width: 100%;font-size: 2.5vh;"
+              type="textarea"
+              :rows="32"
+              resize="none"
+              v-model="excute_text"
+              
+              class="el_main--el_input"
+              >
+              </el-input>
+          </el-col>
+          <el-col :span="8">
+                <!-- 输出选择列表框 -->
+              <ul   class="el_main-ul" >
+                  <el-checkbox-group v-model="check_list" >
+                      <li  v-for="item,index in excute_response_data" :key="index" >
+                          <el-checkbox  :checked="true" :label="item.fun_name+item.ip+item.port+item.type"  >
+                            函数:{{item.fun_name}} IP:{{item.ip}} 设备类型:{{item.type}} 
+                          </el-checkbox>
+                      </li>
+                  </el-checkbox-group>
+                    </ul>
+                  </el-col>
+            </el-row>
+            <el-row type="flex">
+          <el-col :span=24>
+              <div style="position: relative;top:-1vh; width: 100%;height: 1vh;background-color:#272822;" ></div>
+          </el-col>
+        </el-row>
+      </el-drawer>
+      <el-dialog  title="设置参数" :visible.sync="setting_dialog_able" width="100vh">
+          <el-form :model="setting_parameter">
+            <el-form-item label="TXT导出路径"  :label-width="'25vh'">
+                <el-input class="input_size"  placeholder="TXT文件导出路径" v-model="setting_parameter.txt_export_path">
+                    <template slot="prepend">PATH</template>
+                </el-input>
+            </el-form-item>
+          </el-form>
+          <el-row type="flex"  justify="center">
+            <el-col :span="4">
+                <el-button @click="setting_handler_cancel" class="bt"  >取 消</el-button>
+            </el-col>
+            <el-col :span="4">
+                <el-button type="primary" @click="setting_handler_commit" class="bt">确 定</el-button>
+            </el-col>
+        </el-row>
+    </el-dialog>
+    </div>
 </template>
 
 <script>
@@ -66,7 +108,20 @@ export default{
         storage_tabs:[],
         index_list:[],
         pop_able:false,
-        check_list:[]
+        check_list:[],
+        //保留让使用者可以自由调整输出框内的文字大小
+        // check_cls_obj:{
+        //         zoom:document.documentElement.clientHeight/600,
+        //     }
+        //自由调整执行结果输出框
+        setting_dialog_able:false,
+        search_command_history_able:false,
+        input:'',
+        response_title:'',
+        setting_parameter:{
+          txt_export_path:'',
+        }
+        
     }
   },
   methods:{
@@ -75,7 +130,12 @@ export default{
       HANDLER_RESPONSE_DATA:'HANDLER_RESPONSE_DATA',
       SET_EXCUTE_TEXT:'SET_EXCUTE_TEXT',
       SET_RESPONSE_DATE_TIME:'SET_RESPONSE_DATE_TIME',
-      SET_EXCUTE_RESPONSE_DATA:'SET_EXCUTE_RESPONSE_DATA'}),
+      SET_EXCUTE_RESPONSE_DATA:'SET_EXCUTE_RESPONSE_DATA',
+    // 弹出框
+      GET_ALL_COMMAND_TIME:'GET_ALL_COMMAND_TIME',
+      EXPORT_TEXTAREA:'EXPORT_TEXTAREA'
+    
+    }),
 
     record_index(tab){
       this.activename=tab.name
@@ -117,7 +177,69 @@ export default{
       this.pop_able=true
       this.SET_RESPONSE_DATE_TIME(get_time())
       this.HANDLER_RESPONSE_DATA(response_data)
-    }
+    },
+    search_command_handler(){
+            this.search_command_history_able=true
+            this.input=''
+            this.GET_ALL_COMMAND_TIME()
+        },
+    export_textarea(){
+        this.EXPORT_TEXTAREA({
+            'command':this.response_title,
+            'vm':this,
+            'txt_export_path':this.txt_export_path
+        })
+    },
+    next_command(){
+            if(this,this.command_index<=-1){
+                this.$message({
+                    showClose: true,
+                    message: '没有更多命令了',
+                    type: 'warning'
+                });
+                return
+            }
+            if(this.command_index<=0){
+                this.$message({
+                    showClose: true,
+                    message: '已经是最后一条命令了',
+                    type: 'warning'
+                });
+                return
+            }
+            this.check_list=[]
+            this.NEXT_COMMAND(this)
+            console.log(this.command_index)
+        },
+    rollback_command(){
+        if(this.command_index>=this.history_command_count-1){
+            this.$message({
+                showClose: true,
+                message: '已经是最早的一条命令了',
+                type: 'warning'
+            });
+            return
+        }
+        this.check_list=[]
+        this.ROLLBACK_COMMAND()
+        console.log(this.command_index)
+    },
+    setting_handler_cancel(){
+            this.setting_dialog_able=false
+        },
+    setting_handler_commit(){ 
+          send_post('/change_netknife_parameter',{
+              'where':{
+                  'file_name':this.title,
+              },
+              'update':{
+                  'txt_export_path': this.setting_parameter.txt_export_path,
+              }
+          },response=>{
+              console.log(response.data)
+              this.setting_dialog_able=false
+          })
+        }
   }, 
   watch:{
     check_list(new_value){
@@ -338,8 +460,9 @@ export default{
             this.handler_response_data(response.data)
         })
       })
-      this.$bus.$on('show_excute_result',()=>{
+      this.$bus.$on('show_excute_result',(file_name)=>{
         this.pop_able=true
+        this.response_title=file_name
       })
       this.$bus.$on('clear_check_list',()=>{
         this.check_list=[]
@@ -347,11 +470,18 @@ export default{
       this.$bus.$on('clear_excute_response_data',()=>{
         this.SET_EXCUTE_RESPONSE_DATA([])
       })
-      // window.onresize = ()=>{
+
+
+      send_post('/get_netknife_parameter',{
+            'file_name':this.response_title,
+        },response=>{
+          this.setting_parameter=response.data
+        })
+      //保留让使用者可以自由调整输出框内的文字大小
+      // const _this = this;
+      //   window.onresize = ()=>{
       //       return (() => {
-      //       let _this=this
-      //       alert(1)
-      //       _this.auto_size = `${document.documentElement.clientHeight}`;
+      //       _this.check_cls_obj.zoom=document.documentElement.clientHeight/600;
       //       })();
       //   };
   },
@@ -373,6 +503,10 @@ export default{
     padding: 0.1vh 1vh;
     position: relative;
     margin: 0 0 0 0;
+}
+// 按钮
+::v-deep .el-button{
+  border-radius: 0;
 }
 //标签体
 ::v-deep .el-tabs__item {
@@ -425,27 +559,68 @@ export default{
 }
 
 // 
-   .el_main--el_input{
-      float: left;
-      margin-left: 20px;
-      font-size: larger;
-      width: 660px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);   
+
+// 执行结果弹出框
+::v-deep .el-drawer__header{
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+
+
+//
+ // 输出框
+ .el_main--el_input{
+        font-size: larger;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
+
+    }
+
+    ::v-deep .el-textarea__inner {
+        display: block;
+        resize: vertical;
+        padding: 0px 0px;
+        line-height: 1;
+        box-sizing: border-box;
+        width: 100%;
+        font-size: inherit;
+        font-weight: 900;
+        color: #ffffff;
+        background-color: #272822;
+        background-image: none;
+        border: 1px solid #272822;
+        border-radius: 0;
+        transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+    }
+
+    //
+     // 选择框
+     ::v-deep .el-checkbox__input.is-checked+.el-checkbox__label {
+    color: #ffffff;
+        }
+    ::v-deep .el-checkbox__input.is-checked .el-checkbox__inner, .el-checkbox__input.is-indeterminate .el-checkbox__inner {
+    background-color: #272822;
+    border-color: #272822;
     }
     .el_main-ul{
-        float: left;
-        margin-left: 10px;
-        margin-top: 3px;
-        width: 400px;
-        height: 430px;
+       border-bottom:0.3vh solid #272822;
+        width:100%;
+        height: 80vh;
         overflow-y:scroll;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
+        background-color: #272822;
+        box-shadow: 0 1vh 4vh rgba(0, 0, 0, .12), 0 0 1vh rgba(0, 0, 0, .04);
     }
-    .el_main-ul-li{
-        list-style: none;
-        margin-bottom: 3px;
-    }
-    .el_main-ul-li-el_checkbox{
-        width: 400px;
-    }
+    // ::v-deep .el-checkbox.is-bordered {
+
+    //     padding: 9px 20vh 9px 12vh;
+
+    // }
+    // //
+    // .el_main-ul-li{
+    //     list-style: none;
+    //     margin-bottom: 3px;
+    // }
+    // .el_main-ul-li-el_checkbox{
+    //     width: 400px;
+    // }
 </style>

@@ -9,7 +9,7 @@
         </el-col>
         <el-col :span="13">
             <el-button-group style=";width: 100%" >
-                <el-button v-for="title,i in base_title" :key="i" style=";height: 4.5vh;font-size: 2vh;" :type="title.type" size="mini"  @click="goBack($event,title.type)"> {{ title.label }}</el-button>
+                <el-button v-for="title,i in base_title" :key="i" style=";height: 4.5vh;font-size: 2vh;" :type="title.type" size="mini"  @click="goBack($event,title.type)"> {{ title.label.length>30?title.label.slice(0,30)+'...':title.label }}</el-button>
             </el-button-group>
         </el-col>
         <el-col  :span="8 "  >
@@ -177,7 +177,7 @@
              <!-- 输出选择列表框 -->
             <ul   class="el_main-ul" >
                 <el-checkbox-group v-model="check_list" >
-                    <li style="margin-left: 1vh;" v-for="item,index in response_data_list" :key="index" class="el_main-ul-li">
+                    <li style="margin-left: 1vh;" v-for="item,index in response_data_list" :key="index" >
                         <el-checkbox  :style="check_cls_obj" :checked="true"  :label="item.type+item.ip+':'+item.port"  >   
                         {{ item.type }} {{item.ip}} {{ item.port }}
                         </el-checkbox>

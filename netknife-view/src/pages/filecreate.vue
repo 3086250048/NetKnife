@@ -1,8 +1,8 @@
 <template>
   <div style="margin-left: 1vh;">
  
-    <el-row >
-      <el-col >
+    <el-row  type="flex">
+      <el-col  :span="24">
         <codemirror
       id="codemirror"
       ref="myCm" 
@@ -17,34 +17,28 @@
     </el-row>
    
 
-  <el-row type="flex" justify="start">
-    <el-col :span="16">
+  <el-row type="flex" justify="start" >
+    <el-col :span="24">
     <el-button-group style="width: 100%;" >
-      <el-button style="height: 5vh;width: 23%;font-size: 2vh;font-weight: 600;text-align: center;" :type="save_bt_style" class="create" @click="save_file" icon="el-icon-folder-add" size="small">
+      <el-button style="height: 5vh;width: 13%;font-size: 2vh;font-weight: 600;text-align: center;" :type="save_bt_style" class="create" @click="save_file" icon="el-icon-folder-add" size="small">
       保存
     </el-button>
-      <el-button style="height: 5vh;width: 23%;font-size: 2vh;font-weight: 600;text-align: center" type="primary" class="delete" @click="delete_file" icon="el-icon-folder-delete" :disabled="del_able" size="small">
+      <el-button style="height: 5vh;width: 13%;font-size: 2vh;font-weight: 600;text-align: center" type="primary" class="delete" @click="delete_file" icon="el-icon-folder-delete" :disabled="del_able" size="small">
       删除
     </el-button>
-      <el-button style="height: 5vh;width: 27%;font-size: 2vh;font-weight: 600;text-align: center" type="primary" class="open" @click="open_file" icon="el-icon-folder-opened" size="small">
+      <el-button style="height: 5vh;width: 15%;font-size: 2vh;font-weight: 600;text-align: center" type="primary" class="open" @click="open_file" icon="el-icon-folder-opened" size="small">
       打开文件
     </el-button>
-    <el-button style="height: 5vh;width: 27%;font-size: 2vh;font-weight: 600;text-align: center" type="primary" class="empty_add" @click="add_empty" icon="el-icon-view" size="small">
+    <el-button style="height: 5vh;width: 15%;font-size: 2vh;font-weight: 600;text-align: center" type="primary" class="empty_add" @click="add_empty" icon="el-icon-view" size="small">
       新窗口+
     </el-button>
-    </el-button-group>
-    </el-col>
-
-    <el-col :span="8">
-      <el-button-group style="width: 100%;">
-        <el-button style="height: 5vh;width: 50%;font-size: 2vh;font-weight: 600;text-align: center" :type="excute_bt_style" class="excute" @click="excute_file" :icon="excute_icon" size="small">
+    <el-button style="height: 5vh;width: 22%;font-size: 2vh;font-weight: 600;text-align: center" :type="excute_bt_style" class="excute" @click="excute_file" :icon="excute_icon" size="small">
           运行
         </el-button>
-        <el-button style="height: 5vh;width: 50%;font-size: 2vh;font-weight: 600;text-align: center"  type="info" class="excute" @click="show_excute_result" icon="el-icon-warning-outline" size="small">
+        <el-button style="height: 5vh;width: 22%;font-size: 2vh;font-weight: 600;text-align: center"  type="info" class="excute" @click="show_excute_result" icon="el-icon-warning-outline" size="small">
           执行结果
         </el-button>
-      </el-button-group>
-     
+    </el-button-group>
     </el-col>
   </el-row>
     
@@ -144,7 +138,7 @@ export default{
       
     },
     show_excute_result(){
-      this.$bus.$emit('show_excute_result')
+      this.$bus.$emit('show_excute_result',this.title)
     },
    
   },

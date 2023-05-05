@@ -18,20 +18,13 @@ export const filemanageAbout={
         },
         SET_EXCUTE_TEXT(state,check_list){
             state.excute_text=''
-            let flag=true
             state.excute_response_data.forEach(element=>{
                 check_list.forEach(e=>{
                     if(`${element.fun_name}${element.ip}${element.port}${element.type}`===e ){
-                        if(flag){
-                            state.excute_text+='===============================================================================\n'
-                            flag=false
-                        }else{
-                            state.excute_text+='\n===============================================================================\n'
-                        }
+                        
                         state.excute_text+=`设备类型:${element.type}  设备登录IP:${element.ip}  设备登录端口:${element.port}\n`
-                        state.excute_text+=`时间:${state.response_date_time} 函数名:${element.fun_name}`
-                        state.excute_text+='\n===============================================================================\n'
-                        state.excute_text+=element.response                   
+                        state.excute_text+=`时间:${state.response_date_time} 函数名:${element.fun_name}\n`
+                        state.excute_text+=element.response+'\n\n'                   
                     }
                 }) 
             });
