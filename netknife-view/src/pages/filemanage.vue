@@ -271,7 +271,7 @@ export default{
         this.EXPORT_TEXTAREA({
             'file_name':this.response_title,
             'vm':this,
-            'txt_export_path':this.txt_export_path
+            'txt_export_path':this.setting_parameter.txt_export_path
         })
     },
   //执行结果回退和前进按钮
@@ -336,6 +336,16 @@ export default{
                 this.ROLLBACK_EXCUTE_RESULT_LIST()
             }
     },
+    setting_dialog_able(new_value){
+            // if(new_value){
+                send_post('/get_netknife_parameter',{
+                  "file_name":this.response_title
+                },response=>{
+                    // 正常
+                    console.log(response.data)
+                    this.setting_parameter=response.data
+                })
+      }
   },
   computed:{
     excute_response_data(){

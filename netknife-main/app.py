@@ -282,14 +282,7 @@ def export_textarea():
     else:
         return 'EXPORT_FAULT'
     
-@netknife.route('/export_excute_result_textarea',methods=['POST'])
-def export_excute_result_textarea():
-    export_dict=json.loads(request.get_data(as_text=True))
-    result=ba.export_textarea(export_dict,'file_name','txt_export_path','excute_text')
-    if result:
-        return 'EXPORT_SUCCESS'
-    else:
-        return 'EXPORT_FAULT'
+
 
 @netknife.route('/get_all_command_time',methods=['POST'])
 def get_all_command_time():
@@ -488,14 +481,28 @@ def get_netknife_code():
         return 'CODE_NOT_EXIST'
 
 # 待添加netknife_parameter参数数据库
+@netknife.route('/get_netknife_parameter',methods=['POST'])
+def get_netknife_parameter():
+    file_name_dict=json.loads(request.get_data(as_text=True))
+    result=storage.get_database_data('NETKNIFE_PARAMETER',['TXT_EXPORT_PATH'],file_name_dict)
+    if result:
+        print(result)
+        return {'txt_export_path':result[0][0]}
+    else:
+        return 'GET_NETKNIFE_PARAMETER_FAULT'
+
 @netknife.route('/add_netknife_parameter',methods=['POST'])
 def add_netknife_parameter():
     file_name=json.loads(request.get_data(as_text=True))['file_name']
     desk_path=tools.get_desktop_path()
     _data_lis=[file_name,desk_path]
+    print('add_netknife_parameter')
+    print(_data_lis)
     result=storage.add_database_data('NETKNIFE_PARAMETER',['ID','FILE_NAME','TXT_EXPORT_PATH'],_data_lis)
     if result:
         return 'NETKNIFE_PARAMETER_ADD_SUCCESS'
+    else: 
+        return 'NETKNIFE_PARAMETER_ADD_FAULT'
 
 @netknife.route('/delete_netknife_parameter',methods=['POST'])
 def delete_netknife_parameter():
@@ -526,7 +533,14 @@ def delete_netknife_excute_result():
 # @netknife.route('/change_netknife_excute_result',methods=['POST'])
 # def change_netknife_excute_result():
 #     pass
-
+@netknife.route('/export_excute_result_textarea',methods=['POST'])
+def export_excute_result_textarea():
+    export_dict=json.loads(request.get_data(as_text=True))
+    result=ba.export_textarea(export_dict,'file_name','txt_export_path','excute_text')
+    if result:
+        return 'EXPORT_SUCCESS'
+    else:
+        return 'EXPORT_FAULT'
 
 if __name__ == '__main__':
     netknife.run('0.0.0.0',port=3000,debug=True)    

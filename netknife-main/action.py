@@ -1,4 +1,4 @@
-import re
+import re,os
 class AppAction():
     def __new__(cls,*args, **kwds):
         if not hasattr(cls,'_instance'):
@@ -24,10 +24,13 @@ class ButtonAction():
             print(export_dict)
             file_name_list=re.split('[<>/\|:*? ]',export_dict[file_name_key]) 
             file_name_str='_'.join(file_name_list)
-            full_file_path=export_dict[export_path_key]+file_name_str+'.txt'
+            print(file_name_str)
+            print(export_dict[export_path_key])
+            full_file_path=os.path.join(export_dict[export_path_key],file_name_str+'.txt')
             print(full_file_path)
             with open(full_file_path, "w") as file:
                 file.write(export_dict[export_data_key])
             return True
-        except:
+        except Exception as e:
+            # print(e)
             return False

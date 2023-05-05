@@ -171,7 +171,7 @@ class AppStorage():
                 ID             TEXT PRIMARY KEY NOT NULL,
                 FILE_NAME      TEXT     NOT NULL,
                 EXCUTE_RESULT   TEXT    NOT NULL,
-                DATE_TIME       TEXT    NOT NULL,
+                DATE_TIME       TEXT    NOT NULL
                 );'''
                 )
                 print('EXCUTE_RESULT')
