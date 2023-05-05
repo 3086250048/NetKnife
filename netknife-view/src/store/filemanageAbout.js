@@ -15,6 +15,7 @@ export const filemanageAbout={
                 state.excute_response_data.push(response_data[i])
             }
             console.log(state.excute_response_data)
+            send_post('/add_netknife_excute_result',{'file_name':state.title,'excute_result':state.excute_response_data,'date_time':state.response_date_time})
         },
         SET_EXCUTE_TEXT(state,check_list){
             state.excute_text=''
@@ -34,12 +35,50 @@ export const filemanageAbout={
         },
         SET_EXCUTE_RESPONSE_DATA(state,data){
             state.excute_response_data=data
+        },
+    // 导出按钮
+    EXPORT_TEXTAREA(state,payload){
+        if(payload.file_name.length<=0){
+            payload.vm.$message({
+                showClose: true,
+                message: '导出失败。',
+                type: 'error'
+            });
+            return
         }
+        send_post('/export_excute_result_textarea',{
+            'excute_text':state.excute_text,
+            'file_name':payload.file_name,
+            'txt_export_path':payload.txt_export_path
+        },response=>{
+            if(response.data==='EXPORT_SUCCESS'){
+                payload.vm.$message({
+                    showClose: true,
+                    message: '导出成功',
+                    type: 'success'
+                });
+            }else{
+                payload.vm.$message({
+                    showClose: true,
+                    message: '导出失败',
+                    type: 'error'
+                });
+            }
+        })
+    },
+
+
     },
     state:{
         title:'',
         excute_response_data:[],
         excute_text:'',
-        response_date_time:''
+        response_date_time:'',
+        code_index:-1,
+        history_code:'',
+        history_code_count:0,
+        all_excute_result_search_list:[],
+        all_excute_result_list:[],
+        full_excute_result_list:[]
     }
 }

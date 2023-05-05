@@ -101,7 +101,7 @@ export default{
     delete_file(){
       this.SET_VM(this)
       const code = this.codemirror.getValue();
-      this.delete_netknife_file({code:code,name:this.name})
+      this.delete_netknife_file({code:code,name:this.name,title:this.title})
     },
     add_empty(){
       this.SET_VM(this)

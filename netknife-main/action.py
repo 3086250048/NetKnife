@@ -19,15 +19,15 @@ class ButtonAction():
             cls._instance=super().__new__(cls,*args,**kwds)
         return cls._instance   
     
-    def export_textarea(self,export_dict):
+    def export_textarea(self,export_dict,file_name_key,export_path_key,export_data_key):
         try:
             print(export_dict)
-            file_name_list=re.split('[<>/\|:*? ]',export_dict['command']) 
+            file_name_list=re.split('[<>/\|:*? ]',export_dict[file_name_key]) 
             file_name_str='_'.join(file_name_list)
-            full_file_path=export_dict['txt_export_path']+file_name_str+'.txt'
+            full_file_path=export_dict[export_path_key]+file_name_str+'.txt'
             print(full_file_path)
             with open(full_file_path, "w") as file:
-                file.write(export_dict['textarea'])
+                file.write(export_dict[export_data_key])
             return True
         except:
             return False

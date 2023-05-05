@@ -666,6 +666,7 @@ export default {
     box-sizing: border-box;
 }
 // 
+// dialog框相关
 ::v-deep .el-form-item__label {
     text-align: center;
     vertical-align: middle;
@@ -693,6 +694,7 @@ export default {
     font-size: 1vh;
     word-break: break-all;
 }
+// 
 
  ::v-deep .el-dialog__headerbtn {
     position: absolute;

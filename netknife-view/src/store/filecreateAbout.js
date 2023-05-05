@@ -43,6 +43,7 @@ export const filecreateAbout={
                     });
                 }
                 if(response.data==='EXIST'){
+                    state.file_name=payload['title']
                     context.commit('DELETE_NETKNIFE_FILE',payload['name'])
                 }
                
@@ -72,7 +73,13 @@ export const filecreateAbout={
                       });
                     return
                 }
-                state.file_name=response.data           
+                // 添加成功后的动作
+                state.file_name=response.data  
+                send_post('/add_netknife_parameter',{
+                    file_name:state.file_name,
+                })
+
+       
                 state.vm.$bus.$emit('change_title',state.file_name+'')
                 state.vm.$bus.$emit('change_code',state.vm.name,state.code)
                 if(!state.vm.excute_flag){
@@ -114,6 +121,7 @@ export const filecreateAbout={
                             message: '删除成功',
                             type: 'success'
                           });
+                        send_post('/delete_netknife_parameter',{file_name:state.file_name})
                         state.vm.$bus.$emit('change_title','空窗口')
                         state.vm.$bus.$emit('change_code',name,`name:\npriority:\n\nconfig:{\n\n  send:{\n  read_timeout:10.0\n   }\n\n}\n\ntranslation:{\n\n\n}\n\njinja2:{\n\n\n}\n\nexcute:{\n\n}\n\n`)
                         state.vm.storage_code=`NOT_EXIST`

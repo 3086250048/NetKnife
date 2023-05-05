@@ -67,6 +67,7 @@
           </el-col>
         </el-row>
       </el-drawer>
+      <!-- 设置按钮 -->
       <el-dialog  title="设置参数" :visible.sync="setting_dialog_able" width="100vh">
           <el-form :model="setting_parameter">
             <el-form-item label="TXT导出路径"  :label-width="'25vh'">
@@ -84,6 +85,39 @@
             </el-col>
         </el-row>
     </el-dialog>
+
+     <!-- 搜索历史命令 -->
+     <el-dialog  title="搜索历史命令" :visible.sync="search_command_history_able" width="120vh" >
+        <el-row>
+            <el-col :span="24">
+                <el-autocomplete
+                    class="search"
+                    style="width: 100%;height: 4vh;z-index: 1;"
+                    prefix-icon="el-icon-search"
+                    v-model="input"
+                    :popper-append-to-body="false"
+                    :fetch-suggestions="querySearchAsync"
+                    placeholder="输入命令或执行时间进行检索"
+                    @select="handleSelect"
+                    ></el-autocomplete>
+            </el-col>
+        </el-row>
+        <div style="height:66vh;overflow: scroll;">
+            <ul class="his_ul">
+                <li  v-for="(item,i) in all_command_time_list " :key="i" > 
+                    <el-card class="cmd_his_about" style="height: 10vh;width: 115vh;font-size: 2vh;" >
+                        <el-button-group style="float: right;margin-top: -20px;margin-right:-20px;" >
+                            <el-button style="width: 12vh;height: 4.5vh;font-size: 2vh;line-height: 1vh;" type="primary"  @click="show_history_command(item[0],item[1],i)" >查看</el-button>
+                            <el-button style="width: 12vh;height: 4.5vh;font-size: 2vh;line-height: 1vh;" type="primary"  @click="delete_history_command(item[0],item[1],item[2],i)">删除</el-button>
+                        </el-button-group>
+                        命令:{{ item[0] }}<br>
+                        执行时间:{{ item[1] }} <br>
+                    </el-card>
+                </li>
+            </ul>
+        </div>
+    </el-dialog>
+   
     </div>
 </template>
 
@@ -120,7 +154,10 @@ export default{
         response_title:'',
         setting_parameter:{
           txt_export_path:'',
-        }
+        },
+        excute_time:'',
+        search_command_history_able:false,
+     
         
     }
   },
@@ -131,10 +168,21 @@ export default{
       SET_EXCUTE_TEXT:'SET_EXCUTE_TEXT',
       SET_RESPONSE_DATE_TIME:'SET_RESPONSE_DATE_TIME',
       SET_EXCUTE_RESPONSE_DATA:'SET_EXCUTE_RESPONSE_DATA',
-    // 弹出框
+    //待实现函数
+      //导出文件按钮
+      EXPORT_TEXTAREA:'EXPORT_TEXTAREA',
+
+      // 历史命令按钮相关
       GET_ALL_COMMAND_TIME:'GET_ALL_COMMAND_TIME',
-      EXPORT_TEXTAREA:'EXPORT_TEXTAREA'
+      CHOOSE_CHANGE:'CHOOSE_CHANGE',
+      SHOW_HISTORY_COMMAND:'SHOW_HISTORY_COMMAND',
+      DELETE_HISTORY_COMMAND:'DELETE_HISTORY_COMMAND',
+      ROLLBACK_EXCUTE_RESULT_LIST:'ROLLBACK_EXCUTE_RESULT_LIST',
     
+      // 命令前进和后退按钮相关
+      NEXT_COMMAND:'NEXT_COMMAND',
+      ROLLBACK_COMMAND:'ROLLBACK_COMMAND',
+      SET_COMMAND_INDEX:'SET_COMMAND_INDEX'
     }),
 
     record_index(tab){
@@ -171,25 +219,62 @@ export default{
         }
        
     },
-    handler_response_data(response_data){
+    handler_response_data(response_data,file_name){
       this.$bus.$emit('change_excute_icon','el-icon-video-play')
       this.$bus.$emit('change_excute_style','primary')
       this.pop_able=true
       this.SET_RESPONSE_DATE_TIME(get_time())
+      this.SET_TITLE(file_name)
       this.HANDLER_RESPONSE_DATA(response_data)
     },
+
+    //搜索按钮相关函数
     search_command_handler(){
             this.search_command_history_able=true
             this.input=''
             this.GET_ALL_COMMAND_TIME()
         },
+        querySearchAsync(queryString, cb) {
+            let results=this.all_command_time_search_list
+            results = queryString ? results.filter(this.createStateFilter(queryString)) : results;
+            cb(results);
+        },
+        createStateFilter(queryString) {
+        return (item) => {
+          return item.value.toLowerCase().match(queryString.toLowerCase());
+        };
+        },
+        handleSelect(item) {
+            this.CHOOSE_CHANGE(item)
+        },
+        show_history_command(command,date_time,i){
+            this.check_list=[]
+            this.search_command_history_able=false
+            this.SHOW_HISTORY_COMMAND({
+                'command':command,
+                'date_time':date_time,
+                'index':i
+            })
+
+        },
+        delete_history_command(command,date_time,id,i){
+            this.check_list=[]
+            this.DELETE_HISTORY_COMMAND({
+                'command':command,
+                'date_time':date_time,
+                'id':id,
+                'index':i
+            })
+        },
+  //导出按钮
     export_textarea(){
         this.EXPORT_TEXTAREA({
-            'command':this.response_title,
+            'file_name':this.response_title,
             'vm':this,
             'txt_export_path':this.txt_export_path
         })
     },
+  //执行结果回退和前进按钮
     next_command(){
             if(this,this.command_index<=-1){
                 this.$message({
@@ -224,6 +309,7 @@ export default{
         this.ROLLBACK_COMMAND()
         console.log(this.command_index)
     },
+  // 设置按钮
     setting_handler_cancel(){
             this.setting_dialog_able=false
         },
@@ -245,6 +331,11 @@ export default{
     check_list(new_value){
       this.SET_EXCUTE_TEXT(new_value)
     },
+    input(new_value,old_value){
+            if(old_value!=='' && new_value===''){
+                this.ROLLBACK_EXCUTE_RESULT_LIST()
+            }
+    },
   },
   computed:{
     excute_response_data(){
@@ -252,7 +343,27 @@ export default{
     },
     excute_text(){
       return this.$store.state.filemanageAbout.excute_text
-    }
+    },
+    // 搜索按钮
+    code_index(){
+        return this.$store.state.filemanageAbout.code_index
+    },
+    history_code(){
+        return this.$store.state.filemanageAbout.history_code
+    },
+    history_code_count(){
+        return this.$store.state.filemanageAbout.history_code_count
+    },
+    all_excute_result_search_list(){
+        return this.$store.state.filemanageAbout.all_command_time_search_list
+    },
+    all_excute_result_list(){
+        return this.$store.state.filemanageAbout.all_command_time_list
+    },
+    // 
+  },
+  beforeDestroy(){
+    this.SET_COMMAND_INDEX(-1) 
   },
   mounted(){
      //将localStorage中的页面状态信息读入列表，用于被页面迭代创建
@@ -457,7 +568,7 @@ export default{
               this.$bus.$emit('change_excute_style','primary')
               return
             }
-            this.handler_response_data(response.data)
+            this.handler_response_data(response.data,file_name)
         })
       })
       this.$bus.$on('show_excute_result',(file_name)=>{
@@ -498,6 +609,77 @@ export default{
 </script>
 
 <style lang="scss" scoped>
+
+//历史命令搜索框
+.search ::v-deep .el-input__inner {
+        height: 5vh;
+        font-size: 2vh;
+        padding-left: 4vh;
+        border-radius: 0.8vh;
+       
+}
+.search ::v-deep .el-input__icon {
+        height: 100%;
+        width: 3vh;
+        font-size: 2vh;
+        line-height: 100%;
+        padding-top: 0.3vh;
+        
+      
+}
+ ::v-deep .el-autocomplete-suggestion li{
+    padding: 0 1vh;
+    margin: 0;
+    line-height: 4vh;
+    cursor: pointer;
+    color: #606266;
+    font-size: 2vh;
+    list-style: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+   
+}
+::v-deep .el-autocomplete-suggestion__wrap {
+    max-height: 20vh;
+    padding: 1vh 0;
+    box-sizing: border-box;
+}
+// 
+
+
+// dialog框相关
+::v-deep .el-form-item__label {
+    text-align: center;
+    vertical-align: middle;
+    float: left;
+    font-size: 2vh;
+    color: #606266;
+    line-height: 4.3vh;
+    padding: 0 12px 0 0;
+    box-sizing: border-box;
+}
+ ::v-deep .el-dialog__title {
+    line-height: 2vh;
+    font-size:2vh;
+    color: #303133;
+    margin: 1vh;
+}
+
+  ::v-deep .el-dialog__header {
+    padding: 2vh 2vh 1vh;
+}
+
+  ::v-deep .el-dialog__body {
+    padding: 3vh 2.2vh;
+    color: #606266;
+    font-size: 1vh;
+    word-break: break-all;
+}
+// 
+
+
+
 // tabs标签页头
 ::v-deep .el-tabs__header {
     padding: 0.1vh 1vh;

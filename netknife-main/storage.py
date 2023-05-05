@@ -26,6 +26,8 @@ class AppStorage():
         self.__add_excute_sql='''INSERT INTO EXCUTE (FILE_NAME,CMD,PARAMETER,CONDITION) VALUES(?,?,?,?)'''
         self.__add_code_sql='''INSERT INTO CODE (ID,FILE_NAME,CODE) VALUES(?,?,?)'''
         self.__add_config_sql='''INSERT INTO CONFIG (ID,FILE_NAME,PARAMETER_CLASS,PARAMETER_KEY,PARAMETER_VALUE) VALUES(?,?,?,?,?)'''
+        self.__add_netknife_parameter_sql='''INSERT INTO NETKNIFE_PARAMETER (ID,FILE_NAME,TXT_EXPORT_PATH) VALUES(?,?,?)'''
+        self.__add_netknife_excute_result_sql='''INSERT INTO NETKNIFE_EXCUTE_RESULT (ID,FILE_NAME,EXCUTE_RESULT,DATE_TIME) VALUES(?,?,?,?)   '''
         #初始化创建数据库和表
         if not os.path.exists(self.__path):
             try:
@@ -155,6 +157,24 @@ class AppStorage():
                 );'''
                 )
                 print('CONFIG')
+                cur.execute(               
+                     '''CREATE TABLE NETKNIFE_PARAMETER (
+                ID             TEXT PRIMARY KEY NOT NULL,
+                FILE_NAME      TEXT     NOT NULL,
+                TXT_EXPORT_PATH TEXT   NOT NULL,
+                UNIQUE(FILE_NAME)
+                );'''
+                )
+                print('NETKNIFE_PARAMETER')
+                cur.execute(               
+                     '''CREATE TABLE NETKNIFE_EXCUTE_RESULT (
+                ID             TEXT PRIMARY KEY NOT NULL,
+                FILE_NAME      TEXT     NOT NULL,
+                EXCUTE_RESULT   TEXT    NOT NULL,
+                DATE_TIME       TEXT    NOT NULL,
+                );'''
+                )
+                print('EXCUTE_RESULT')
                 cur.execute(
                     '''CREATE TABLE SUID (FIRST_SUID   TEXT    PRIMARY KEY NOT NULL);'''
                 )
@@ -183,8 +203,12 @@ class AppStorage():
                 print('INSERT-10')
                 cur.execute(self.__add_config_sql,[suid]*5)
                 print('INSERT-11')
-                cur.execute(self.__add_suid_sql,[suid])
+                cur.execute(self.__add_netknife_parameter_sql,[suid]*3)
                 print('INSERT-12')
+                cur.execute(self.__add_netknife_excute_result_sql,[suid]*4)
+                print('INSERT-13')
+                cur.execute(self.__add_suid_sql,[suid])
+                print('INSERT-14')
                 con.commit()
             except sqlite3.Error as e:
                 print(e)
@@ -290,7 +314,32 @@ class AppStorage():
             return True
         else:
             return False
+    #向任意数据库中插入数据
+    def add_database_data(self,database_name,feild_list,data):
+        uid =str(uuid.uuid4())
+        suid=''.join(uid.split('-'))
+        if isinstance(data,dict):
+            value_list=list(data.values())
+        if isinstance(data,list):
+            value_list=data
         
+        value_list.insert(0,suid)
+        def callback(cur,con):
+            con.commit()
+            return True
+        sql=f"INSERT INTO {database_name} ({','.join(feild_list)}) VALUES({','.join(['?']*len(feild_list))})"   
+        return self.oprate_sql(sql,value_list,callback)
+
+    def update_database_data(self,database_name,update_where_dict,updata_data_dict):
+        def callback(cur,con):
+            con.commit()
+            return True
+        where_sql=AppStorage.dynamic_sql_return('','where','and',update_where_dict)
+        update_sql=AppStorage.dynamic_sql_return(f'update {database_name}','set',',',updata_data_dict)
+        sql=update_sql+where_sql
+        print(sql)
+        return self.oprate_sql(sql,{},callback)
+
     #向数据库中插入数据
     #返回:布尔值
     #传入:{'projet':'',area:'',protocol:'',port:'',ip_expression:'',username:'',password:'',secret:''} 

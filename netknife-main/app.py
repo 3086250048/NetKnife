@@ -14,7 +14,7 @@ from processing import StorageProcessing
 from processing import NetProcessing
 from server import APPserver
 from action import ButtonAction
-
+import tools
 
 data=AppInfo()
 storage=AppStorage()
@@ -275,11 +275,22 @@ def update_command_history_database():
 
 @netknife.route('/export_textarea',methods=['POST'])
 def export_textarea():
-    result=ba.export_textarea(json.loads(request.get_data(as_text=True)))
+    export_dict=json.loads(request.get_data(as_text=True))
+    result=ba.export_textarea(export_dict,'command','txt_export_path','textarea')
     if result:
         return 'EXPORT_SUCCESS'
     else:
         return 'EXPORT_FAULT'
+    
+@netknife.route('/export_excute_result_textarea',methods=['POST'])
+def export_excute_result_textarea():
+    export_dict=json.loads(request.get_data(as_text=True))
+    result=ba.export_textarea(export_dict,'file_name','txt_export_path','excute_text')
+    if result:
+        return 'EXPORT_SUCCESS'
+    else:
+        return 'EXPORT_FAULT'
+
 @netknife.route('/get_all_command_time',methods=['POST'])
 def get_all_command_time():
     where_dict=ap.processing_command_history_where_dict(json.loads(request.get_data(as_text=True)))
@@ -475,7 +486,46 @@ def get_netknife_code():
         return result[0][0]
     else:
         return 'CODE_NOT_EXIST'
-   
+
+# 待添加netknife_parameter参数数据库
+@netknife.route('/add_netknife_parameter',methods=['POST'])
+def add_netknife_parameter():
+    file_name=json.loads(request.get_data(as_text=True))['file_name']
+    desk_path=tools.get_desktop_path()
+    _data_lis=[file_name,desk_path]
+    result=storage.add_database_data('NETKNIFE_PARAMETER',['ID','FILE_NAME','TXT_EXPORT_PATH'],_data_lis)
+    if result:
+        return 'NETKNIFE_PARAMETER_ADD_SUCCESS'
+
+@netknife.route('/delete_netknife_parameter',methods=['POST'])
+def delete_netknife_parameter():
+    file_name=json.loads(request.get_data(as_text=True))['file_name']
+    result=storage.del_database_data('NETKNIFE_PARAMETER',{'FILE_NAME':file_name},'')
+    if result:
+        return 'NETKNIFE_PARAMETER_DELETE_SUCCESS'
+@netknife.route('/change_netknife_parameter',methods=['POST'])
+def change_netknife_parameter():
+    where_dict=json.loads(request.get_data(as_text=True))['where']
+    data_dict=json.loads(request.get_data(as_text=True))['update']
+    result=storage.update_database_data('NETKNIFE_PARAMETER',where_dict,data_dict)
+    if result:
+        return 'NETKNIFE_PARAMETER_CHANGE_SUCCESS'
+    
+#待添加netknife_excute_result数据库
+@netknife.route('/add_netknife_excute_result',methods=['POST'])
+def add_netknife_excute_result():
+    _data_dict=json.loads(request.get_data(as_text=True))
+    result=storage.add_database_data('NETKNIFE_EXCUTE_RESULT',['ID','FILE_NAME','EXCUTE_RESULT','DATE_TIME'],_data_dict)
+    if result:
+        return 'NETKNIFE_EXCUTE_RESULT_SUCCESS'
+@netknife.route('/delete_netknife_excute_result',methods=['POST'])
+def delete_netknife_excute_result():
+    pass
+# 待实现搜索界面的UI
+
+# @netknife.route('/change_netknife_excute_result',methods=['POST'])
+# def change_netknife_excute_result():
+#     pass
 
 
 if __name__ == '__main__':
