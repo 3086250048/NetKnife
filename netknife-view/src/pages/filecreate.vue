@@ -33,11 +33,11 @@
       新窗口+
     </el-button>
     <el-button :disabled="excute_able" style="height: 5vh;width: 22%;font-size: 2vh;font-weight: 600;text-align: center" :type="excute_bt_style" class="excute" @click="excute_file" :icon="excute_icon" size="small">
-          运行
-        </el-button>
-        <el-button style="height: 5vh;width: 22%;font-size: 2vh;font-weight: 600;text-align: center"  type="info" class="excute" @click="show_excute_result" icon="el-icon-warning-outline" size="small">
-          执行结果
-        </el-button>
+      运行
+    </el-button>
+    <el-button style="height: 5vh;width: 22%;font-size: 2vh;font-weight: 600;text-align: center"  type="info" class="excute" @click="show_excute_result" icon="el-icon-warning-outline" size="small">
+      执行结果
+    </el-button>
     </el-button-group>
     </el-col>
   </el-row>
@@ -129,7 +129,7 @@ export default{
       }
     },
     excute_file(){
-      this.excute_able=true
+   
       this.SET_VM(this)
       this.excute_flag=true
       const code=this.codemirror.getValue()
@@ -161,19 +161,31 @@ export default{
      
     },1)
     
-    this.$bus.$on('change_excute_icon',(icon)=>{
-      this.excute_icon=icon
+    this.$bus.$on('change_excute_icon',(icon,file_name)=>{
+      console.log(file_name)
+      console.log(this.title)
+      if(this.title+''===file_name+''){
+        this.excute_icon=icon
+      }
+   
     })
-    this.$bus.$on('change_excute_style',(style)=>{
-      this.excute_bt_style=style
+    this.$bus.$on('change_excute_style',(style,file_name)=>{
+      if(this.title+''===file_name+''){
+        this.excute_bt_style=style
+      }
+
     })
+    //防止连续点击执行按钮,导致数据库中同一时间对应多个表项导致删除时一次性删除多条表项
+    this.$bus.$on('change_excute_able',(bool,file_name)=>{
+      if(this.title+''===file_name+''){
+        this.excute_able=bool
+      }
+    })
+    //这个应该是在本文件改的，暂时保留
     this.$bus.$on('change_save_style',(style)=>{
       this.save_bt_style=style
     })
-    //防止连续点击执行按钮,导致数据库中同一时间对应多个表项导致删除时一次性删除多条表项
-    this.$bus.$on('change_excute_able',(bool)=>{
-      this.excute_able=bool
-    })
+    //
    console.log(`title是:${this.title}`)
     send_post('/get_netknife_code',{'file_name':this.title},response=>{
       this.storage_code=response.data
@@ -199,7 +211,9 @@ export default{
     console.log('Destory')
     this.$bus.$off('change_excute_icon')
     this.$bus.$off('change_excute_style')
+    // 这个应该是在文件改的
     this.$bus.$off('change_save_style')
+    //
     this.$bus.$off('change_excute_able')
   }
 };

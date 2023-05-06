@@ -523,11 +523,15 @@ def change_netknife_parameter():
 def get_netknife_excute_result():
     _data_dict=json.loads(request.get_data(as_text=True))   
     # 要返回到时间的结果（会来后继续）
-    result=storage.get_database_data('NETKNIFE_EXCUTE_RESULT',['EXCUTE_RESULT'],_data_dict)
+    result=storage.get_database_data('NETKNIFE_EXCUTE_RESULT',['EXCUTE_RESULT','DATE_TIME'],_data_dict)
     if result:
-        return json.loads(result[0][0]) 
+        result_dict=json.loads(result[0][0]) 
+        for v in result_dict:
+            v['date_time']=result[0][1]
+        print(result_dict)
+        return result_dict
     else:
-        return 'GE_TNETKNIFE_EXCUTE_RESULT_FAULT'
+        return 'GET_TNETKNIFE_EXCUTE_RESULT_FAULT'
     
 @netknife.route('/add_netknife_excute_result',methods=['POST'])
 def add_netknife_excute_result():

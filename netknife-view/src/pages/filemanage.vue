@@ -16,8 +16,9 @@
           </el-col>
         </el-row>
       <!-- 执行结果 -->
+      <!-- 如何通过last_key防止pop页面跨文件弹出 -->
       <el-drawer
-        title="执行结果"
+        :title=pop_title
         :visible.sync="pop_able"
         direction="btt"
         size="90%"
@@ -155,7 +156,7 @@ export default{
           txt_export_path:'',
         },
         excute_time:'',
-        
+        pop_title:'执行结果'
      
         
     }
@@ -178,6 +179,7 @@ export default{
       DELETE_HISTORY_COMMAND:'DELETE_HISTORY_COMMAND',
       ROLLBACK_EXCUTE_RESULT_LIST:'ROLLBACK_EXCUTE_RESULT_LIST',
       SET_IF_HISTORY_TIME:'SET_IF_HISTORY_TIME',
+      CLEAR_EXCUTE_TEXT:'CLEAR_EXCUTE_TEXT',
       // 命令前进和后退按钮相关
       NEXT_COMMAND:'NEXT_COMMAND',
       ROLLBACK_COMMAND:'ROLLBACK_COMMAND',
@@ -219,10 +221,14 @@ export default{
        
     },
     handler_response_data(response_data,file_name){
-      this.$bus.$emit('change_excute_icon','el-icon-video-play')
-      this.$bus.$emit('change_excute_style','primary')
-      this.$bus.$emit('change_excute_able',false)
+      this.$bus.$emit('change_excute_icon','el-icon-video-play',file_name)
+      this.$bus.$emit('change_excute_style','primary',file_name)
+      this.$bus.$emit('change_excute_able',false,file_name)
+      // if(file_name===JSON.parse(localStorage[localStorage['last_key']])['title']){
       this.pop_able=true
+      // }
+
+      this.response_title=file_name
       this.SET_IF_HISTORY_TIME(false)
       this.SET_RESPONSE_DATE_TIME(get_time())
       this.SET_TITLE(file_name)
@@ -318,7 +324,7 @@ export default{
     setting_handler_commit(){ 
           send_post('/change_netknife_parameter',{
               'where':{
-                  'file_name':this.title,
+                  'file_name':this.response_title,
               },
               'update':{
                   'txt_export_path': this.setting_parameter.txt_export_path,
@@ -347,7 +353,16 @@ export default{
                     console.log(response.data)
                     this.setting_parameter=response.data
                 })
+    },
+    pop_able(new_value){
+      if(new_value===false){
+        this.CLEAR_EXCUTE_TEXT()
+        this.SET_EXCUTE_RESPONSE_DATA([])
       }
+    },
+    response_title(new_value){
+      this.pop_title=`${new_value}的执行结果`
+    }
   },
   computed:{
     excute_response_data(){
@@ -486,8 +501,9 @@ export default{
          
       }
       this.$bus.$on('excute',(file_name)=>{
-        this.$bus.$emit('change_excute_icon','el-icon-video-pause')
-        this.$bus.$emit('change_excute_style','warning')
+        this.$bus.$emit('change_excute_icon','el-icon-video-pause',file_name)
+        this.$bus.$emit('change_excute_style','warning',file_name)
+        this.$bus.$emit('change_excute_able',true,file_name)
         send_post('/excute_netknife_file',{'file_name':file_name},response=>{
             if(response.data==='FILE_NOT_EXIST'){
               this.$message({
@@ -495,8 +511,8 @@ export default{
                 message: '请保存后运行',
                 type: 'error'
               });
-              this.$bus.$emit('change_excute_icon','el-icon-video-play')
-              this.$bus.$emit('change_excute_style','primary')
+              this.$bus.$emit('change_excute_icon','el-icon-video-play',file_name)
+              this.$bus.$emit('change_excute_style','primary',file_name)
               return
             }
             if(response.data==='EXCUTE_NOT_EXIST'){
@@ -505,8 +521,8 @@ export default{
                 message: 'Excute中没有等待执行的语句',
                 type: 'warning'
               });
-              this.$bus.$emit('change_excute_icon','el-icon-video-play')
-              this.$bus.$emit('change_excute_style','primary')
+              this.$bus.$emit('change_excute_icon','el-icon-video-play',file_name)
+              this.$bus.$emit('change_excute_style','primary',file_name)
               return
             }
             if(response.data==='LOCAL_FUN_NOT_EXIST'){
@@ -515,8 +531,8 @@ export default{
                 message: 'Excute中存在本地Jinja2中不存在的函数',
                 type: 'warning'
               });
-              this.$bus.$emit('change_excute_icon','el-icon-video-play')
-              this.$bus.$emit('change_excute_style','primary')
+              this.$bus.$emit('change_excute_icon','el-icon-video-play',file_name)
+              this.$bus.$emit('change_excute_style','primary',file_name)
               return
             }
             if(response.data==='IMPORT_FUN_NOT_EXIST'){
@@ -525,8 +541,8 @@ export default{
                 message: 'Excute中导入的Jinja2函数不存在',
                 type: 'warning'
               });
-              this.$bus.$emit('change_excute_icon','el-icon-video-play')
-              this.$bus.$emit('change_excute_style','primary')
+              this.$bus.$emit('change_excute_icon','el-icon-video-play',file_name)
+              this.$bus.$emit('change_excute_style','primary',file_name)
               return
             }
             if(response.data==='EXCUTE_FAULT'){
@@ -535,8 +551,8 @@ export default{
                 message: '执行失败',
                 type: 'error'
               });
-              this.$bus.$emit('change_excute_icon','el-icon-video-play')
-              this.$bus.$emit('change_excute_style','primary')
+              this.$bus.$emit('change_excute_icon','el-icon-video-play',file_name)
+              this.$bus.$emit('change_excute_style','primary',file_name)
               return
             }
             if(response.data==='NOT_CHOOSE_EFFECT_RANGE'){
@@ -545,8 +561,8 @@ export default{
                 message: 'Excute中存在无指定范围的指令',
                 type: 'warning'
               });
-              this.$bus.$emit('change_excute_icon','el-icon-video-play')
-              this.$bus.$emit('change_excute_style','primary')
+              this.$bus.$emit('change_excute_icon','el-icon-video-play',file_name)
+              this.$bus.$emit('change_excute_style','primary',file_name)
               return
             }
             if(response.data==='MIXUNIT_NOT_EXIST'){
@@ -555,8 +571,8 @@ export default{
                 message: 'Excute中存在指定范围无效的指令',
                 type: 'warning'
               });
-              this.$bus.$emit('change_excute_icon','el-icon-video-play')
-              this.$bus.$emit('change_excute_style','primary')
+              this.$bus.$emit('change_excute_icon','el-icon-video-play',file_name)
+              this.$bus.$emit('change_excute_style','primary',file_name)
               return
             }
             console.log(response.data)
@@ -566,8 +582,8 @@ export default{
                 message: 'JINJA2函数中存在循环引用',
                 type: 'warning'
               });
-              this.$bus.$emit('change_excute_icon','el-icon-video-play')
-              this.$bus.$emit('change_excute_style','primary')
+              this.$bus.$emit('change_excute_icon','el-icon-video-play',file_name)
+              this.$bus.$emit('change_excute_style','primary',file_name)
               return
             }
             if(response.data==='TRANSLATION_REPEAT_IMPORT'){
@@ -576,8 +592,8 @@ export default{
                 message: 'TRANSLATION函数中存在循环引用',
                 type: 'warning'
               });
-              this.$bus.$emit('change_excute_icon','el-icon-video-play')
-              this.$bus.$emit('change_excute_style','primary')
+              this.$bus.$emit('change_excute_icon','el-icon-video-play',file_name)
+              this.$bus.$emit('change_excute_style','primary',file_name)
               return
             }
             this.handler_response_data(response.data,file_name)

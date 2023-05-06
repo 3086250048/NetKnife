@@ -35,6 +35,9 @@ export const filemanageAbout={
                 }) 
             });
         },
+        CLEAR_EXCUTE_TEXT(state){
+            state.excute_text=''
+        },
         SET_RESPONSE_DATE_TIME(state,time){
             state.response_date_time=time
         },
