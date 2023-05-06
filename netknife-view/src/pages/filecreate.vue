@@ -23,19 +23,19 @@
       <el-button style="height: 5vh;width: 13%;font-size: 2vh;font-weight: 600;text-align: center;" :type="save_bt_style" class="create" @click="save_file" icon="el-icon-folder-add" size="small">
       保存
     </el-button>
-      <el-button style="height: 5vh;width: 13%;font-size: 2vh;font-weight: 600;text-align: center" type="primary" class="delete" @click="delete_file" icon="el-icon-folder-delete" :disabled="del_able" size="small">
+      <el-button :disabled="del_final_able" style="height: 5vh;width: 13%;font-size: 2vh;font-weight: 600;text-align: center" type="primary" class="delete" @click="delete_file" icon="el-icon-folder-delete"  size="small">
       删除
     </el-button>
-      <el-button style="height: 5vh;width: 15%;font-size: 2vh;font-weight: 600;text-align: center" type="primary" class="open" @click="open_file" icon="el-icon-folder-opened" size="small">
+      <el-button :disabled="open_file_able" style="height: 5vh;width: 15%;font-size: 2vh;font-weight: 600;text-align: center" type="primary" class="open" @click="open_file" icon="el-icon-folder-opened" size="small">
       打开文件
     </el-button>
-    <el-button style="height: 5vh;width: 15%;font-size: 2vh;font-weight: 600;text-align: center" type="primary" class="empty_add" @click="add_empty" icon="el-icon-view" size="small">
+    <el-button  style="height: 5vh;width: 15%;font-size: 2vh;font-weight: 600;text-align: center" type="primary" class="empty_add" @click="add_empty" icon="el-icon-view" size="small">
       新窗口+
     </el-button>
     <el-button :disabled="excute_able" style="height: 5vh;width: 22%;font-size: 2vh;font-weight: 600;text-align: center" :type="excute_bt_style" class="excute" @click="excute_file" :icon="excute_icon" size="small">
       运行
     </el-button>
-    <el-button style="height: 5vh;width: 22%;font-size: 2vh;font-weight: 600;text-align: center"  type="info" class="excute" @click="show_excute_result" icon="el-icon-warning-outline" size="small">
+    <el-button  style="height: 5vh;width: 22%;font-size: 2vh;font-weight: 600;text-align: center"  type="primary" class="excute" @click="show_excute_result" icon="el-icon-warning-outline" size="small">
       执行结果
     </el-button>
     </el-button-group>
@@ -81,7 +81,13 @@ export default{
       save_bt_style:'primary',
       storage_code:'',
       base_code:`name:\npriority:\n\nconfig:{\n\n  send:{\n  read_timeout:10.0\n   }\n\n}\n\ntranslation:{\n\n\n}\n\njinja2:{\n\n\n}\n\nexcute:{\n\n}\n\n`,
-      excute_able:false
+      excute_able:false,
+      real_time_title:'',
+
+      // 执行时禁用
+      open_file_able:false,
+      real_del_able:false,
+     
     };
   },
   methods: {
@@ -150,6 +156,18 @@ export default{
     file_name(){
       return this.$store.state.filecreateAbout.file_name
     },
+    del_final_able(){
+      if(this.del_able){
+        return true
+      }{
+        if(this.real_del_able){
+          return true
+        }else{
+          return false
+        }
+
+      }
+    }
   },
   mounted(){
     
@@ -160,24 +178,56 @@ export default{
       this.$bus.$emit('create_tabs')
      
     },1)
-    
+
+    this.$bus.$on('all_excute_done',()=>{
+        this.open_file_able=false
+        this.real_del_able=false
+    })
+
+    this.$bus.$on('change_excute_state',(bool,file_name)=>{
+         
+          if(bool){
+            // 全局禁用
+            this.open_file_able=true
+            this.real_del_able=true
+        
+            if(this.real_time_title+''===file_name+''){
+            //用户停留页面禁用
+              this.excute_icon='el-icon-video-pause'
+              this.excute_bt_style='warning'
+              this.excute_able=true
+             
+            }
+          }else{
+       
+             if(this.real_time_title+''===file_name+''){
+              //用户所在页面启用
+              this.excute_icon='el-icon-video-play'
+              this.excute_bt_style='primary'
+              this.excute_able=false
+            }
+
+          }
+        }
+    )
+
     this.$bus.$on('change_excute_icon',(icon,file_name)=>{
       console.log(file_name)
       console.log(this.title)
-      if(this.title+''===file_name+''){
+      if(this.real_time_title+''===file_name+''){
         this.excute_icon=icon
       }
    
     })
     this.$bus.$on('change_excute_style',(style,file_name)=>{
-      if(this.title+''===file_name+''){
+      if(this.real_time_title+''===file_name+''){
         this.excute_bt_style=style
       }
 
     })
     //防止连续点击执行按钮,导致数据库中同一时间对应多个表项导致删除时一次性删除多条表项
     this.$bus.$on('change_excute_able',(bool,file_name)=>{
-      if(this.title+''===file_name+''){
+      if(this.real_time_title+''===file_name+''){
         this.excute_able=bool
       }
     })

@@ -544,7 +544,12 @@ def add_netknife_excute_result():
         return 'ADD_NETKNIFE_EXCUTE_RESULT_FAULT'
 @netknife.route('/delete_netknife_excute_result',methods=['POST'])
 def delete_netknife_excute_result():
-    pass
+    file_name_dict=json.loads(request.get_data(as_text=True)) 
+    result=storage.del_database_data('NETKNIFE_EXCUTE_RESULT',file_name_dict)
+    if result:
+        return 'DELETE_NETKNIFE_EXCUTE_RESULT_SUCCESS'
+    else:
+        return 'DELETE_NETKNIFE_EXCUTE_RESULT_FAULT'
 
 @netknife.route('/get_all_excute_date_time',methods=['POST'])
 def get_all_excute_date_time():

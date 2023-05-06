@@ -156,8 +156,8 @@ export default{
           txt_export_path:'',
         },
         excute_time:'',
-        pop_title:'执行结果'
-     
+        pop_title:'执行结果',
+        excute_file_list:[],     
         
     }
   },
@@ -220,14 +220,27 @@ export default{
         }
        
     },
-    handler_response_data(response_data,file_name){
-      this.$bus.$emit('change_excute_icon','el-icon-video-play',file_name)
-      this.$bus.$emit('change_excute_style','primary',file_name)
-      this.$bus.$emit('change_excute_able',false,file_name)
-      // if(file_name===JSON.parse(localStorage[localStorage['last_key']])['title']){
-      this.pop_able=true
-      // }
 
+    // set_excute_button_normal_state(file_name){
+    //   this.$bus.$emit('change_excute_icon','el-icon-video-play',file_name)
+    //   this.$bus.$emit('change_excute_style','primary',file_name)
+    //   this.$bus.$emit('change_excute_able',false,file_name)
+    // },
+
+    handler_response_data(response_data,file_name){
+      //从执行文件队列中删除此file_name文件
+      delete this.excute_file_list[this.excute_file_list.indexOf(file_name)]
+      //判断队列中的文件是否都已经执行完毕
+      console.log(this.excute_file_list)
+      // JS中删除列表中的元素还会留下一个‘empty’需要使用filter过滤(filter默认过滤empty等值)
+      if(this.excute_file_list.filter(e=>e).length===0){
+         
+          this.$bus.$emit('all_excute_done')
+      }
+      //改变已经执行完成文件的页面UI
+      this.$bus.$emit('change_excute_state',false,file_name)
+    
+      this.pop_able=true
       this.response_title=file_name
       this.SET_IF_HISTORY_TIME(false)
       this.SET_RESPONSE_DATE_TIME(get_time())
@@ -257,7 +270,7 @@ export default{
         },
         show_history_command(date_time,i){
             this.SET_IF_HISTORY_TIME(true)
-            this.check_list=[]
+            this.check_list=[] 
             this.search_command_history_able=false
             this.SHOW_HISTORY_COMMAND({
                 'file_name':this.response_title,
@@ -356,6 +369,7 @@ export default{
     },
     pop_able(new_value){
       if(new_value===false){
+        this.check_list=[]
         this.CLEAR_EXCUTE_TEXT()
         this.SET_EXCUTE_RESPONSE_DATA([])
       }
@@ -501,103 +515,115 @@ export default{
          
       }
       this.$bus.$on('excute',(file_name)=>{
-        this.$bus.$emit('change_excute_icon','el-icon-video-pause',file_name)
-        this.$bus.$emit('change_excute_style','warning',file_name)
-        this.$bus.$emit('change_excute_able',true,file_name)
-        send_post('/excute_netknife_file',{'file_name':file_name},response=>{
-            if(response.data==='FILE_NOT_EXIST'){
-              this.$message({
+       
+        this.$bus.$emit('change_excute_state',true,file_name)
+        // 控制执行文件
+        if(this.excute_file_list.indexOf(file_name)!==-1){
+          this.$bus.$emit('change_excute_state',false,file_name)
+          this.$message({
                 showClose: true,
-                message: '请保存后运行',
-                type: 'error'
-              });
-              this.$bus.$emit('change_excute_icon','el-icon-video-play',file_name)
-              this.$bus.$emit('change_excute_style','primary',file_name)
-              return
-            }
-            if(response.data==='EXCUTE_NOT_EXIST'){
-              this.$message({
-                showClose: true,
-                message: 'Excute中没有等待执行的语句',
+                message: '此文件已在队列中运行',
                 type: 'warning'
               });
-              this.$bus.$emit('change_excute_icon','el-icon-video-play',file_name)
-              this.$bus.$emit('change_excute_style','primary',file_name)
-              return
-            }
-            if(response.data==='LOCAL_FUN_NOT_EXIST'){
-              this.$message({
-                showClose: true,
-                message: 'Excute中存在本地Jinja2中不存在的函数',
-                type: 'warning'
-              });
-              this.$bus.$emit('change_excute_icon','el-icon-video-play',file_name)
-              this.$bus.$emit('change_excute_style','primary',file_name)
-              return
-            }
-            if(response.data==='IMPORT_FUN_NOT_EXIST'){
-              this.$message({
-                showClose: true,
-                message: 'Excute中导入的Jinja2函数不存在',
-                type: 'warning'
-              });
-              this.$bus.$emit('change_excute_icon','el-icon-video-play',file_name)
-              this.$bus.$emit('change_excute_style','primary',file_name)
-              return
-            }
-            if(response.data==='EXCUTE_FAULT'){
-              this.$message({
-                showClose: true,
-                message: '执行失败',
-                type: 'error'
-              });
-              this.$bus.$emit('change_excute_icon','el-icon-video-play',file_name)
-              this.$bus.$emit('change_excute_style','primary',file_name)
-              return
-            }
-            if(response.data==='NOT_CHOOSE_EFFECT_RANGE'){
-              this.$message({
-                showClose: true,
-                message: 'Excute中存在无指定范围的指令',
-                type: 'warning'
-              });
-              this.$bus.$emit('change_excute_icon','el-icon-video-play',file_name)
-              this.$bus.$emit('change_excute_style','primary',file_name)
-              return
-            }
-            if(response.data==='MIXUNIT_NOT_EXIST'){
-              this.$message({
-                showClose: true,
-                message: 'Excute中存在指定范围无效的指令',
-                type: 'warning'
-              });
-              this.$bus.$emit('change_excute_icon','el-icon-video-play',file_name)
-              this.$bus.$emit('change_excute_style','primary',file_name)
-              return
-            }
-            console.log(response.data)
-            if(response.data==='JINJA2_REPEAT_IMPORT'){
-              this.$message({
-                showClose: true,
-                message: 'JINJA2函数中存在循环引用',
-                type: 'warning'
-              });
-              this.$bus.$emit('change_excute_icon','el-icon-video-play',file_name)
-              this.$bus.$emit('change_excute_style','primary',file_name)
-              return
-            }
-            if(response.data==='TRANSLATION_REPEAT_IMPORT'){
-              this.$message({
-                showClose: true,
-                message: 'TRANSLATION函数中存在循环引用',
-                type: 'warning'
-              });
-              this.$bus.$emit('change_excute_icon','el-icon-video-play',file_name)
-              this.$bus.$emit('change_excute_style','primary',file_name)
-              return
-            }
-            this.handler_response_data(response.data,file_name)
-        })
+          return 
+        }else{
+          this.excute_file_list.push(file_name)
+          send_post('/excute_netknife_file',{'file_name':file_name},response=>{
+              if(response.data==='FILE_NOT_EXIST'){
+                this.$message({
+                  showClose: true,
+                  message: '请保存后运行',
+                  type: 'error'
+                });
+                delete this.excute_file_list[this.excute_file_list.indexOf(file_name)]
+                this.$bus.$emit('change_excute_state',false,file_name)
+                return
+              }
+              if(response.data==='EXCUTE_NOT_EXIST'){
+                this.$message({
+                  showClose: true,
+                  message: 'Excute中没有等待执行的语句',
+                  type: 'warning'
+                });
+                delete this.excute_file_list[this.excute_file_list.indexOf(file_name)]
+                this.$bus.$emit('change_excute_state',false,file_name)
+                return
+              }
+              if(response.data==='LOCAL_FUN_NOT_EXIST'){
+                this.$message({
+                  showClose: true,
+                  message: 'Excute中存在本地Jinja2中不存在的函数',
+                  type: 'warning'
+                });
+                delete this.excute_file_list[this.excute_file_list.indexOf(file_name)]
+                this.$bus.$emit('change_excute_state',false,file_name)
+                return
+              }
+              if(response.data==='IMPORT_FUN_NOT_EXIST'){
+                this.$message({
+                  showClose: true,
+                  message: 'Excute中导入的Jinja2函数不存在',
+                  type: 'warning'
+                });
+                delete this.excute_file_list[this.excute_file_list.indexOf(file_name)]
+                this.$bus.$emit('change_excute_state',false,file_name)
+                return
+              }
+              if(response.data==='EXCUTE_FAULT'){
+                this.$message({
+                  showClose: true,
+                  message: '执行失败',
+                  type: 'error'
+                });
+                delete this.excute_file_list[this.excute_file_list.indexOf(file_name)]
+                this.$bus.$emit('change_excute_state',false,file_name)
+                return
+              }
+              if(response.data==='NOT_CHOOSE_EFFECT_RANGE'){
+                this.$message({
+                  showClose: true,
+                  message: 'Excute中存在无指定范围的指令',
+                  type: 'warning'
+                });
+                delete this.excute_file_list[this.excute_file_list.indexOf(file_name)]
+                this.$bus.$emit('change_excute_state',false,file_name)
+                return
+              }
+              if(response.data==='MIXUNIT_NOT_EXIST'){
+                this.$message({
+                  showClose: true,
+                  message: 'Excute中存在指定范围无效的指令',
+                  type: 'warning'
+                });
+                delete this.excute_file_list[this.excute_file_list.indexOf(file_name)]
+                this.$bus.$emit('change_excute_state',false,file_name)
+                return
+              }
+              console.log(response.data)
+              if(response.data==='JINJA2_REPEAT_IMPORT'){
+                this.$message({
+                  showClose: true,
+                  message: 'JINJA2函数中存在循环引用',
+                  type: 'warning'
+                });
+                delete this.excute_file_list[this.excute_file_list.indexOf(file_name)]
+                this.$bus.$emit('change_excute_state',false,file_name)
+                return
+              }
+              if(response.data==='TRANSLATION_REPEAT_IMPORT'){
+                this.$message({
+                  showClose: true,
+                  message: 'TRANSLATION函数中存在循环引用',
+                  type: 'warning'
+                });
+                delete this.excute_file_list[this.excute_file_list.indexOf(file_name)]
+                this.$bus.$emit('change_excute_state',false,file_name)
+                return
+              }
+              this.handler_response_data(response.data,file_name)
+              
+          })
+        }
       })
       this.$bus.$on('show_excute_result',(file_name)=>{
         this.pop_able=true

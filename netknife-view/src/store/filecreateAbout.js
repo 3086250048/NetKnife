@@ -81,6 +81,7 @@ export const filecreateAbout={
                     return
                 }
                 // 添加成功后的动作
+                state.vm.real_time_title=response.data
                 state.file_name=response.data  
                 send_post('/add_netknife_parameter',{
                     file_name:state.file_name,
@@ -131,6 +132,7 @@ export const filecreateAbout={
                             type: 'success'
                           });
                         send_post('/delete_netknife_parameter',{file_name:state.file_name})
+                        send_post('/delete_netknife_excute_result',{file_name:state.file_name})
                         state.vm.$bus.$emit('change_title','空窗口')
                         state.vm.$bus.$emit('change_code',name,`name:\npriority:\n\nconfig:{\n\n  send:{\n  read_timeout:10.0\n   }\n\n}\n\ntranslation:{\n\n\n}\n\njinja2:{\n\n\n}\n\nexcute:{\n\n}\n\n`)
                         state.vm.storage_code=`NOT_EXIST`
@@ -157,6 +159,7 @@ export const filecreateAbout={
                           });
                           return
                     }
+                    state.vm.real_time_title=response.data
                     state.file_name=response.data
                     state.vm.$bus.$emit('change_title',state.file_name+'')
                     state.vm.$bus.$emit('change_code',state.vm.name,state.code)
