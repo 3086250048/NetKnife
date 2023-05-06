@@ -319,11 +319,19 @@ class AppStorage():
         uid =str(uuid.uuid4())
         suid=''.join(uid.split('-'))
         if isinstance(data,dict):
-            value_list=list(data.values())
+            value_list=[]
+            for k,v in data.items():
+                if isinstance(v,list):
+                    value_list.append(json.dumps(v, ensure_ascii=False, indent=2))
+                else:
+                    value_list.append(v)
         if isinstance(data,list):
             value_list=data
         
         value_list.insert(0,suid)
+        
+        print(value_list)
+
         def callback(cur,con):
             con.commit()
             return True

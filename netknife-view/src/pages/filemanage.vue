@@ -97,21 +97,20 @@
                     v-model="input"
                     :popper-append-to-body="false"
                     :fetch-suggestions="querySearchAsync"
-                    placeholder="输入命令或执行时间进行检索"
+                    placeholder="输入执行时间进行检索"
                     @select="handleSelect"
                     ></el-autocomplete>
             </el-col>
         </el-row>
         <div style="height:66vh;overflow: scroll;">
             <ul class="his_ul">
-                <li  v-for="(item,i) in all_command_time_list " :key="i" > 
+                <li  v-for="(item,i) in all_excute_date_time_list " :key="i" > 
                     <el-card class="cmd_his_about" style="height: 10vh;width: 115vh;font-size: 2vh;" >
                         <el-button-group style="float: right;margin-top: -20px;margin-right:-20px;" >
-                            <el-button style="width: 12vh;height: 4.5vh;font-size: 2vh;line-height: 1vh;" type="primary"  @click="show_history_command(item[0],item[1],i)" >查看</el-button>
-                            <el-button style="width: 12vh;height: 4.5vh;font-size: 2vh;line-height: 1vh;" type="primary"  @click="delete_history_command(item[0],item[1],item[2],i)">删除</el-button>
+                            <el-button style="width: 12vh;height: 4.5vh;font-size: 2vh;line-height: 1vh;" type="primary"  @click="show_history_command(item,i)" >查看</el-button>
+                            <el-button style="width: 12vh;height: 4.5vh;font-size: 2vh;line-height: 1vh;" type="primary"  @click="delete_history_command(item,i)">删除</el-button>
                         </el-button-group>
-                        命令:{{ item[0] }}<br>
-                        执行时间:{{ item[1] }} <br>
+                        执行时间:{{ item}} <br>
                     </el-card>
                 </li>
             </ul>
@@ -156,7 +155,7 @@ export default{
           txt_export_path:'',
         },
         excute_time:'',
-        search_command_history_able:false,
+        
      
         
     }
@@ -173,12 +172,12 @@ export default{
       EXPORT_TEXTAREA:'EXPORT_TEXTAREA',
 
       // 历史命令按钮相关
-      GET_ALL_COMMAND_TIME:'GET_ALL_COMMAND_TIME',
+      GET_ALL_EXCUTE_DATE_TIME:'GET_ALL_EXCUTE_DATE_TIME',
       CHOOSE_CHANGE:'CHOOSE_CHANGE',
       SHOW_HISTORY_COMMAND:'SHOW_HISTORY_COMMAND',
       DELETE_HISTORY_COMMAND:'DELETE_HISTORY_COMMAND',
       ROLLBACK_EXCUTE_RESULT_LIST:'ROLLBACK_EXCUTE_RESULT_LIST',
-    
+      SET_IF_HISTORY_TIME:'SET_IF_HISTORY_TIME',
       // 命令前进和后退按钮相关
       NEXT_COMMAND:'NEXT_COMMAND',
       ROLLBACK_COMMAND:'ROLLBACK_COMMAND',
@@ -222,7 +221,9 @@ export default{
     handler_response_data(response_data,file_name){
       this.$bus.$emit('change_excute_icon','el-icon-video-play')
       this.$bus.$emit('change_excute_style','primary')
+      this.$bus.$emit('change_excute_able',false)
       this.pop_able=true
+      this.SET_IF_HISTORY_TIME(false)
       this.SET_RESPONSE_DATE_TIME(get_time())
       this.SET_TITLE(file_name)
       this.HANDLER_RESPONSE_DATA(response_data)
@@ -232,10 +233,11 @@ export default{
     search_command_handler(){
             this.search_command_history_able=true
             this.input=''
-            this.GET_ALL_COMMAND_TIME()
+            console.log(this.response_title)
+            this.GET_ALL_EXCUTE_DATE_TIME(this.response_title)
         },
         querySearchAsync(queryString, cb) {
-            let results=this.all_command_time_search_list
+            let results=this.all_excute_date_time_search_list
             results = queryString ? results.filter(this.createStateFilter(queryString)) : results;
             cb(results);
         },
@@ -245,24 +247,24 @@ export default{
         };
         },
         handleSelect(item) {
-            this.CHOOSE_CHANGE(item)
+            this.CHOOSE_CHANGE(item.value,this.response_title)
         },
-        show_history_command(command,date_time,i){
+        show_history_command(date_time,i){
+            this.SET_IF_HISTORY_TIME(true)
             this.check_list=[]
             this.search_command_history_able=false
             this.SHOW_HISTORY_COMMAND({
-                'command':command,
+                'file_name':this.response_title,
                 'date_time':date_time,
                 'index':i
             })
 
         },
-        delete_history_command(command,date_time,id,i){
+        delete_history_command(date_time,i){
             this.check_list=[]
             this.DELETE_HISTORY_COMMAND({
-                'command':command,
+                'file_name':this.response_title,
                 'date_time':date_time,
-                'id':id,
                 'index':i
             })
         },
@@ -364,11 +366,11 @@ export default{
     history_code_count(){
         return this.$store.state.filemanageAbout.history_code_count
     },
-    all_excute_result_search_list(){
-        return this.$store.state.filemanageAbout.all_command_time_search_list
+    all_excute_date_time_search_list(){
+        return this.$store.state.filemanageAbout.all_excute_date_time_search_list
     },
-    all_excute_result_list(){
-        return this.$store.state.filemanageAbout.all_command_time_list
+    all_excute_date_time_list(){
+        return this.$store.state.filemanageAbout.all_excute_date_time_list
     },
     // 
   },

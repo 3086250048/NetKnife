@@ -519,20 +519,41 @@ def change_netknife_parameter():
         return 'NETKNIFE_PARAMETER_CHANGE_SUCCESS'
     
 #待添加netknife_excute_result数据库
+@netknife.route('/get_netknife_excute_result',methods=['POST'])
+def get_netknife_excute_result():
+    _data_dict=json.loads(request.get_data(as_text=True))   
+    # 要返回到时间的结果（会来后继续）
+    result=storage.get_database_data('NETKNIFE_EXCUTE_RESULT',['EXCUTE_RESULT'],_data_dict)
+    if result:
+        return json.loads(result[0][0]) 
+    else:
+        return 'GE_TNETKNIFE_EXCUTE_RESULT_FAULT'
+    
 @netknife.route('/add_netknife_excute_result',methods=['POST'])
 def add_netknife_excute_result():
-    _data_dict=json.loads(request.get_data(as_text=True))
+    _data_dict=json.loads(request.get_data(as_text=True))   
+  
     result=storage.add_database_data('NETKNIFE_EXCUTE_RESULT',['ID','FILE_NAME','EXCUTE_RESULT','DATE_TIME'],_data_dict)
     if result:
-        return 'NETKNIFE_EXCUTE_RESULT_SUCCESS'
+        return 'ADD_NETKNIFE_EXCUTE_RESULT_SUCCESS'
+    else:
+        return 'ADD_NETKNIFE_EXCUTE_RESULT_FAULT'
 @netknife.route('/delete_netknife_excute_result',methods=['POST'])
 def delete_netknife_excute_result():
     pass
-# 待实现搜索界面的UI
 
-# @netknife.route('/change_netknife_excute_result',methods=['POST'])
-# def change_netknife_excute_result():
-#     pass
+@netknife.route('/get_all_excute_date_time',methods=['POST'])
+def get_all_excute_date_time():
+    file_name_dict=json.loads(request.get_data(as_text=True))
+    print(file_name_dict)
+    result=storage.get_database_data('NETKNIFE_EXCUTE_RESULT',['DATE_TIME'],file_name_dict,'ORDER BY DATE_TIME DESC')
+    if result:
+        _value_lis=[v[0] for v in result]
+        result=[{'value':v} for v in _value_lis]
+        return result
+    else:
+        return 'GET_ALL_EXCUTE_DATE_TIME_FAULT'
+
 @netknife.route('/export_excute_result_textarea',methods=['POST'])
 def export_excute_result_textarea():
     export_dict=json.loads(request.get_data(as_text=True))

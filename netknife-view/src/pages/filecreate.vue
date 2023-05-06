@@ -32,7 +32,7 @@
     <el-button style="height: 5vh;width: 15%;font-size: 2vh;font-weight: 600;text-align: center" type="primary" class="empty_add" @click="add_empty" icon="el-icon-view" size="small">
       新窗口+
     </el-button>
-    <el-button style="height: 5vh;width: 22%;font-size: 2vh;font-weight: 600;text-align: center" :type="excute_bt_style" class="excute" @click="excute_file" :icon="excute_icon" size="small">
+    <el-button :disabled="excute_able" style="height: 5vh;width: 22%;font-size: 2vh;font-weight: 600;text-align: center" :type="excute_bt_style" class="excute" @click="excute_file" :icon="excute_icon" size="small">
           运行
         </el-button>
         <el-button style="height: 5vh;width: 22%;font-size: 2vh;font-weight: 600;text-align: center"  type="info" class="excute" @click="show_excute_result" icon="el-icon-warning-outline" size="small">
@@ -81,7 +81,7 @@ export default{
       save_bt_style:'primary',
       storage_code:'',
       base_code:`name:\npriority:\n\nconfig:{\n\n  send:{\n  read_timeout:10.0\n   }\n\n}\n\ntranslation:{\n\n\n}\n\njinja2:{\n\n\n}\n\nexcute:{\n\n}\n\n`,
-    
+      excute_able:false
     };
   },
   methods: {
@@ -129,6 +129,7 @@ export default{
       }
     },
     excute_file(){
+      this.excute_able=true
       this.SET_VM(this)
       this.excute_flag=true
       const code=this.codemirror.getValue()
@@ -169,6 +170,10 @@ export default{
     this.$bus.$on('change_save_style',(style)=>{
       this.save_bt_style=style
     })
+    //防止连续点击执行按钮,导致数据库中同一时间对应多个表项导致删除时一次性删除多条表项
+    this.$bus.$on('change_excute_able',(bool)=>{
+      this.excute_able=bool
+    })
    console.log(`title是:${this.title}`)
     send_post('/get_netknife_code',{'file_name':this.title},response=>{
       this.storage_code=response.data
@@ -195,6 +200,7 @@ export default{
     this.$bus.$off('change_excute_icon')
     this.$bus.$off('change_excute_style')
     this.$bus.$off('change_save_style')
+    this.$bus.$off('change_excute_able')
   }
 };
 </script>
