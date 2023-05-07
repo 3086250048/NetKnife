@@ -533,6 +533,22 @@ def get_netknife_excute_result():
     else:
         return 'GET_TNETKNIFE_EXCUTE_RESULT_FAULT'
     
+@netknife.route('/get_history_netknife_excute_result',methods=['POST'])
+def get_history_netknife_excute_result():
+    where_dict=json.loads(request.get_data(as_text=True))
+    file_name_dict={'file_name':json.loads(request.get_data(as_text=True))['file_name']}
+    other_sql= f" ORDER BY DATE_TIME DESC limit {where_dict['index']},1"
+    result=storage.get_database_data('NETKNIFE_EXCUTE_RESULT',['EXCUTE_RESULT','DATE_TIME'],file_name_dict,other_sql)
+    if result:
+        result_dict=json.loads(result[0][0]) 
+        for v in result_dict:
+            v['date_time']=result[0][1]
+        print(result_dict)
+        return result_dict
+    else:
+        return 'GET_TNETKNIFE_EXCUTE_RESULT_FAULT'
+
+
 @netknife.route('/add_netknife_excute_result',methods=['POST'])
 def add_netknife_excute_result():
     _data_dict=json.loads(request.get_data(as_text=True))   
@@ -562,6 +578,14 @@ def get_all_excute_date_time():
         return result
     else:
         return 'GET_ALL_EXCUTE_DATE_TIME_FAULT'
+@netknife.route('/get_all_excute_date_count',methods=['POST'])
+def get_all_excute_data_count():
+    file_name_dict=json.loads(request.get_data(as_text=True))
+    result=storage.get_database_data_count_number('NETKNIFE_EXCUTE_RESULT',file_name_dict)
+    if result:
+        return  str(result)
+    else:
+        return 'NOT_EXIST_THIS_FILE_NAME_DATA'
 
 @netknife.route('/export_excute_result_textarea',methods=['POST'])
 def export_excute_result_textarea():

@@ -125,51 +125,31 @@ export const filemanageAbout={
     },
 
     DELETE_HISTORY_COMMAND(state,payload){
-        state.response_data_list=[]
-        state.textarea=''
-        state.history_command=''
+        state.excute_response_data=[]
+        state.excute_text=''
         state.command_index=-1
-        send_post('/delete_history_command',{
-            'mode':state.oprate_mode,
-            'id':payload.id,
-            'project':state.choose_project[0],
-            'area':state.choose_mixunit[3],
-            'protocol':state.choose_mixunit[4],
-            'port':state.choose_mixunit[5],
-            'ip_expression':state.choose_mixunit[9],
-            'command':payload.command,
+        send_post('/delete_netknife_excute_result',{
+            'file_name':payload.file_name,
             'date_time':payload.date_time
         },response=>{
-            if(response.data==='DELETE_SUCCESS'){     
-                state.all_command_time_list=[]
+            if(response.data==='DELETE_NETKNIFE_EXCUTE_RESULT_SUCCESS'){     
+                state.all_excute_date_time_list=[]
                 state.all_command_time_search_list=[]              
-                send_post('/get_all_command_time',{
-                    'project':state.choose_project[0],
-                    'area':state.choose_mixunit[3],
-                    'protocol':state.choose_mixunit[4],
-                    'port':state.choose_mixunit[5],
-                    'ip_expression':state.choose_mixunit[9],
-                    'mode':state.oprate_mode,
-                },response=>{
-                    response.data.forEach(e=>{
-                        state.all_command_time_search_list.push({'value':`${e.value[0]} | ${e.value[1]}`})
-                        state.all_command_time_list.push([e.value[0],e.value[1],e.value[2]])
-                    })
-                    state.full_all_command_time_list=state.all_command_time_list
-                })
+                send_post('/get_all_excute_date_time',{
+                    'file_name':payload.file_name
+                 },response=>{
+                     console.log(response.data)
+                     state.all_excute_date_time_search_list=response.data
+                     response.data.forEach(e=>{
+                         state.all_excute_date_time_list.push(e['value'])
+                     })
+                     state.full_excute_result_list=state.all_excute_date_time_list
+                 })
 
-                send_post('/get_command_history_count',{
-                    'project':state.choose_project[0],
-                    'area':state.choose_mixunit[3],
-                    'protocol':state.choose_mixunit[4],
-                    'port':state.choose_mixunit[5],
-                    'ip_expression':state.choose_mixunit[9],
-                    'mode':state.oprate_mode,
+                send_post('/get_all_excute_date_count',{
+                  'file_name':payload.file_name
                 },response=>{
-                    // 刷新
-                    if(response.data==='RELOAD_PAGE') return
-                    // 正常
-                    state.history_command_count=response.data    
+                    state.history_excute_result_count=response.data    
                 })
                 
             }
@@ -178,10 +158,47 @@ export const filemanageAbout={
 
     SET_IF_HISTORY_TIME(state,bool){
         state.if_history_time=bool
+    },
+
+    // 回退和前进历史命令功能
+    ROLLBACK_COMMAND(state,file_name){
+        state.excute_index+=1
+        state.excute_response_data=[]
+        state.excute_text=''
+        send_post('/get_history_netknife_excute_result',{
+            'file_name':file_name,
+            'index':state.excute_index,
+        },response=>{
+            state.if_history_time=true
+            state.excute_response_data=response.data
+        })
+        
+    },
+    NEXT_COMMAND(state,file_name){
+        state.excute_index-=1
+        state.excute_response_data=[]
+        state.excute_text=''
+        send_post('/get_history_netknife_excute_result',{
+            'file_name':file_name,
+            'index':state.excute_index
+        },response=>{
+            state.if_history_time=true  
+            state.excute_response_data=response.data
+        })
+     
+    },
+
+    SET_HISTORY_EXCUTE_RESULT_COUNT(state,file_name){
+        send_post('/get_all_excute_date_count',{
+            'file_name':file_name
+          },response=>{
+              state.history_excute_result_count=response.data    
+              console.log(state.history_excute_result_count)
+          })
+    },
+    SET_EXCUTE_INDEX(state,number){
+        state.excute_index=number
     }
-
-
-
 
     },
     state:{
@@ -190,8 +207,7 @@ export const filemanageAbout={
         excute_text:'',
         response_date_time:{},
         excute_index:-1,
-        history_code:'',
-        history_code_count:0,
+        history_excute_result_count:0,
         all_excute_date_time_list:[],
         all_excute_date_time_search_list:[],
         full_excute_result_list:[],

@@ -378,7 +378,7 @@ export default {
             console.log(this.command_index)
         },
         next_command(){
-            if(this,this.command_index<=-1){
+            if(this.command_index<=-1){
                 this.$message({
                     showClose: true,
                     message: '没有更多命令了',

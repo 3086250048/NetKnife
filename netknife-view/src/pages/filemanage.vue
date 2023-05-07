@@ -184,7 +184,9 @@ export default{
       // 命令前进和后退按钮相关
       NEXT_COMMAND:'NEXT_COMMAND',
       ROLLBACK_COMMAND:'ROLLBACK_COMMAND',
-      SET_COMMAND_INDEX:'SET_COMMAND_INDEX'
+      SET_COMMAND_INDEX:'SET_COMMAND_INDEX',
+      SET_HISTORY_EXCUTE_RESULT_COUNT:'SET_HISTORY_EXCUTE_RESULT_COUNT',
+      SET_EXCUTE_INDEX:'SET_EXCUTE_INDEX'
     }),
 
     record_index(tab){
@@ -262,88 +264,88 @@ export default{
     
     },
 
-    //搜索按钮相关函数
-    search_command_handler(){
-            this.search_command_history_able=true
-            this.input=''
-            console.log(this.response_title)
-            this.GET_ALL_EXCUTE_DATE_TIME(this.response_title)
-        },
-        querySearchAsync(queryString, cb) {
-            let results=this.all_excute_date_time_search_list
-            results = queryString ? results.filter(this.createStateFilter(queryString)) : results;
-            cb(results);
-        },
-        createStateFilter(queryString) {
-        return (item) => {
-          return item.value.toLowerCase().match(queryString.toLowerCase());
-        };
-        },
-        handleSelect(item) {
-            this.CHOOSE_CHANGE(item.value,this.response_title)
-        },
-        show_history_command(date_time,i){
-            this.SET_IF_HISTORY_TIME(true)
-            this.check_list=[] 
-            this.search_command_history_able=false
-            this.SHOW_HISTORY_COMMAND({
-                'file_name':this.response_title,
-                'date_time':date_time,
-                'index':i
-            })
+//搜索按钮相关函数
+search_command_handler(){
+        this.search_command_history_able=true
+        this.input=''
+        console.log(this.response_title)
+        this.GET_ALL_EXCUTE_DATE_TIME(this.response_title)
+    },
+querySearchAsync(queryString, cb) {
+    let results=this.all_excute_date_time_search_list
+    results = queryString ? results.filter(this.createStateFilter(queryString)) : results;
+    cb(results);
+},
+createStateFilter(queryString) {
+return (item) => {
+  return item.value.toLowerCase().match(queryString.toLowerCase());
+};
+},
+handleSelect(item) {
+    this.CHOOSE_CHANGE(item.value,this.response_title)
+},
+show_history_command(date_time,i){
+    this.SET_IF_HISTORY_TIME(true)
+    this.check_list=[] 
+    this.search_command_history_able=false
+    this.SHOW_HISTORY_COMMAND({
+        'file_name':this.response_title,
+        'date_time':date_time,
+        'index':i
+    })
 
-        },
-        delete_history_command(date_time,i){
-            this.check_list=[]
-            this.DELETE_HISTORY_COMMAND({
-                'file_name':this.response_title,
-                'date_time':date_time,
-                'index':i
-            })
-        },
-  //导出按钮
-    export_textarea(){
-        this.EXPORT_TEXTAREA({
-            'file_name':this.response_title,
-            'vm':this,
-            'txt_export_path':this.setting_parameter.txt_export_path
-        })
-    },
-  //执行结果回退和前进按钮
-    next_command(){
-            if(this,this.command_index<=-1){
-                this.$message({
-                    showClose: true,
-                    message: '没有更多命令了',
-                    type: 'warning'
-                });
-                return
-            }
-            if(this.command_index<=0){
-                this.$message({
-                    showClose: true,
-                    message: '已经是最后一条命令了',
-                    type: 'warning'
-                });
-                return
-            }
-            this.check_list=[]
-            this.NEXT_COMMAND(this)
-            console.log(this.command_index)
-        },
-    rollback_command(){
-        if(this.command_index>=this.history_command_count-1){
-            this.$message({
-                showClose: true,
-                message: '已经是最早的一条命令了',
-                type: 'warning'
-            });
-            return
-        }
-        this.check_list=[]
-        this.ROLLBACK_COMMAND()
-        console.log(this.command_index)
-    },
+},
+delete_history_command(date_time,i){
+    this.check_list=[]
+    this.DELETE_HISTORY_COMMAND({
+        'file_name':this.response_title,
+        'date_time':date_time,
+        'index':i
+    })
+},
+//导出按钮
+  export_textarea(){
+      this.EXPORT_TEXTAREA({
+          'file_name':this.response_title,
+          'vm':this,
+          'txt_export_path':this.setting_parameter.txt_export_path
+      })
+  },
+//执行结果回退和前进按钮
+  next_command(){
+          if(this.excute_index<=-1){
+              this.$message({
+                  showClose: true,
+                  message: '没有更多命令了',
+                  type: 'warning'
+              });
+              return
+          }
+          if(this.excute_index<=0){
+              this.$message({
+                  showClose: true,
+                  message: '已经是最后一条命令了',
+                  type: 'warning'
+              });
+              return
+          }
+          this.check_list=[]
+          this.NEXT_COMMAND(this.response_title)
+          console.log(this.excute_index)
+      },
+  rollback_command(){
+      if(this.excute_index>=this.history_excute_result_count-1){
+          this.$message({
+              showClose: true,
+              message: '已经是最早的一条命令了',
+              type: 'warning'
+          });
+          return
+      }
+      this.check_list=[]
+      this.ROLLBACK_COMMAND(this.response_title)
+      console.log(this.excute_index)
+  },
   // 设置按钮
     setting_handler_cancel(){
             this.setting_dialog_able=false
@@ -401,14 +403,11 @@ export default{
       return this.$store.state.filemanageAbout.excute_text
     },
     // 搜索按钮
-    code_index(){
-        return this.$store.state.filemanageAbout.code_index
+    excute_index(){
+        return this.$store.state.filemanageAbout.excute_index
     },
-    history_code(){
-        return this.$store.state.filemanageAbout.history_code
-    },
-    history_code_count(){
-        return this.$store.state.filemanageAbout.history_code_count
+    history_excute_result_count(){
+        return this.$store.state.filemanageAbout.history_excute_result_count
     },
     all_excute_date_time_search_list(){
         return this.$store.state.filemanageAbout.all_excute_date_time_search_list
@@ -638,7 +637,8 @@ export default{
                 return
               }
               if(this.pop_able===true){
-                console.log(11111111111111111111111111111111111)
+                this.search_command_history_able=false
+                this.setting_dialog_able=false
                 this.pop_able=false
                 setTimeout(() => {
                   this.handler_response_data(response.data,file_name)
@@ -654,6 +654,8 @@ export default{
       this.$bus.$on('show_excute_result',(file_name)=>{
         this.pop_able=true
         this.response_title=file_name
+        this.SET_EXCUTE_INDEX(-1)
+        this.SET_HISTORY_EXCUTE_RESULT_COUNT(this.response_title)
       })
       this.$bus.$on('clear_check_list',()=>{
         this.check_list=[]

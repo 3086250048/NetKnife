@@ -337,7 +337,7 @@ class AppStorage():
             return True
         sql=f"INSERT INTO {database_name} ({','.join(feild_list)}) VALUES({','.join(['?']*len(feild_list))})"   
         return self.oprate_sql(sql,value_list,callback)
-
+    #更新任意数据库数据
     def update_database_data(self,database_name,update_where_dict,updata_data_dict):
         def callback(cur,con):
             con.commit()
@@ -347,6 +347,22 @@ class AppStorage():
         sql=update_sql+where_sql
         print(sql)
         return self.oprate_sql(sql,{},callback)
+
+    #获取任意数据库中的记录数
+    def get_database_data_count_number(self,database_name,where_dict,other_sql=''):
+        def callback(cur,con):
+            return cur.fetchall()
+        if where_dict:
+            where_sql=AppStorage.dynamic_sql_return('','WHERE','AND',where_dict)
+        else:
+            where_sql=''
+        full_sql=f"SELECT COUNT(*) FROM {database_name} {where_sql} {other_sql}"
+        print(full_sql)
+        result= self.oprate_sql(full_sql,{},callback)
+        if result[0][0]==0:
+            return False
+        else:
+            return result[0][0]
 
     #向数据库中插入数据
     #返回:布尔值
