@@ -55,7 +55,7 @@
                   <el-checkbox-group v-model="check_list" >
                       <li  v-for="item,index in excute_response_data" :key="index" >
                           <el-checkbox  :checked="true" :label="item.fun_name+item.ip+item.port+item.type"  >
-                            函数:{{item.fun_name}} IP:{{item.ip}} 设备类型:{{item.type}} 
+                            函数:{{item.fun_name}} IP:{{item.ip}} PORT:{{item.port}}  设备类型:{{item.type}} 
                           </el-checkbox>
                       </li>
                   </el-checkbox-group>
@@ -157,7 +157,8 @@ export default{
         },
         excute_time:'',
         pop_title:'执行结果',
-        excute_file_list:[],     
+        excute_file_list:[],  
+        
         
     }
   },
@@ -234,18 +235,30 @@ export default{
       console.log(this.excute_file_list)
       // JS中删除列表中的元素还会留下一个‘empty’需要使用filter过滤(filter默认过滤empty等值)
       if(this.excute_file_list.filter(e=>e).length===0){
-         
           this.$bus.$emit('all_excute_done')
+          this.excute_file_list=[]
       }
+
       //改变已经执行完成文件的页面UI
       this.$bus.$emit('change_excute_state',false,file_name)
-    
-      this.pop_able=true
-      this.response_title=file_name
+      
+      //弹窗
+      // 防止在弹窗和所在文件不一致的问题(其他数据照常处理)
+      // if(JSON.parse(localStorage[localStorage['last_key']])['title']===file_name){
+        this.pop_able=true
+        //设置当前操作的文件名称(主动点击会设置一次,运行完毕会被动设置一次)
+        this.response_title=file_name
+      // }
+
+      // 设置时间戳的模式，一个是查看历史命令时用数据库中的时间，另外一种是实时模式使用执行文件时的时间
       this.SET_IF_HISTORY_TIME(false)
-      this.SET_RESPONSE_DATE_TIME(get_time())
+      // 设置操作的文件名(vuex中使用)
       this.SET_TITLE(file_name)
-      this.HANDLER_RESPONSE_DATA(response_data)
+      // 对response_data数据进行处理
+      
+      this.HANDLER_RESPONSE_DATA({'response_data':response_data,'file_name':file_name,'vm':this})
+     
+    
     },
 
     //搜索按钮相关函数
@@ -350,7 +363,8 @@ export default{
   }, 
   watch:{
     check_list(new_value){
-      this.SET_EXCUTE_TEXT(new_value)
+        console.log(new_value)
+        this.SET_EXCUTE_TEXT(new_value)
     },
     input(new_value,old_value){
             if(old_value!=='' && new_value===''){
@@ -369,8 +383,8 @@ export default{
     },
     pop_able(new_value){
       if(new_value===false){
-        this.check_list=[]
         this.CLEAR_EXCUTE_TEXT()
+        // this.check_list=[]
         this.SET_EXCUTE_RESPONSE_DATA([])
       }
     },
@@ -528,6 +542,8 @@ export default{
           return 
         }else{
           this.excute_file_list.push(file_name)
+          // 设置执行时候的时间
+          this.SET_RESPONSE_DATE_TIME(get_time())
           send_post('/excute_netknife_file',{'file_name':file_name},response=>{
               if(response.data==='FILE_NOT_EXIST'){
                 this.$message({
@@ -599,7 +615,6 @@ export default{
                 this.$bus.$emit('change_excute_state',false,file_name)
                 return
               }
-              console.log(response.data)
               if(response.data==='JINJA2_REPEAT_IMPORT'){
                 this.$message({
                   showClose: true,
@@ -620,6 +635,8 @@ export default{
                 this.$bus.$emit('change_excute_state',false,file_name)
                 return
               }
+              console.log(typeof this.check_list)
+              console.log(this.check_list)
               this.handler_response_data(response.data,file_name)
               
           })

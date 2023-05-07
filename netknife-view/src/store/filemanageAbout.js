@@ -8,17 +8,21 @@ export const filemanageAbout={
         SET_TITLE(state,title){
             state.title=title
         },
-        HANDLER_RESPONSE_DATA(state,response_data){
+        HANDLER_RESPONSE_DATA(state,payload){
             state.excute_response_data=[]
-            for(let i=0;i<response_data.length;i++){
-                console.log(response_data[i])
-                state.excute_response_data.push(response_data[i])
+            state.excute_text=''
+        
+            for(let i=0;i<payload['response_data'].length;i++){
+                // payload.vm.check_list.push(`${item.fun_name}${item.ip}${item.port}${item.type}`)
+                state.excute_response_data.push(payload['response_data'][i])
             }
-            console.log(state.excute_response_data)
+       
+         
             send_post('/add_netknife_excute_result',{'file_name':state.title,'excute_result':state.excute_response_data,'date_time':state.response_date_time})
         },
         SET_EXCUTE_TEXT(state,check_list){
             state.excute_text=''
+            console.log(check_list)
             state.excute_response_data.forEach(element=>{
                 check_list.forEach(e=>{
                     if(`${element.fun_name}${element.ip}${element.port}${element.type}`===e ){

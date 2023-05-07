@@ -211,26 +211,26 @@ export default{
         }
     )
 
-    this.$bus.$on('change_excute_icon',(icon,file_name)=>{
-      console.log(file_name)
-      console.log(this.title)
-      if(this.real_time_title+''===file_name+''){
-        this.excute_icon=icon
-      }
+    // this.$bus.$on('change_excute_icon',(icon,file_name)=>{
+    //   console.log(file_name)
+    //   console.log(this.title)
+    //   if(this.real_time_title+''===file_name+''){
+    //     this.excute_icon=icon
+    //   }
    
-    })
-    this.$bus.$on('change_excute_style',(style,file_name)=>{
-      if(this.real_time_title+''===file_name+''){
-        this.excute_bt_style=style
-      }
+    // })
+    // this.$bus.$on('change_excute_style',(style,file_name)=>{
+    //   if(this.real_time_title+''===file_name+''){
+    //     this.excute_bt_style=style
+    //   }
 
-    })
-    //防止连续点击执行按钮,导致数据库中同一时间对应多个表项导致删除时一次性删除多条表项
-    this.$bus.$on('change_excute_able',(bool,file_name)=>{
-      if(this.real_time_title+''===file_name+''){
-        this.excute_able=bool
-      }
-    })
+    // })
+    // //防止连续点击执行按钮,导致数据库中同一时间对应多个表项导致删除时一次性删除多条表项
+    // this.$bus.$on('change_excute_able',(bool,file_name)=>{
+    //   if(this.real_time_title+''===file_name+''){
+    //     this.excute_able=bool
+    //   }
+    // })
     //这个应该是在本文件改的，暂时保留
     this.$bus.$on('change_save_style',(style)=>{
       this.save_bt_style=style
@@ -259,12 +259,13 @@ export default{
   },
   beforeDestroy(){
     console.log('Destory')
-    this.$bus.$off('change_excute_icon')
-    this.$bus.$off('change_excute_style')
+    // this.$bus.$off('change_excute_icon')
+    // this.$bus.$off('change_excute_style')
+    // this.$bus.$off('change_excute_able')
     // 这个应该是在文件改的
     this.$bus.$off('change_save_style')
-    //
-    this.$bus.$off('change_excute_able')
+    this.$bus.$off('change_excute_state')
+    this.$bus.$off('all_excute_done')
   }
 };
 </script>
