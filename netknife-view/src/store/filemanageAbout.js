@@ -16,9 +16,8 @@ export const filemanageAbout={
                 // payload.vm.check_list.push(`${item.fun_name}${item.ip}${item.port}${item.type}`)
                 state.excute_response_data.push(payload['response_data'][i])
             }
-       
-         
-            send_post('/add_netknife_excute_result',{'file_name':state.title,'excute_result':state.excute_response_data,'date_time':state.response_date_time})
+            console.log(state.response_date_time[payload.file_name])
+            send_post('/add_netknife_excute_result',{'file_name':state.title,'excute_result':state.excute_response_data,'date_time':state.response_date_time[payload.file_name]})
         },
         SET_EXCUTE_TEXT(state,check_list){
             state.excute_text=''
@@ -31,7 +30,7 @@ export const filemanageAbout={
                         if(state.if_history_time){
                             state.excute_text+=`时间:${element.date_time} 函数名:${element.fun_name}\n`
                         }else{
-                            state.excute_text+=`时间:${state.response_date_time} 函数名:${element.fun_name}\n`
+                            state.excute_text+=`时间:${state.response_date_time[state.title]} 函数名:${element.fun_name}\n`
                         }
                       
                         state.excute_text+=element.response+'\n\n'                   
@@ -42,8 +41,8 @@ export const filemanageAbout={
         CLEAR_EXCUTE_TEXT(state){
             state.excute_text=''
         },
-        SET_RESPONSE_DATE_TIME(state,time){
-            state.response_date_time=time
+        SET_RESPONSE_DATE_TIME(state,payload){
+            state.response_date_time[payload.file_name]=payload.date_time
         },
         SET_EXCUTE_RESPONSE_DATA(state,data){
             state.excute_response_data=data
@@ -189,7 +188,7 @@ export const filemanageAbout={
         title:'',
         excute_response_data:[],
         excute_text:'',
-        response_date_time:'',
+        response_date_time:{},
         excute_index:-1,
         history_code:'',
         history_code_count:0,

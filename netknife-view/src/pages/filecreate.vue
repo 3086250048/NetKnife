@@ -29,7 +29,7 @@
       <el-button :disabled="open_file_able" style="height: 5vh;width: 15%;font-size: 2vh;font-weight: 600;text-align: center" type="primary" class="open" @click="open_file" icon="el-icon-folder-opened" size="small">
       打开文件
     </el-button>
-    <el-button  style="height: 5vh;width: 15%;font-size: 2vh;font-weight: 600;text-align: center" type="primary" class="empty_add" @click="add_empty" icon="el-icon-view" size="small">
+    <el-button  :disabled="open_window_able" style="height: 5vh;width: 15%;font-size: 2vh;font-weight: 600;text-align: center" type="primary" class="empty_add" @click="add_empty" icon="el-icon-view" size="small">
       新窗口+
     </el-button>
     <el-button :disabled="excute_able" style="height: 5vh;width: 22%;font-size: 2vh;font-weight: 600;text-align: center" :type="excute_bt_style" class="excute" @click="excute_file" :icon="excute_icon" size="small">
@@ -87,6 +87,7 @@ export default{
       // 执行时禁用
       open_file_able:false,
       real_del_able:false,
+      open_window_able:false,
      
     };
   },
@@ -182,6 +183,7 @@ export default{
     this.$bus.$on('all_excute_done',()=>{
         this.open_file_able=false
         this.real_del_able=false
+        this.open_window_able=false
     })
 
     this.$bus.$on('change_excute_state',(bool,file_name)=>{
@@ -190,7 +192,7 @@ export default{
             // 全局禁用
             this.open_file_able=true
             this.real_del_able=true
-        
+            this.open_window_able=true
             if(this.real_time_title+''===file_name+''){
             //用户停留页面禁用
               this.excute_icon='el-icon-video-pause'

@@ -55,7 +55,7 @@
                   <el-checkbox-group v-model="check_list" >
                       <li  v-for="item,index in excute_response_data" :key="index" >
                           <el-checkbox  :checked="true" :label="item.fun_name+item.ip+item.port+item.type"  >
-                            函数:{{item.fun_name}} IP:{{item.ip}} PORT:{{item.port}}  设备类型:{{item.type}} 
+                            函数:{{item.fun_name}} IP:{{item.ip}} PORT:{{item.port}} 设备类型:{{item.type}} 
                           </el-checkbox>
                       </li>
                   </el-checkbox-group>
@@ -229,6 +229,7 @@ export default{
     // },
 
     handler_response_data(response_data,file_name){
+      this.check_list=[]
       //从执行文件队列中删除此file_name文件
       delete this.excute_file_list[this.excute_file_list.indexOf(file_name)]
       //判断队列中的文件是否都已经执行完毕
@@ -256,7 +257,7 @@ export default{
       this.SET_TITLE(file_name)
       // 对response_data数据进行处理
       
-      this.HANDLER_RESPONSE_DATA({'response_data':response_data,'file_name':file_name,'vm':this})
+      this.HANDLER_RESPONSE_DATA({'response_data':response_data,'file_name':file_name})
      
     
     },
@@ -529,7 +530,7 @@ export default{
          
       }
       this.$bus.$on('excute',(file_name)=>{
-       
+        console.log(file_name)
         this.$bus.$emit('change_excute_state',true,file_name)
         // 控制执行文件
         if(this.excute_file_list.indexOf(file_name)!==-1){
@@ -543,8 +544,9 @@ export default{
         }else{
           this.excute_file_list.push(file_name)
           // 设置执行时候的时间
-          this.SET_RESPONSE_DATE_TIME(get_time())
+          this.SET_RESPONSE_DATE_TIME({file_name:file_name,date_time:get_time()})
           send_post('/excute_netknife_file',{'file_name':file_name},response=>{
+            this.file_name=file_name
               if(response.data==='FILE_NOT_EXIST'){
                 this.$message({
                   showClose: true,
@@ -635,9 +637,16 @@ export default{
                 this.$bus.$emit('change_excute_state',false,file_name)
                 return
               }
-              console.log(typeof this.check_list)
-              console.log(this.check_list)
+              if(this.pop_able===true){
+                console.log(11111111111111111111111111111111111)
+                this.pop_able=false
+                setTimeout(() => {
+                  this.handler_response_data(response.data,file_name)
+                }, 1);
+              }else{
               this.handler_response_data(response.data,file_name)
+              }
+            
               
           })
         }
