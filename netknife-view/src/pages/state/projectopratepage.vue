@@ -629,8 +629,16 @@ export default {
 
 
 <style lang="scss" scoped>
+// tag
+::v-deep .el-button-group>.el-button:first-child:last-child{
+    border-radius: 0;
+}
+
 
 //历史命令搜索框
+::v-deep .el-button{
+  border-radius: 0;
+}
 .search ::v-deep .el-input__inner {
         height: 5vh;
         font-size: 2vh;
@@ -877,10 +885,10 @@ export default {
 
     li{
     list-style-type: none;
-    margin-top: 2px;
+    margin-top: 0.2vh;
     }
     li:first-child{
-        margin-top: 10px;
+        margin-top: 1vh;
     }
    
     @media (min-width:900px) { 

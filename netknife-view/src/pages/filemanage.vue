@@ -23,7 +23,7 @@
         direction="btt"
         size="90%"
         >
-        <el-row type="flex">
+        <el-row type="flex" >
             <el-col  :span="24"  >
               <el-button-group style="width: 100%;">
               <el-button style=" width: 20%;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-arrow-left" size="mini" @click="rollback_command" >上一条命令</el-button>
@@ -32,7 +32,7 @@
               <el-button style=" width: 20%;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-search" size="mini" @click="search_command_handler" ></el-button>
               <el-button style="width: 20%;height: 4.5vh;font-size: 2vh;" type="primary" icon="el-icon-setting" size="mini" @click="setting_dialog_able=true"></el-button>
               </el-button-group>
-            </el-col>
+              </el-col>
         </el-row>
         
         <el-row type="flex" >
@@ -64,7 +64,7 @@
             </el-row>
             <el-row type="flex">
           <el-col :span=24>
-              <div style="position: relative;top:-1vh; width: 100%;height: 1vh;background-color:#272822;" ></div>
+              <div style="position: relative;top:-1vh; width: 100%;height: 3vh;background-color:#272822;" ></div>
           </el-col>
         </el-row>
       </el-drawer>
@@ -693,6 +693,13 @@ delete_history_command(date_time,i){
 <style lang="scss" scoped>
 
 //历史命令搜索框
+li{
+    list-style-type: none;
+    margin-top: 0.2vh;
+    }
+li:first-child{
+    margin-top: 1vh;
+}
 .search ::v-deep .el-input__inner {
         height: 5vh;
         font-size: 2vh;
@@ -731,14 +738,45 @@ delete_history_command(date_time,i){
 
 
 // dialog框相关
+// 路径输入框
+.input_size{
+  margin-left: -4vh;
+  width: 70vh;
+
+}
+::v-deep .input_size .el-input__inner{
+  height: 6vh;
+  font-size: 2vh;
+}
+::v-deep .input_size .el-input-group__prepend {
+    background-color: #F5F7FA;
+    color: #909399;
+    vertical-align: middle;
+    display: table-cell;
+    position: relative;
+    border: 1px 1px 0 1px solid #DCDFE6;
+    border-radius:0.25vh 0 0 0.25vh;
+    padding: 0 2vh;
+    width: 2vh;
+    white-space: nowrap;
+    font-size: 2vh;
+}
+.bt{
+  width: 10vh;
+  height: 6vh;
+  font-size: 2vh;
+  padding: 1vh;
+
+}
+// 
 ::v-deep .el-form-item__label {
     text-align: center;
     vertical-align: middle;
     float: left;
     font-size: 2vh;
     color: #606266;
-    line-height: 4.3vh;
-    padding: 0 12px 0 0;
+    line-height:6vh;
+    padding: 0;
     box-sizing: border-box;
 }
  ::v-deep .el-dialog__title {
@@ -827,7 +865,11 @@ delete_history_command(date_time,i){
 // 执行结果弹出框
 ::v-deep .el-drawer__header{
   margin-bottom: 0;
-  padding-bottom: 0;
+  padding-bottom: 0.1vh;
+  padding-top: 0;
+  font-weight: 600;
+  text-align: center;
+  color: #272822;
 }
 
 
