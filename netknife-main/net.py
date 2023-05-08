@@ -2,6 +2,8 @@ from concurrent.futures import ThreadPoolExecutor
 from multiping import MultiPing
 from tcping import Ping
 from netmiko import ConnectHandler
+from paramiko import SSHClient
+import telnetlib
 
 from storage import AppStorage
 from processing import AppProcessing
@@ -15,6 +17,66 @@ storage=AppStorage()
 ap=AppProcessing()
 aa=AppAction()
 np=NetProcessing()
+
+
+class Base_Excute_Mode():
+    def __new__(cls,*args, **kwds):
+        if not hasattr(cls,'_instance'): 
+            cls._instance=super().__new__(cls,*args,**kwds)
+        return cls._instance      
+    def __init__(
+            self,
+            parameter:dict,
+            login_info:list,
+            commands:list,
+            excute_call_back:function,
+            max_workers:int=1,
+            ) -> None:
+        self._parameter_dict=parameter
+        self._login_dict_list=login_info
+        self._command_list=commands
+        self._max_workers=max_workers
+        if not excute_call_back:
+            if len(commands)<len(login_info):
+                copy_num=len(login_info)
+                self._excute_list=list(zip(login_info,commands*copy_num))
+            elif len(login_info) < len(commands):
+                copy_num=len(commands)
+                self._excute_list=list(zip(login_info*copy_num,commands))
+            else:
+                self._excute_list=list(zip(login_info,commands))
+        else:
+            excute_call_back(self._excute_list,login_info,commands)
+
+
+    def send_commands(device_info, command_data):
+        try:
+            with ConnectHandler(**device_info) as connect:
+                return SEND_COMMANDS_MAP[device_info['device_type'].split('_')[0]](connect,device_info,command_data)
+        except Exception as e:
+            return {'ip':device_info['ip'],
+                    'response':f'连接错误:{e}',
+                    'port':device_info['port'],
+                    'type':device_info['device_type']
+                    }
+    def process_device(device_info, command_data):
+        result = send_commands(device_info, command_data)
+        return result
+    def excute(self):
+        with ThreadPoolExecutor(max_workers=self._max_workers) as executor:
+            futures = [executor.submit(process_device, item[0], item[1]) for item in self._excute_list]
+            for future in futures:
+                result = future.result()
+                results.append(result)
+
+class Telnetlib_Excute_Mode():
+    pass
+class Paramiko_Excute_Mode():
+    pass
+class Netmiko_Excute_Mode():
+    pass
+
+
 
 class AppNet():
     def __new__(cls,*args, **kwds):
@@ -33,134 +95,28 @@ class AppNet():
             fault_tcp_ping+=ping.ping(1)
         return fault_tcp_ping
 
+    
+    def send_commands(connect,device_info,excute_type,command):
+        if excute_type=='send_command':
+        response=connect.send_command_timing(,**command_data['send_parameter'])
+        return {'ip':device_info['ip'] ,
+                'response':response ,
+                'port':device_info['port'],
+                'type':device_info['device_type']}
+
+
     def send_command(self,login_dict,command_data):
-
-        print('login_dict')
-        print(login_dict)
-        print('command_data')
-        print(command_data)
-        SEND_COMMANDS_MAP,DEVICE_TYPE_MAP={},{}
-
-        DEVICE_TYPE_MAP['huaweissh']='huawei'
-        DEVICE_TYPE_MAP['huaweitelnet']='huawei_telnet'
-        DEVICE_TYPE_MAP['ruijiessh']='ruijie_os'
-        DEVICE_TYPE_MAP['ruijietelnet']='ruijie_os_telnet'
-        DEVICE_TYPE_MAP['h3cssh']='hp_comware'
-        DEVICE_TYPE_MAP['h3ctelnet']='hp_comware_telnet'
+        
         
 
-        def h3c_send_commands(connect,device_info,command_data):
-            select_out,config_out,upload_out,download_out= '','','',''
-            if command_data['delete']:
-                _cmd=f"delete {command_data['delete']}"
-                select_out += connect.send_command_timing(_cmd,**command_data['send_parameter'])
-                select_out += connect.send_command_timing('Y',**command_data['send_parameter'])
-                select_out += connect.send_command_timing('reset recycle-bin ',**command_data['send_parameter'])
-                select_out += connect.send_command_timing('Y',**command_data['send_parameter'])
-            if command_data['upload']:
-                upload_cmd_list=[f"ftp {command_data['upload'][0]}",f"netknife_user",f"netknife_pwd",f"get  {command_data['path_parameter']['ftp_upload_path']}{command_data['upload'][1]} {command_data['upload'][2]}"]
-                upload_out+=connect.send_command_timing(upload_cmd_list[0],**command_data['send_parameter'])
-                upload_out+=connect.send_command_timing(upload_cmd_list[1],**command_data['send_parameter'])
-                upload_out+=connect.send_command_timing(upload_cmd_list[2],**command_data['send_parameter'])
-                upload_out+=connect.send_command_timing(upload_cmd_list[3],**command_data['send_parameter'])
-                upload_out+=connect.send_command_timing('quit',**command_data['send_parameter'])
-            if command_data['download']:
-                download_cmd_list=[f"ftp {command_data['download'][0]}",f"netknife_user",f"netknife_pwd",f"put {command_data['download'][2]} {command_data['path_parameter']['ftp_download_path']}{command_data['download'][1]}"]
-                download_out+=connect.send_command_timing(download_cmd_list[0],**command_data['send_parameter'])
-                download_out+=connect.send_command_timing(download_cmd_list[1],**command_data['send_parameter'])
-                download_out+=connect.send_command_timing(download_cmd_list[2],**command_data['send_parameter'])
-                download_out+=connect.send_command_timing(download_cmd_list[3],**command_data['send_parameter'])
-                download_out+=connect.send_command_timing('quit',**command_data['send_parameter'])
-            if command_data['select']:
-                select_out += connect.send_command_timing(command_data['select'],**command_data['send_parameter'])
-            if command_data['config']:
-                config_out += connect.send_config_set(command_data['config'],**command_data['send_parameter'])
-                connect.save_config()
-            return {'ip':device_info['ip'] ,
-                            'response': select_out +'\n'+config_out+'\n'+upload_out+'\n'+download_out,
-                            'port':device_info['port'],
-                            'type':device_info['device_type']}
-        def huawei_send_commands(connect,device_info,command_data):
-            select_out,config_out,upload_out,download_out= '','','',''
-            print('command============================================================================')
-            print(command_data)
-            {'delete': None, 'select': 'dir', 'config': None, 'upload': None, 'download': None, 'action': None,
-            'send_parameter': {'strip_prompt': True, 'strip_command': False, 'read_timeout': 17.0}, 
-            'path_parameter': {'txt_export_path': 'C:\\Users\\30862\\Desktop\\', 'ftp_root_path': 'C:\\Users\\30862\\Desktop\\',
-             'ftp_upload_path': 'C:\\Users\\30862\\Desktop\\', 'ftp_download_path': 'C:\\Users\\30862\\Desktop\\'}}
-            if command_data['delete']:
-                _cmd=f"delete {command_data['delete']}"
-                select_out += connect.send_command_timing(_cmd,**command_data['send_parameter'])
-                select_out += connect.send_command_timing('Y',**command_data['send_parameter'])
-                select_out += connect.send_command_timing('reset recycle-bin ',**command_data['send_parameter'])
-                select_out += connect.send_command_timing('Y',**command_data['send_parameter'])
-            if command_data['select']:
-                select_out += connect.send_command(command_data['select'],**command_data['send_parameter'])
-            if command_data['config']:
-                config_out += connect.send_config_set(command_data['config'],**command_data['send_parameter'])
-                connect.save_config()
-            if command_data['upload']:
-                print(command_data['upload'][1])
-                upload_cmd_list=[f"ftp {command_data['upload'][0]}",f"netknife_user",f"netknife_pwd",f"get  {command_data['path_parameter']['ftp_upload_path']}{command_data['upload'][1]} {command_data['upload'][2]}"]
-                upload_out+=connect.send_command_timing(upload_cmd_list[0],**command_data['send_parameter'])
-                upload_out+=connect.send_command_timing(upload_cmd_list[1],**command_data['send_parameter'])
-                upload_out+=connect.send_command_timing(upload_cmd_list[2],**command_data['send_parameter'])
-                upload_out+=connect.send_command_timing(upload_cmd_list[3],**command_data['send_parameter'])
-                upload_out+=connect.send_command_timing('quit',**command_data['send_parameter'])
-            if command_data['download']:
-                download_cmd_list=[f"ftp {command_data['download'][0]}",f"netknife_user",f"netknife_pwd",f"put {command_data['download'][2]} {command_data['path_parameter']['ftp_download_path']}{command_data['download'][1]}"]
-                download_out+=connect.send_command_timing(download_cmd_list[0],**command_data['send_parameter'])
-                download_out+=connect.send_command_timing(download_cmd_list[1],**command_data['send_parameter'])
-                download_out+=connect.send_command_timing(download_cmd_list[2],**command_data['send_parameter'])   
-                download_out+=connect.send_command_timing(download_cmd_list[3],**command_data['send_parameter'])
-                download_out+=connect.send_command_timing('quit',**command_data['send_parameter'])
-            return {'ip':device_info['ip'] ,
-                            'response': select_out +'\n'+config_out+'\n'+upload_out+'\n'+download_out,
-                            'port':device_info['port'],
-                            'type':device_info['device_type']}
-        def ruijie_send_commands(connect,device_info,command_data):
-            select_out,config_out,upload_out,download_out= '','','',''
-            if command_data['select']:
-                select_out += connect.send_command_timing(command_data['select'],**command_data['send_parameter'])
-            if command_data['config']:
-                config_out += connect.send_config_set(command_data['config'],**command_data['send_parameter'])
-                connect.save_config()
-            if command_data['upload']:
-                upload_cmd=f"copy ftp://netknife_user:netknife_pwd@{command_data['upload'][0]}/{command_data['upload'][1]} {command_data['upload'][2]}"
-                upload_out+=connect.send_command_timing(upload_cmd,**command_data['send_parameter'])
-            if command_data['download']:
-                
-                download_cmd=f"copy {command_data['download'][2]} ftp://netknife_user:netknife_pwd@{command_data['download'][0]}/{command_data['download'][1]}"
-                download_out+=connect.send_command_timing(download_cmd,**command_data['send_parameter'])
-            
-            return {
-                    'ip':device_info['ip'] ,
-                    'response': select_out +'\n'+config_out+'\n'+upload_out+'\n'+download_out,
-                    'port':device_info['port'],
-                    'type':device_info['device_type']
-                    }
-
-        SEND_COMMANDS_MAP['hp']=h3c_send_commands
-        SEND_COMMANDS_MAP['huawei']=huawei_send_commands
-        SEND_COMMANDS_MAP['ruijie']=ruijie_send_commands
-
-     
-        DEVICE_LIST=np.get_device_list(login_dict,DEVICE_TYPE_MAP)
+       
        
 
-        def send_commands(device_info, command_data):
-            try:
-                with ConnectHandler(**device_info) as connect:
-                    return SEND_COMMANDS_MAP[device_info['device_type'].split('_')[0]](connect,device_info,command_data)
-            except Exception as e:
-                return {'ip':device_info['ip'],
-                        'response':f'连接错误:{e}',
-                        'port':device_info['port'],
-                        'type':device_info['device_type']
-                        }
-        def process_device(device_info, command_data):
-            result = send_commands(device_info, command_data)
-            return result
+     
+        DEVICE_LIST=np.get_device_list(login_dict,device_type)
+       
+
+  
         
         results = []
         with ThreadPoolExecutor(max_workers=len(DEVICE_LIST)) as executor:

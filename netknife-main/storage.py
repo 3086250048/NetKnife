@@ -32,7 +32,6 @@ class AppStorage():
         if not os.path.exists(self.__path):
             try:
                 con=sqlite3.connect(self.__path)
-                
                 cur=con.cursor()
                 cur.execute(
                     '''CREATE TABLE  LOGININFO(
