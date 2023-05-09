@@ -13,10 +13,13 @@ from pprint import pprint
 from jinja2 import Template
 from itertools import chain
 
+
 storage=AppStorage()
 ap=AppProcessing()
 aa=AppAction()
 np=NetProcessing()
+
+
 
 
 class Base_Excute_Mode():
@@ -56,16 +59,16 @@ class Base_Excute_Mode():
             for future in as_completed(futures):
                 yield future.result()
                 
-    def send_commands(login_info, commands):
-        try:
-            with ConnectHandler(**device_info) as connect:
-                return SEND_COMMANDS_MAP[device_info['device_type'].split('_')[0]](connect,device_info,command_data)
-        except Exception as e:
-            return {'ip':device_info['ip'],
-                    'response':f'连接错误:{e}',
-                    'port':device_info['port'],
-                    'type':device_info['device_type']
-                    }
+    # def send_commands(login_info, commands):
+    #     try:
+    #         with ConnectHandler(**device_info) as connect:
+    #             return SEND_COMMANDS_MAP[device_info['device_type'].split('_')[0]](connect,device_info,command_data)
+    #     except Exception as e:
+    #         return {'ip':device_info['ip'],
+    #                 'response':f'连接错误:{e}',
+    #                 'port':device_info['port'],
+    #                 'type':device_info['device_type']
+    #                 }
  
 
 class Telnetlib_Excute_Mode():
@@ -95,16 +98,16 @@ class AppNet():
         return fault_tcp_ping
 
     
-    def send_commands(connect,device_info,excute_type,command):
-        if excute_type=='send_command':
-        response=connect.send_command_timing(,**command_data['send_parameter'])
-        return {'ip':device_info['ip'] ,
-                'response':response ,
-                'port':device_info['port'],
-                'type':device_info['device_type']}
+    # def send_commands(connect,device_info,excute_type,command):
+    #     if excute_type=='send_command':
+    #     response=connect.send_command_timing(,**command_data['send_parameter'])
+    #     return {'ip':device_info['ip'] ,
+    #             'response':response ,
+    #             'port':device_info['port'],
+    #             'type':device_info['device_type']}
 
 
-    def send_command(self,login_dict,command_data):
+    # def send_command(self,login_dict,command_data):
         
         
 

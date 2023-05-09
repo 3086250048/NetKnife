@@ -5,7 +5,8 @@ __version__ = '1.0.0'
 
 from flask import Flask,request,render_template
 from flask_cors import CORS
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO,send,emit
+import urllib.parse
 import json
 from data import AppInfo
 from storage import AppStorage
@@ -16,9 +17,10 @@ from processing import NetProcessing
 from server import APPserver
 from action import ButtonAction
 import tools
-from .test import Test
+from test import Atest
 
-
+a=Atest()
+print(a)
 data=AppInfo()
 storage=AppStorage()
 net=AppNet()
@@ -31,13 +33,19 @@ np=NetProcessing()
 netknife=Flask(__name__)
 CORS(netknife, resources={r"/*": {"origins": "*"}})
 socketio=SocketIO(netknife,cors_allowed_origins="*")
+socketio.init_app(netknife)
 
-@netknife.route('/hello')
-def hello():
-    a=Test()
-    for i in a.my():
-        socketio.emit('response',{'data':i})
-    return 'Done'
+
+
+@socketio.on('join')
+def handle_join(data):
+    print(f"Client joined room: {data['roomId']}")
+    # join_room(data['roomId'])
+
+@socketio.on('message')
+def handle_message(message):
+    print(f"Received message: {message['text']} from {message['sender']}")
+    emit('message', message, broadcast=True)
 
 @netknife.route('/')
 def index():
@@ -607,7 +615,7 @@ def export_excute_result_textarea():
         return 'EXPORT_FAULT'
 
 if __name__ == '__main__':
-    netknife.run('0.0.0.0',port=3000,debug=True)    
-   
+    # netknife.run('0.0.0.0',port=3000,debug=True)    
+   socketio.run(netknife,host='0.0.0.0',port='3000',debug=True)
    
     

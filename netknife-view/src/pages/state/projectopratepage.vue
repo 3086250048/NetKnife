@@ -1,5 +1,17 @@
 <template>
     <div style="height: 92vh;width: 98%;margin-left: 1vh;margin-top: 1vh;overflow: hidden;">
+    <!-- -->
+    <div>
+    <h2>Real-time Chat</h2>
+    <div v-for="message in messages" :key="message.id">
+      {{ message.sender }}: {{ message.text }}
+    </div>
+    <form @submit.prevent="sendMessage">
+        <input v-model="messageText" type="text" placeholder="Type your message here" />
+        <button type="submit">Send</button>
+        </form>
+    </div>
+<!--  -->
     <el-row type="flex">
         <el-col :span="3">
             <el-button-group style=";width: 100%" >
@@ -195,15 +207,20 @@
 </template>
 
 <script>
+//////
+import VueSocketIO from 'vue-socket.io'
+import io from 'socket.io-client'
+//////
 import { send_get, send_post } from '@/store/tools'
 import { mapMutations } from 'vuex'
-
-
-
 export default {
     name:'ProjectOprate',
     data(){
         return {
+            ////////////
+            messageText: '',
+            messages: [],
+            /////////////
             command:'',
             check_list:[],
             response_percent:0,
@@ -228,11 +245,24 @@ export default {
             check_cls_obj:{
                 zoom:document.documentElement.clientHeight/600,
             },
-            response_list:[]
             
         }
     },
     methods:{
+        ///
+        sendMessage() {
+      this.$socket.emit('message', {
+        text: this.messageText,
+        sender: 'Me'
+      })
+      this.messageText = ''
+    },
+        ///
+        test(){
+            send_get('/hello',response=>{
+                console.log(response.data)
+            })
+        },
         format(){
             return ``
         },
@@ -448,8 +478,7 @@ export default {
                 'id':id,
                 'index':i
             })
-        }
-
+        },
     },
     computed:{
         able(){
@@ -577,12 +606,31 @@ export default {
             }
         },
     },
-    mounted(){
-        let socket= io()
-        socket.on("response",function(msg){
-            list.push(msg.data)
-            console.log(list)
-        })
+    sockets: {
+    connect() {
+      console.log('Connected to socket server')
+    },
+    disconnect() {
+      console.log('Disconnected from socket server')
+    },
+    error(err) {
+      console.error(err)
+    },
+    reconnect() {
+      console.log('Reconnected to socket server')
+    },
+    message(message) {
+      this.messages.push(message)
+    }
+  },
+    mounted(){   
+        ////
+        // this.$socket.emit('join', { roomId: 123 })
+    this.$socket.on('message', message => {
+      this.messages.push(message)
+    })
+
+        ////
         this.SET_VM(this)
         this.set_effect()
         // 加载初始化参数
