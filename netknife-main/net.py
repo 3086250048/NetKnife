@@ -1,4 +1,4 @@
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor,as_completed
 from multiping import MultiPing
 from tcping import Ping
 from netmiko import ConnectHandler
@@ -22,21 +22,24 @@ np=NetProcessing()
 class Base_Excute_Mode():
     def __new__(cls,*args, **kwds):
         if not hasattr(cls,'_instance'): 
-            cls._instance=super().__new__(cls,*args,**kwds)
+            cls._instance=super().__new__(cls)
         return cls._instance      
     def __init__(
             self,
             parameter:dict,
             login_info:list,
             commands:list,
-            excute_call_back:function,
+            excute_handler:object,
+            excute_list_handler:object=None,
             max_workers:int=1,
             ) -> None:
         self._parameter_dict=parameter
         self._login_dict_list=login_info
         self._command_list=commands
         self._max_workers=max_workers
-        if not excute_call_back:
+        self._excute_list=[]
+        self._excute_handler=excute_handler
+        if not excute_list_handler:
             if len(commands)<len(login_info):
                 copy_num=len(login_info)
                 self._excute_list=list(zip(login_info,commands*copy_num))
@@ -46,10 +49,14 @@ class Base_Excute_Mode():
             else:
                 self._excute_list=list(zip(login_info,commands))
         else:
-            excute_call_back(self._excute_list,login_info,commands)
-
-
-    def send_commands(device_info, command_data):
+            excute_list_handler(self._excute_list,login_info,commands)
+    def excute(self):
+        with ThreadPoolExecutor(max_workers=self._max_workers) as executor:
+            futures = [executor.submit(self._excute_handler, item[0], item[1]) for item in self._excute_list]
+            for future in as_completed(futures):
+                yield future.result()
+                
+    def send_commands(login_info, commands):
         try:
             with ConnectHandler(**device_info) as connect:
                 return SEND_COMMANDS_MAP[device_info['device_type'].split('_')[0]](connect,device_info,command_data)
@@ -59,15 +66,7 @@ class Base_Excute_Mode():
                     'port':device_info['port'],
                     'type':device_info['device_type']
                     }
-    def process_device(device_info, command_data):
-        result = send_commands(device_info, command_data)
-        return result
-    def excute(self):
-        with ThreadPoolExecutor(max_workers=self._max_workers) as executor:
-            futures = [executor.submit(process_device, item[0], item[1]) for item in self._excute_list]
-            for future in futures:
-                result = future.result()
-                results.append(result)
+ 
 
 class Telnetlib_Excute_Mode():
     pass

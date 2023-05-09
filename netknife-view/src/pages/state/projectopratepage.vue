@@ -198,6 +198,8 @@
 import { send_get, send_post } from '@/store/tools'
 import { mapMutations } from 'vuex'
 
+
+
 export default {
     name:'ProjectOprate',
     data(){
@@ -225,7 +227,8 @@ export default {
             progress_size:document.documentElement.clientHeight/150,
             check_cls_obj:{
                 zoom:document.documentElement.clientHeight/600,
-            }
+            },
+            response_list:[]
             
         }
     },
@@ -299,6 +302,10 @@ export default {
         },
         //提交命令
         commit_command(){
+            send_get('hello',response=>{
+
+                console.log(response.data)
+            })
             if(this.command.length<=0){
                 this.$message({
                     showClose: true,
@@ -571,6 +578,11 @@ export default {
         },
     },
     mounted(){
+        let socket= io()
+        socket.on("response",function(msg){
+            list.push(msg.data)
+            console.log(list)
+        })
         this.SET_VM(this)
         this.set_effect()
         // 加载初始化参数

@@ -5,6 +5,7 @@ __version__ = '1.0.0'
 
 from flask import Flask,request,render_template
 from flask_cors import CORS
+from flask_socketio import SocketIO
 import json
 from data import AppInfo
 from storage import AppStorage
@@ -15,6 +16,8 @@ from processing import NetProcessing
 from server import APPserver
 from action import ButtonAction
 import tools
+from .test import Test
+
 
 data=AppInfo()
 storage=AppStorage()
@@ -27,7 +30,14 @@ np=NetProcessing()
 
 netknife=Flask(__name__)
 CORS(netknife, resources={r"/*": {"origins": "*"}})
+socketio=SocketIO(netknife,cors_allowed_origins="*")
 
+@netknife.route('/hello')
+def hello():
+    a=Test()
+    for i in a.my():
+        socketio.emit('response',{'data':i})
+    return 'Done'
 
 @netknife.route('/')
 def index():
