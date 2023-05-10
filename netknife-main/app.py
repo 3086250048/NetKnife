@@ -6,7 +6,6 @@ __version__ = '1.0.0'
 from flask import Flask,request,render_template
 from flask_cors import CORS
 from flask_socketio import SocketIO,send,emit
-import urllib.parse
 import json
 from data import AppInfo
 from storage import AppStorage
@@ -37,15 +36,17 @@ socketio.init_app(netknife)
 
 
 
-@socketio.on('join')
-def handle_join(data):
-    print(f"Client joined room: {data['roomId']}")
-    # join_room(data['roomId'])
 
-@socketio.on('message')
-def handle_message(message):
-    print(f"Received message: {message['text']} from {message['sender']}")
-    emit('message', message, broadcast=True)
+@socketio.on('my event')
+def handle_my_custom_event(json):
+    print(str(json))
+    for i in a.my():
+        emit('my response',i)
+        
+
+
+
+
 
 @netknife.route('/')
 def index():
