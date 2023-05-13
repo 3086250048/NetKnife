@@ -18,13 +18,6 @@ import 'codemirror/theme/monokai.css'
 import 'codemirror/theme/material.css'
 import 'codemirror/mode/javascript/javascript.js'
 import 'codemirror/addon/display/placeholder.js'
-import VueSocketIO from 'vue-socket.io'
-Vue.use(VueCodemirror)
-Vue.use(new VueSocketIO({
-  debug: true,   
-  connection: 'http://127.0.0.1:3000/',
-  autoConnect:false 
-}))
 
 
 

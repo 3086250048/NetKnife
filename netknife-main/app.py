@@ -18,6 +18,7 @@ from action import ButtonAction
 import tools
 from test import Atest
 
+
 a=Atest()
 print(a)
 data=AppInfo()
@@ -34,19 +35,12 @@ CORS(netknife, resources={r"/*": {"origins": "*"}})
 socketio=SocketIO(netknife,cors_allowed_origins="*")
 socketio.init_app(netknife)
 
-
-
-
-@socketio.on('my event')
-def handle_my_custom_event(json):
+@socketio.on('init')  
+def handle_init(json):  
     print(str(json))
-    for i in a.my():
-        emit('my response',i)
-        
-
-
-
-
+    emit('my_response',{'data':json})
+    for i in list(a.my()):
+         emit('my_response',{'data':i})
 
 @netknife.route('/')
 def index():
