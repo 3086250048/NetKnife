@@ -16,7 +16,9 @@ from processing import NetProcessing
 from server import APPserver
 from action import ButtonAction
 import tools
-from test import Atest
+from test import Atest,r
+import threading
+import time
 
 
 a=Atest()
@@ -35,12 +37,32 @@ CORS(netknife, resources={r"/*": {"origins": "*"}})
 socketio=SocketIO(netknife,cors_allowed_origins="*")
 socketio.init_app(netknife)
 
+raw=None
+
+def consume():
+    global raw
+    """消费者函数"""
+    while True:
+        msg = r.get('i')
+        if msg!=raw:
+            print(msg)
+            emit('my_response',{'data':msg})
+            raw=msg
+    
+
 @socketio.on('init')  
 def handle_init(json):  
     print(str(json))
     emit('my_response',{'data':json})
-    for i in list(a.my()):
-         emit('my_response',{'data':i})
+    consumer_thread = threading.Thread(target=consume)
+    consumer_thread.daemon = True
+    consumer_thread.start()
+    a.my()
+    
+    
+
+
+
 
 @netknife.route('/')
 def index():
