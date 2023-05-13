@@ -46,7 +46,7 @@ def consume():
         msg = r.get('i')
         if msg!=raw:
             print(msg)
-            emit('my_response',{'data':msg})
+            socketio.emit('my_response', {'data': msg})
             raw=msg
     
 
